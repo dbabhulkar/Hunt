@@ -1,49 +1,527 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+<!DOCTYPE html>
+
+<html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Hunt</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Hunt.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - API_Adda</title>
+
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/style.css" rel="stylesheet" />
+    <link href="~/fonts/boxicons/css/boxicons.css" rel="stylesheet" />
+    <link href="~/css/aos.css" rel="stylesheet" />
+    <link href="~/css/datepicker3.css" rel="stylesheet" />
+    <link href="~/css/datatables.css" rel="stylesheet" />
+    <link href="~/css/Toaster.css" rel="stylesheet" />
+    @*<link href="~/css/smoothness.css" rel="stylesheet" />*@
+    <link href="~/css/jquery-ui.css" rel="stylesheet" />
+
+    @*<link href="~/css/1jquery-ui.css" rel="stylesheet" />*@ @*--------new----------*@
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Hunt</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
+    <div class="top-header fixed-top">
         <div class="container">
-            &copy; 2024 - Hunt - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="logo">
+                <img src="~/images/HDFC_logo.png" />
+            </div>
+
+            <div class="user-logout">
+                @*@using (Html.BeginForm("LogoutUser", "Login", FormMethod.Post,
+                new { enctype = "multipart/form-data" }))
+                {*@
+                <a href="/Login/LogoutUser" class="btn-border">
+                    <i class="bx bx-power-off"></i>
+                </a>
+                @*   }*@
+
+            </div>
+            <div class="user-logout">
+                <label class="NameLabel">@Accessor.HttpContext.Session.GetString("UserName") - <span style="font-size:13px">@Accessor.HttpContext.Session.GetString("Role")</span></label>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    </div>
+    <header id="header" class="fixed-top  header-transparent " style="top: 30px;" data-aos="fade-down">
+        <div class="container d-flex align-items-center justify-content-between">
+
+            <nav id="navbar" class="navbar">
+                <ul id="nav">
+                    <li style="padding-left:0;"><a class="nav-link scrollto" href="/home/index/" style="border-bottom:0 !important;"><i class="bx bx-desktop"></i></a></li>
+
+                    <li><a class="nav-link scrollto" href="/home/search/">Search API</a></li>
+                    @*
+                    <li><a class="nav-link scrollto" href="#">Log Project</a></li>*@
+                    <li><a class="nav-link scrollto" href="/home/TestAPI/">Test API</a></li>
+                    @*
+                    <li><a class="nav-link scrollto" href="#">Diagnose UAT Integration</a></li>
+                    <li><a class="nav-link scrollto" href="#">Diagnose Production Issues</a></li>*@
+                    <li><a class="nav-link scrollto" href="/home/faq/">FAQ</a></li>
+
+                </ul>
+
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+
+        </div>
+    </header>
+
+    @RenderBody()
+
+
+
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/aos.js"></script>
+    <script src="~/js/bootstrap.bundle.js"></script>
+    <script src="~/js/main.js"></script>
+    <script src="~/js/carbon-components.min.js"></script>
+    <script src="~/js/prism.js"></script>
+    <script src="~/js/bootstrap-datepicker.js"></script>
+    <script src="~/js/dataTable.min.js"></script>
+    <script src="~/js/Toaster.js"></script>
+    <script src="~/js/jquery-ui.js"></script>
+    @*<script src="~/js/1jquery-ui.min.js"></script>*@
+    <script>
+        $(document).ready(function () {
+
+            toastr.options = {
+                "closeButton": true,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "3000",
+                "hideDuration": "1000",
+                "timeOut": "0",
+                "extendedTimeOut": "0",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+
+        });
+        AOS.init();
+
+        /////// Datepicker ////////
+        $(".date").datepicker({
+            startDate: new Date(),
+            format: 'dd/mm/yyyy',
+            todayHighlight: true,
+            autoclose: true,
+        });
+
+
+        /////// File Uploader ///////
+        (function ($) {
+            /**
+             * Create drag and drop element.
+             */
+            var customDragandDrop = function (element) {
+                $(element).addClass("kwt-file__input");
+                var element = $(element).wrap(
+                    `<div class="kwt-file"><div class="kwt-file__drop-area"><span class='kwt-file__choose-file ${element.attributes.data_btn_text
+                        ? "" === element.attributes.data_btn_text.textContent
+                            ? ""
+                            : "kwt-file_btn-text"
+                        : ""
+                    }'>${element.attributes.data_btn_text
+                        ? "" === element.attributes.data_btn_text.textContent
+                            ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M67.508 468.467c-58.005-58.013-58.016-151.92 0-209.943l225.011-225.04c44.643-44.645 117.279-44.645 161.92 0 44.743 44.749 44.753 117.186 0 161.944l-189.465 189.49c-31.41 31.413-82.518 31.412-113.926.001-31.479-31.482-31.49-82.453 0-113.944L311.51 110.491c4.687-4.687 12.286-4.687 16.972 0l16.967 16.971c4.685 4.686 4.685 12.283 0 16.969L184.983 304.917c-12.724 12.724-12.73 33.328 0 46.058 12.696 12.697 33.356 12.699 46.054-.001l189.465-189.489c25.987-25.989 25.994-68.06.001-94.056-25.931-25.934-68.119-25.932-94.049 0l-225.01 225.039c-39.249 39.252-39.258 102.795-.001 142.057 39.285 39.29 102.885 39.287 142.162-.028A739446.174 739446.174 0 0 1 439.497 238.49c4.686-4.687 12.282-4.684 16.969.004l16.967 16.971c4.685 4.686 4.689 12.279.004 16.965a755654.128 755654.128 0 0 0-195.881 195.996c-58.034 58.092-152.004 58.093-210.048.041z" /></svg>`
+                            : `${element.attributes.data_btn_text.textContent}`
+                        : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M67.508 468.467c-58.005-58.013-58.016-151.92 0-209.943l225.011-225.04c44.643-44.645 117.279-44.645 161.92 0 44.743 44.749 44.753 117.186 0 161.944l-189.465 189.49c-31.41 31.413-82.518 31.412-113.926.001-31.479-31.482-31.49-82.453 0-113.944L311.51 110.491c4.687-4.687 12.286-4.687 16.972 0l16.967 16.971c4.685 4.686 4.685 12.283 0 16.969L184.983 304.917c-12.724 12.724-12.73 33.328 0 46.058 12.696 12.697 33.356 12.699 46.054-.001l189.465-189.489c25.987-25.989 25.994-68.06.001-94.056-25.931-25.934-68.119-25.932-94.049 0l-225.01 225.039c-39.249 39.252-39.258 102.795-.001 142.057 39.285 39.29 102.885 39.287 142.162-.028A739446.174 739446.174 0 0 1 439.497 238.49c4.686-4.687 12.282-4.684 16.969.004l16.967 16.971c4.685 4.686 4.689 12.279.004 16.965a755654.128 755654.128 0 0 0-195.881 195.996c-58.034 58.092-152.004 58.093-210.048.041z" /></svg>`
+                    }</span>${element.outerHTML}</span><span class="kwt-file__msg">${"" === element.placeholder ? "or drop files here" : `${element.placeholder}`
+                    }</span><div class="kwt-file__delete"></div></div></div>`
+                );
+                var element = element.parents(".kwt-file");
+
+                // Add class on focus and drage enter event.
+                element.on("dragenter focus click", ".kwt-file__input", function (e) {
+                    $(this).parents(".kwt-file__drop-area").addClass("is-active");
+                });
+
+                // Remove class on blur and drage leave event.
+                element.on("dragleave blur drop", ".kwt-file__input", function (e) {
+                    $(this).parents(".kwt-file__drop-area").removeClass("is-active");
+                });
+
+                // Show filename when change file.
+                element.on("change", ".kwt-file__input", function (e) {
+                    let filesCount = $(this)[0].files.length;
+                    let textContainer = $(this).next(".kwt-file__msg");
+                    if (1 === filesCount) {
+                        let fileName = $(this).val().split("\\").pop();
+                        textContainer
+                            .text(fileName)
+                            .next(".kwt-file__delete")
+                            .css("display", "block");
+                    } else if (filesCount > 1) {
+                        textContainer
+                            .text(filesCount + " files selected")
+                            .next(".kwt-file__delete")
+                            .css("display", "inline-block");
+                    } else {
+                        textContainer.text(
+                            `${"" === this[0].placeholder
+                                ? "or drop files here"
+                                : `${this[0].placeholder}`
+                            }`
+                        );
+                        $(this)
+                            .parents(".kwt-file")
+                            .find(".kwt-file__delete")
+                            .css("display", "none");
+                    }
+                });
+
+                // Delete selected file.
+                element.on("click", ".kwt-file__delete", function (e) {
+                    let deleteElement = $(this);
+                    deleteElement.parents(".kwt-file").find(`.kwt-file__input`).val(null);
+                    deleteElement
+                        .css("display", "none")
+                        .prev(`.kwt-file__msg`)
+                        .text(
+                            `${"" ===
+                                $(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder
+                                ? "or drop files here"
+                                : `${$(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder
+                                }`
+                            }`
+                        );
+                });
+            };
+
+            $.fn.kwtFileUpload = function (e) {
+                var _this = $(this);
+                $.each(_this, function (index, element) {
+                    customDragandDrop(element);
+                });
+                return this;
+            };
+        })(jQuery);
+
+        // Plugin initialize
+        jQuery(document).ready(function ($) {
+            //  debugger;
+            $(".demo1").kwtFileUpload();
+        });
+
+
+
+        ////////// New Intergration ///////////
+
+        $("#new").click(function () {
+            $("#integration").show();
+
+        });
+
+        //////////// Datatable //////////
+
+        $("#new_api").DataTable();
+
+        $("#project_detail").DataTable();
+        $("#api_details").DataTable();
+        $("#field_detail").DataTable();
+        $("#new_api_detail").DataTable();
+        //$("#new_api").DataTable();
+
+
+        /////// Dynamic Table ///////
+
+        function create_tr(table_id) {
+            debugger;
+            let table_body = document.getElementById(table_id),
+                first_tr = table_body.firstElementChild
+            tr_clone = first_tr.cloneNode(true);
+
+            table_body.append(tr_clone);
+
+            clean_first_tr(table_body.firstElementChild);
+        }
+
+        function clean_first_tr(firstTr) {
+            let children = firstTr.children;
+
+            children = Array.isArray(children) ? children : Object.values(children);
+            children.forEach(x => {
+                if (x !== firstTr.lastElementChild) {
+                    x.firstElementChild.value = '';
+                }
+            });
+        }
+
+
+
+        function remove_tr(This) {
+
+            This.closest('tr').remove();
+        @*if (This.closest('tbody').childElementCount == 1) {
+                //'@TempData["Editbydb"]'= "NewIntegration";
+                alert("You Don't have Permission to Delete This ?");
+                @{
+                TempData["Editbydb"] = "NewIntegration";
+                window.location.href = "/Home/NewIntegration";
+                //}
+                } else {
+                This.closest('tr').remove();
+                }*@
+                                                }
+
+        //////// Active nav link /////////
+
+        $(function () {
+
+            var current = location.pathname;
+            $('#nav li a').each(function () {
+
+                var $this = $(this);
+                // if the current path is like this link, make it active
+                if ($this.attr('href').indexOf(current) !== -1) {
+
+                    $this.addClass('active');
+                }
+            })
+        })
+        /////////////// Responsive tabs ///////////////////////
+
+        $('.nav-tabs-dropdown').on("click", "li:not('.active') a", function (event) {
+            // debugger;
+            $(this).closest('ul').removeClass("open");
+        })
+            .on("click", "li.active a", function (event) {
+                // debugger;
+                $(this).closest('ul').toggleClass("open");
+            });
+
+        //////////////////////////////////
+
+        function fnRedirct() {
+
+            Response.redirect("/home/TestAPI/");
+
+        };
+
+
+
+        //$(function () {
+        //    $("#ServiceUrl").autocomplete({
+        //        source: function (request, response) {
+        //            $.ajax({
+        //                url: '/Home/Index/',
+        //                data: { "prefix": request.term },
+        //                type: "POST",
+        //                success: function (data) {
+        //                    response($.map(data, function (item) {
+        //                        return item;
+        //                    }))
+        //                },
+        //                error: function (response) {
+        //                    alert(response.responseText);
+        //                },
+        //                failure: function (response) {
+        //                    alert(response.responseText);
+        //                }
+        //            });
+        //        },
+        //        select: function (e, i) {
+        //            $("#hfCustomer").val(i.item.val);
+        //        },
+        //        minLength: 1
+        //    });
+        //});
+        //serviceDetails1_ServiceName
+
+        ///---------------------------------------------------Autocomplete Box --------------------------------------------------------
+        //    $(function () {
+        //       // debugger;
+        //        $("#serviceDetails1_ServiceName").autocomplete(
+        //            {
+
+        //            source: function (request, response) {
+        //                $.ajax({
+        //                    url: '/Home/AutoFilterExistingServiceName/',
+        //                    data: { "prefix": request.term },
+        //                    type: "POST",
+        //                    success: function (data) {
+        //                       // debugger;
+        //                        if ($("#serviceDetails1_Existing_New_Id").val() == "1") {
+        //                            response($.map(data, function (item) {
+        //                                return { label: item.exServiceName, val: item.exServiceId};
+        //                            }))
+        //                        }
+        //                    },
+        //                    error: function (response) {
+        //                        alert(response.responseText);
+        //                    },
+        //                    failure: function (response) {
+        //                        alert(response.responseText);
+        //                    }
+        //                });
+        //            },
+        //           select: function (e, i) {
+        //                   // debugger;
+
+        //             $("#ServiceNameId").val(i.item.val);
+        //               var recordId = $("#ServiceNameId").val();
+        //             $.getJSON("/Home/GetExistingServiceRecordById",
+        //             {
+        //                id: recordId
+        //             },
+        //            function (data) {
+        //               // debugger;
+        //                $('#serviceDetails1_ConsumerApplication').val(data.consumerApplication);
+        //                $('#serviceDetails1_APIType_Id').val(data.apiTypeId);
+        //                $('#serviceDetails1_DomainName_Id').val(data.domainId);
+        //                $('#serviceDetails1_Rest_SOAP_Id').val(data.restSoapId);
+        //                $('#serviceDetails1_APICategory_Id').val(data.apiCatId);
+        //                // $('RecordType').val(data.Type);
+        //            });
+        //            },
+        //            minLength: 1
+
+        //    });
+
+
+        //});
+
+
+
+
+
+
+
+
+        ////////  Add Multiple divs /////
+
+        /* Variables */
+        var row = $(".attr");
+
+        function addRow() {
+            row.clone(true, true).appendTo("#attributes");
+        }
+
+        function removeRow(button) {
+            button.closest("div.attr").remove();
+        }
+
+        $('#attributes .attr:first-child').find('.remove').hide();
+
+        /* Doc ready */
+        $(".add").on('click', function () {
+            //debugger
+            // alert('test1');
+            // $("#adddrow").html("Add");
+            addRow();
+            if ($("#attributes .attr").length > 1) {
+                //alert("Can't remove row.");
+                $(".remove").show();
+            }
+        });
+        $(".remove").on('click', function () {
+            debugger;
+            if ($("#attributes .attr").size() == 1) {
+                //alert("Can't remove row.");
+                $(".remove").hide();
+            } else {
+                removeRow($(this));
+
+                if ($("#attributes .attr").size() == 1) {
+                    $(".remove").hide();
+                }
+
+            }
+        });
+
+        ///////// File Uploader ////////
+
+
+        $(".file-upload").on("change", ".file-upload-field", function () {
+            debugger;
+            $(this).parent(".file-upload-wrapper").attr("data-text", $(this).val().replace(/.*(\/|\\)/, ''));
+        });
+
+        /////////////////// Wizard /////////
+
+        $(document).ready(function () {
+
+            var current_fs, next_fs, previous_fs; //fieldsets
+            var opacity;
+            var current = 1;
+            var steps = $("fieldset").length;
+
+            setProgressBar(current);
+
+            $(".next").click(function () {
+
+                current_fs = $(this).parent();
+                next_fs = $(this).parent().next();
+
+                //Add Class Active
+                $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+
+                //show the next fieldset
+                next_fs.show();
+                //hide the current fieldset with style
+                current_fs.animate({ opacity: 0 }, {
+                    step: function (now) {
+                        // for making fielset appear animation
+                        opacity = 1 - now;
+
+                        current_fs.css({
+                            'display': 'none',
+                            'position': 'relative'
+                        });
+                        next_fs.css({ 'opacity': opacity });
+                    },
+                    duration: 500
+                });
+                setProgressBar(++current);
+            });
+
+            $(".previous").click(function () {
+
+                current_fs = $(this).parent();
+                previous_fs = $(this).parent().prev();
+
+                //Remove class active
+                $("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+
+                //show the previous fieldset
+                previous_fs.show();
+
+                //hide the current fieldset with style
+                current_fs.animate({ opacity: 0 }, {
+                    step: function (now) {
+                        // for making fielset appear animation
+                        opacity = 1 - now;
+
+                        current_fs.css({
+                            'display': 'none',
+                            'position': 'relative'
+                        });
+                        previous_fs.css({ 'opacity': opacity });
+                    },
+                    duration: 500
+                });
+                setProgressBar(--current);
+            });
+
+            function setProgressBar(curStep) {
+                var percent = parseFloat(100 / steps) * curStep;
+                percent = percent.toFixed();
+                $(".progress-bar")
+                    .css("width", percent + "%")
+            }
+
+            $(".submit").click(function () {
+                return false;
+            })
+
+        });
+    </script>
 </body>
 </html>

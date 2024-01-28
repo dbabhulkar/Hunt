@@ -1,8 +1,244 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@model API_Adda.Models.PartnerOnboarding
+@{
+    ViewData["Title"] = "ListofPartner";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<div class="container mt-10">
+    <div class="card">
+        <div class="card-body">
+            <div class="row form-group">
+                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                    <h4>
+                        Partner Onboarding
+                        @if (Convert.ToString(ViewBag.Status) == "False")
+                        {
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+                            <a href="/PartnerOnboarding/ListofPartner" style="font-weight:bold; color:#20C4C6;">&nbsp; Reset Filter</a>
+                        }
+                    </h4>
+                    <a href="/PartnerDashboard/PartnerDashboard/" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+
+                    @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                    {
+                        <a class="btn btn-primary" href="/PartnerOnboarding/AddEditPartnerOnBoarding" id="new" style="font-size: 15px; font-weight: 600;margin-left: 985px;margin-bottom: 8px;">
+                            @*<i class="bx bx-plus-circle" style="vertical-align: middle;"></i>*@ Add Partner
+                        </a>
+                    }
+                </div>
+            </div>
+
+        </div>
+        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+        {
+            <div class="row form-group">
+                <div class="col-md-3" style="width: 20%;">
+                    <div class="count-card">
+                        <a href="/PartnerOnboarding/ListofPartner?Status=1">
+                            <div class="count-card-body">
+                                <i class="bx bx-layer-plus"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Request For Approval</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.Created</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="width: 20%;">
+                    <div class="count-card">
+                        <a href="/PartnerOnboarding/ListofPartner?Status=2">
+                            <div class="count-card-body">
+                                <i class="bx bx-user"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Drafted</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.Drafted</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="width: 20%;">
+                    <div class="count-card">
+                        <a href="/PartnerOnboarding/ListofPartner?Status=3">
+                            <div class="count-card-body">
+                                <i class="bx bx-user"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">In Progress</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.InProgress</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="width: 20%;">
+                    <div class="count-card">
+                        <a href="/PartnerOnboarding/ListofPartner?Status=4">
+                            <div class="count-card-body">
+                                <i class="bx bx-cog"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Awaiting For Reply</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.FeedbackReply</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-3" style="width: 20%;">
+                    <div class="count-card">
+                        <a href="/PartnerOnboarding/ListofPartner?Status=5">
+                            <div class="count-card-body">
+                                <i class="bx bx-x-circle"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Approved / Reject</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.ApprovedReject</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3" style="display:none;">
+                    <a href="/PartnerOnboarding/ListofPartner">&#x21bb;</a>
+                    <a href="/PartnerOnboarding/ListofPartner" style="text-decoration: none; color: #333; display: flex; align-items: center;">
+                        <span style="margin-right: 5px;">&#x21bb;</span> Refresh
+                    </a>
+
+                </div>
+
+                <a href="/PartnerOnboarding/ListofPartner"></a>
+            </div>
+            <div class="row form-group">
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-striped" id="project_detail">
+                        <thead>
+                            <tr>
+                                @*<th>Case    ID</th>*@
+                                <th>Partner Name</th>
+                                <th>Partner Type</th>
+                                <th>Partner Entity Type</th>
+                                <th>Partner TPRM Application</th>
+                                <th class="d-none">Partner Risk</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                @*<th>DateLastUpdated</th>
+                            <th>Ageing</th>*@
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            @if (Model.lstPartnerDetail != null)
+                            {
+
+                                @foreach (var item in Model.lstPartnerDetail)
+                                {
+                                    <tr>
+                                        @*<td class="Appr">
+                            @item.PartnetOnboading_ID
+                            @Html.HiddenFor(model => item.CaseID)
+                            </td>*@
+                                        <td class="ApprName">@item.Partner_Name</td>
+                                        <td>@item.Partner_Type</td>
+                                        <td>@item.Partner_Entity_Type</td>
+                                        <td>@item.PartnerTPRM_Application</td>
+                                        <td class="d-none">@item.Partner_Risk</td>
+                                        <td class="status">@item.statusDescription</td>
+                                        <td>@item.createdBy</td>
+                                        @*<td>@item.createdBy</td>
+                            <td>@item.createdDate</td>
+                            <td>@item.UpdatedDate</td>
+                            <td>@item.Ageing Days</td>*@
+                                        <td>
+                                            @if (item.statusDescription == "Drafted")
+                                            {
+                                                <a href="@Url.Action("ViewPartneronBoarding", "PartnerOnboarding", new { id = item.PartnetOnboading_ID })" title="View Details">
+                                                    <i class="bx bxs-show" style="font-size: 20px; margin-top: 2px;"></i>
+                                                </a>
+                                                <span>|</span>
+                                                <a href="@Url.Action("EditPartneronBoardingNew", "PartnerOnboarding", new { id = item.PartnetOnboading_ID, status = item.statusDescription })" title="Edit Details">
+                                                    <i class="bx bxs-pencil" style="font-size: 20px; margin-top: 2px;"></i>
+                                                </a>
+                                                <span>|</span>
+                                                <a href="@Url.Action("DeletePartneronBoarding", "PartnerOnboarding", new { id = item.PartnetOnboading_ID })" title="Delete">
+                                                    <i class="bx bxs-trash" style="font-size: 20px; margin-top: 2px;"></i>
+                                                </a>
+                                            }
+                                            else if (Accessor.HttpContext.Session.GetString("Role") == "USER" && (item.statusDescription == "Created" || item.statusDescription == "Drafted" || item.statusDescription == "Awaiting For Reply" || item.statusDescription == "In Progress" || item.statusDescription == "Submit"))
+                                            {
+                                                <a href="@Url.Action("ViewPartneronBoarding", "PartnerOnboarding" , new { id = item.PartnetOnboading_ID })" title="View Details">
+                                                    <i class="bx bxs-show" style="font-size: 20px; margin-top: 2px;"></i>
+                                                </a>
+                                                <span>|</span>
+                                                <a href="@Url.Action("EditPartneronBoarding", "PartnerOnboarding" , new { id = item.PartnetOnboading_ID, status = item.statusDescription })" title="Edit Details">
+                                                    <i class="bx bxs-pencil" style="font-size: 20px; margin-top: 2px;"></i>
+                                                </a>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("ViewPartneronBoarding", "PartnerOnboarding" , new { id = item.PartnetOnboading_ID })">
+                                                    <i class="bx bxs-show" style="font-size: 20px;margin-top:2px;"></i> <!-- Download icon -->
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+    <a class="btn btn-default btn-sm" id="ert" onclick="openPopupDetails(ert)" style="display:none;">Show</a>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Details</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="~/js/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var IsSuccess = '@TempData["IsSuccess"]';
+        var msg = '@TempData["Result"]';
+        if (IsSuccess != '' && IsSuccess == 'True' && msg != '') {
+            toastr.success(msg);
+        }
+        else if (IsSuccess != '' && IsSuccess == 'False' && msg != '') {
+            toastr.error(msg);
+        }
+
+        var number = parseInt(@ViewBag.Number);
+
+        if (number == 1) {
+            $("#integration").show();
+        }
+    });
+
+    function openPopupDetails(id) {
+        $.get("@Url.Action("ShowpopUp", "PartnerOnboarding")",
+            function (data) {
+                $('.modal-body').html(data);
+            });
+
+        $("#myModal").modal("show");
+    }
+</script>

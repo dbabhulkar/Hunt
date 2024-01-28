@@ -1,8 +1,581 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using Microsoft.AspNetCore.Http
+@model API_Adda.Models.PartnerOnboarding
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "AddEditPartner";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("SaveAddPartner", "PartnerOnboarding", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+
+{
+    <div class="container mt-10">
+        <div class="card">
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>Add Partner</h4>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div id="msform">
+                        <!-- progressbar -->
+                        <ul id="progressbar">
+                            <li class="active" id="onboarding"><strong>Partner Onboarding</strong></li>
+                            <li id="approval"><strong>Sent For Approval</strong></li>
+
+                        </ul>
+
+                        <fieldset>
+                            <section class="background">
+                                <b>Partner Details:</b>
+                                <div class="row form-group">
+                                    <div class="col-md-4">
+                                        <label class="label-control">Partner Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                        @Html.TextBox("txt_partnerName", null, new { @class = "form-control" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="label-control">Project Description</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.TextBox("txt_projectdescrip", null, new { @class = "form-control" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="label-control">Tentative Go Live Date</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                        <input type="date" id="txt_TentativeGoLiveDate" name="txt_TentativeGoLiveDate" class="form-control" />
+                                    </div>
+
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-4">
+                                        <label class="label-control">Partner Type</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(x => x.lstPartnerType, new SelectList(Model.lstPartnerType, "PartnerType", "PartnerType"), "--select--", new { @class = "form-control " })
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="label-control">Partner Entity Type</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        <div class="col-md-12">
+                                            <input type="button" class="btn btn-outline-primary btn-sm" name="BtnPartnerEntityTypeGov" id="BtnPartnerEntityTypeGov" value="Government" />
+                                            <input type="button" class="btn btn-outline-primary btn-sm" name="BtnPartnerEntityTypeNonGov" id="BtnPartnerEntityTypeNonGov" value="Non-Government" />
+                                            <input type="hidden" name="txtPartnerEntityType" id="txtPartnerEntityType" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="label-control">Partner TPRM Assessment Applicability</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        <div class="col-md-12">
+                                            <input class="form-control" id="txt_PartnerTPRMApplication" name="txt_PartnerTPRMApplication" type="text" value="Partial" readonly style="background-color: lightgray;">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-4">
+                                        <label class="label-control">Partner Risk Score</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.TextBox("PartnetRiskScore", null, new { @class = "form-control" })
+                                        @*<select class="form-control">
+                                    <option>Select</option>
+                                    </select>*@
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="label-control">Partner Risk</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        <div class="col-md-12">
+                                            <input type="button" class="btn btn-outline-primary btn-sm" name="BtnPartnerRisk" id="BtnPartnerRiskHigh" value="High" />
+                                            <input type="button" class="btn btn-outline-primary btn-sm" name="BtnPartnerRisk" id="BtnPartnerRiskMedium" value="Medium" />
+                                            <input type="button" class="btn btn-outline-primary btn-sm" name="BtnPartnerRisk" id="BtnPartnerRiskLow" value="Low" />
+                                            <input type="hidden" name="txtPartnerRisk" id="txtPartnerRisk" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </section>
+                            <section class="background">
+                                <b>API Details</b>
+
+                                <div class="row form-group">
+                                    <div class="col-md-4">
+                                        <label class="label-control">API Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        <div class="input-group">
+                                            @Html.TextBox("txt_Search_apiName", null, new { @class = "form-control" })
+
+                                            <div class="input-group-append">
+                                                <button class="search-btn-2">
+                                                    <i class="bx bx-search-alt-2"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <button class="btn btn-large btn-success add" type="button" style="margin-top: 7%;"><i class="bx bx-plus"></i></button>
+                                    </div>
+                                </div>
+                                <div id="attributes">
+                                    <div class="attr row form-group">
+                                        <div class="col-md-3">
+                                            <label class="label-control">API Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.TextBox("txt_apiName", null, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="label-control">API Risk</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.TextBox("txt_apiRisk", null, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="label-control">API Risk Score</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.TextBox("txt_apiRiskScore", null, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-danger remove" type="button" style="margin-top: 20px; font-size:25px;padding: 8px;    line-height: 6px;">&times; </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+                            <div class="col-md-12">
+                                <section class="background">
+                                    @*<button class="btn btn-md btn-success modal-link" data-toggle="modal" data-target="#myModal" type="button" id="btnaddupapp">Upload</button>*@
+
+                                    @*<div class="modal" style="display: none;">
+                                <p>Some random modal content</p>
+                                <a href="#" class="close">close</a>
+                                </div>
+                                <div class="modal-bg" style="display: none;"></div>*@
+
+                                    <b>Upload</b>
+                                    <div class="row form-group">
+                                        <div class="col-md-3 file-upload">
+                                            <label class="label-control">Attached Journey Documents</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            <div class="file-upload-wrapper form-control" data-text="Select your file!">
+                                                <input name="file-upload-field" type="file" class="file-upload-field" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 file-upload">
+                                            <label class="label-control">Partner Risk Assessment Sheet</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            <div class="file-upload-wrapper form-control" data-text="Select your file!">
+                                                <input name="file-upload-field" type="file" class="file-upload-field" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 file-upload">
+                                            <label class="label-control">Other Document</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            <div class="file-upload-wrapper form-control" data-text="Select your file!">
+                                                <input name="file-upload-field" type="file" class="file-upload-field" value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            @*@if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                        {*@
+                            <input type="button" id="redirectbutton" name="next" class="next action-button btn btn-primary" value="Next" />
+
+                            @*}
+                        else{
+
+                        }*@
+
+                        </fieldset>
+                        <fieldset>
+                            <div class="row form-group">
+                                <div>
+                                    <label class="label-control" style="font-weight: 600;">Approval Matrix For Case ID - </label> <label>APIGW0000000000</label>
+                                </div>
+                                <div>
+                                    <label class="label-control" style="font-weight: 600;">API Risk - </label>
+                                    <label name="APIRiskClassification" id="APIRiskClassification">High</label>
+                                </div>
+                                <div>
+                                    <label class="label-control" style="font-weight: 600;">Partner Risk - </label>
+                                    <label name="PartnerRiskClassification" id="PartnerRiskClassification">Low</label>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of product processor</h5>
+                                <div class="col-md-4">
+                                    <input type="hidden" id="ApproverType" name="ApproverType" value="Product processor" />
+                                    <input type="hidden" name="ApproverLevel" value="FH" id="ApproverLevel" />
+                                    <label class="label-control">Functional Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    <select class="form-control" id="ddlProdProcessorFH">
+                                        <option>Select</option>
+                                    </select>
+
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    <select class="form-control" id="ddlProdProcessorVH">
+                                        <option>Select</option>
+                                    </select>
+                                    @*<select class="form-control">
+                                <option>Select</option>
+                                </select>*@
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    <select class="form-control" id="ddlProdProcessorGH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of Business</h5>
+                                <div class="col-md-4">
+                                    <label class="label-control">Functional Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlBusinessFH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlBusinessVH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlBusinessGH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of Digital Banking</h5>
+                                <div class="col-md-4">
+                                    <label class="label-control">Functional Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlDigitalBankingFH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlDigitalBankingVH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlDigitalBankingGH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of ISG</h5>
+                                <div class="col-md-4">
+                                    <label class="label-control">Functional Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlISGFH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlISGVH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlISGGH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of ITDRM</h5>
+                                <div class="col-md-4">
+                                    <label class="label-control">Functional Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlITDRMFH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlITDRMVH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control" id="ddlITDRMGH">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                            {
+                                <input type="submit" name="next" class="next action-button" value="Request For Approval" />
+                                <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                            }
+                            else
+                            {
+                                <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                <br />
+
+                            }
+                            @if (Accessor.HttpContext.Session.GetString("Role") != "USER")
+                            {
+                                <div class="row form-group">
+                                    <div class="col-md-10">
+                                        <label class="label-control fw-bold">Feedback/Reviewer Comment</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                        @Html.TextArea("txt_Feedback", new { @class = "form-control", @cols = "40", @rows = "5", @maxlength = "450" })
+                                        <span id="Feedback_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-1">
+                                    </div>
+                                    <div class="col-md-10">
+
+                                        <input type="submit" class="btn btn-info" name="button" id="btnFeedbackV" value="Feedback to User" />
+                                        <input type="submit" class="btn btn-success" name="button" id="btnApprovedV" value="Approved" />
+                                        <input type="submit" class="btn btn-danger" name="button" id="btnRejectV" value="Reject" />
+                                        <input type="submit" class="btn btn-success" name="button" style="background-color:rosybrown" id="btnRejecte" value="Cancel" />
+                                        <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+
+                                    </div>
+                                </div>
+                            }
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script src="~/js/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.modal-link').click(function () {
+            $('.modal').show();
+            $('.modal-bg').show();
+        });
+        $('.modal .close').click(function () {
+            $('.modal').hide();
+            $('.modal-bg').hide();
+        })
+
+        $("#BtnPartnerRiskHigh").click(function () {
+            $("#txtPartnerRisk").val("High");
+        });
+        $("#BtnPartnerRiskMedium").click(function () {
+            $("#txtPartnerRisk").val("Medium");
+        });
+        $("#BtnPartnerRiskLow").click(function () {
+            $("#txtPartnerRisk").val("Low");
+        });
+
+        $("#BtnPartnerEntityTypeGov").click(function () {
+            $("#txtPartnerEntityType").val("Government");
+        });
+        $("#BtnPartnerEntityTypeNonGov").click(function () {
+            $("#txtPartnerEntityType").val("Non-Government");
+        });
+
+        $("#redirectbutton").click(function () {
+            BindPartnerCaseApprovalMetrix();
+        });
+    });
+
+    function BindPartnerCaseApprovalMetrix() {
+        debugger;
+        $.ajax({
+            url: "@Url.Action("PartnerCaseApprovalMetrix", "PartnerOnboarding")",
+            data: {
+                PartnerRiskClassification: $("#PartnerRiskClassification").text(),
+                APIRiskClassification: $("#APIRiskClassification").text(),
+                ApproverType: "Product processor",
+                ApproverLevel: "VH"
+            },
+            dataType: "json",
+            type: "GET",
+            error: function () {
+                alert(" An error occurred.");
+            },
+            success: function (data) {
+                objData = $.parseJSON(data);
+
+                /*Bind OPtion ddlProdProcessorFH */
+                var ddlProdProcessorFH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Product processor" && obj.ApproverLevel == "FH")
+                if (ddlProdProcessorFH.length > 0) {
+                    $.each(ddlProdProcessorFH, function (data, value) {
+                        $("#ddlProdProcessorFH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlProdProcessorFH").hide();
+                }
+
+                /*Bind OPtion ddlProdProcessorVH */
+                var ddlProdProcessorVH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Product processor" && obj.ApproverLevel == "VH")
+                if (ddlProdProcessorVH.length > 0) {
+                    $.each(ddlProdProcessorVH, function (data, value) {
+                        $("#ddlProdProcessorVH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlProdProcessorVH").hide();
+                }
+
+                /*Bind OPtion ddlProdProcessorGH */
+                var ddlProdProcessorGH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Product processor" && obj.ApproverLevel == "GH")
+                if (ddlProdProcessorGH.length > 0) {
+                    $.each(ddlProdProcessorGH, function (data, value) {
+                        $("#ddlProdProcessorGH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlProdProcessorGH").hide();
+                }
+
+                /*Bind OPtion ddlBusinessFH */
+                var ddlBusinessFH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Business" && obj.ApproverLevel == "FH")
+                if (ddlBusinessFH.length > 0) {
+                    $.each(ddlBusinessFH, function (data, value) {
+                        $("#ddlBusinessFH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlBusinessFH").hide();
+                }
+
+                /*Bind OPtion ddlBusinessGH */
+                var ddlBusinessGH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Business" && obj.ApproverLevel == "GH")
+                if (ddlBusinessGH.length > 0) {
+                    $.each(ddlBusinessGH, function (data, value) {
+                        $("#ddlBusinessGH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlBusinessGH").hide();
+                }
+
+                /*Bind OPtion ddlBusinessVH */
+                var ddlBusinessVH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Business" && obj.ApproverLevel == "VH")
+                if (ddlBusinessVH.length > 0) {
+                    $.each(ddlBusinessVH, function (data, value) {
+                        $("#ddlBusinessVH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlBusinessVH").hide();
+                }
+
+                /*Bind OPtion ddlDigitalBankingGH */
+                var ddlDigitalBankingGH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Digital Banking" && obj.ApproverLevel == "GH")
+                if (ddlDigitalBankingGH.length > 0) {
+                    $.each(ddlDigitalBankingGH, function (data, value) {
+                        $("#ddlDigitalBankingGH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlDigitalBankingGH").hide();
+                }
+
+                /*Bind OPtion ddlDigitalBankingFH */
+                var ddlDigitalBankingFH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Digital Banking" && obj.ApproverLevel == "FH")
+                if (ddlDigitalBankingFH.length > 0) {
+                    $.each(ddlDigitalBankingFH, function (data, value) {
+                        $("#ddlDigitalBankingFH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlDigitalBankingFH").hide();
+                }
+
+                /*Bind OPtion ddlDigitalBankingVH */
+                var ddlDigitalBankingVH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Digital Banking" && obj.ApproverLevel == "VH")
+                if (ddlDigitalBankingVH.length > 0) {
+                    $.each(ddlDigitalBankingVH, function (data, value) {
+                        $("#ddlDigitalBankingVH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlDigitalBankingVH").hide();
+                }
+
+                /*Bind OPtion ddlISGGH */
+                var ddlISGGH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ISG" && obj.ApproverLevel == "GH")
+                if (ddlISGGH.length > 0) {
+                    $.each(ddlISGGH, function (data, value) {
+                        $("#ddlISGGH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlISGGH").hide();
+                }
+
+                /*Bind OPtion ddlISGVH */
+                var ddlISGVH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ISG" && obj.ApproverLevel == "VH")
+                if (ddlISGVH.length > 0) {
+                    $.each(ddlISGVH, function (data, value) {
+                        $("#ddlISGVH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlISGVH").hide();
+                }
+
+                /*Bind OPtion ddlISGFH */
+                var ddlISGFH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ISG" && obj.ApproverLevel == "FH")
+                if (ddlISGFH.length > 0) {
+                    $.each(ddlISGFH, function (data, value) {
+                        $("#ddlISGFH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlISGFH").hide();
+                }
+
+                /*Bind OPtion ddlITDRMGH */
+                var ddlITDRMGH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ITDRM" && obj.ApproverLevel == "GH")
+                if (ddlITDRMGH.length > 0) {
+                    $.each(ddlITDRMGH, function (data, value) {
+                        $("#ddlITDRMGH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlITDRMGH").hide();
+                }
+
+                /*Bind OPtion ddlITDRMGH */
+                var ddlITDRMFH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ITDRM" && obj.ApproverLevel == "FH")
+                if (ddlITDRMFH.length > 0) {
+                    $.each(ddlITDRMFH, function (data, value) {
+                        $("#ddlITDRMFH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlITDRMFH").hide();
+                }
+
+                /*Bind OPtion ddlITDRMVH */
+                var ddlITDRMVH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ITDRM" && obj.ApproverLevel == "VH")
+                if (ddlITDRMVH.length > 0) {
+                    $.each(ddlITDRMVH, function (data, value) {
+                        $("#ddlITDRMVH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverName));
+                    });
+                }
+                else {
+                    $("#ddlITDRMVH").hide();
+                }
+            }
+        });
+    }
+</script>
