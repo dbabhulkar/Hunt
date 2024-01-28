@@ -1,143 +1,100 @@
-﻿@using Microsoft.AspNetCore.Http
+﻿@model API_Adda.Models.ExceptionLevels
+@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor Accessor
-@model API_Adda.Models.AddEditExceptionModel
 
 @{
-    ViewData["Title"] = "ListofPartner";
+    ViewData["Title"] = "ExceptionLevel2";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@using (Html.BeginForm("ListOfExceptions", "ExceptionManagement", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+
+@using (Html.BeginForm("SaveExceptionLevel2", "ExceptionManagement", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
     <div class="container mt-10">
         <div class="card">
             <div class="card-body">
                 <div class="row form-group">
                     <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
-                        <h4>
-                            Exception Management -Approval
-                        </h4>
-                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                        {
-
-                            <a class="close-btn" href="/ExceptionManagement/AddEditException" id="new" style="font-size: 15px; font-weight: 600;"> <i class="bx bx-plus-circle" style="vertical-align:middle;"></i>Create New Exception</a>
-
-                        }
+                        <h4>Exception Level 2:</h4>
+                        <a href="/ExceptionManagement/AddEditException?CaseId=@Model.CaseID" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
                     </div>
                 </div>
                 <div class="row form-group">
+                    <div id="msform">
+                        <div class="row form-group">
+                            <div>
+                                <label class="label-control" style="font-weight: 600;">Exception Approval Matrix For Case ID - </label> <label>@Model.CaseID</label>
+                                @Html.HiddenFor(m => m.CaseID)
+                            </div>
 
+                        </div>
+                        <div class="row form-group">
+                            <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Concurred by:</h5>
+                            <div class="col-md-4">
+                                <label class="label-control">Business Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
 
-                    <div class="col-6 col-md-4">
-                        <input type="text" class="form-control" placeholder="Exception Id/User Id" />
-                    </div>
-                    <div class="col-6 col-md-4">
-                        <input type="submit" class="btn btn-primary" name="button" id="BtnSaveDraft" value="Search" />
-                    </div>
+                                @Html.DropDownListFor(a => a.BusinessVerticalHead, (List<SelectListItem>
+                                         )ViewBag.BusinessVerticalHeadList, "--Select--", new { @class = "form-control ", @id = "ddlBusinessVerticalHead" })
+                                @Html.ValidationMessageFor(a => a.BusinessVerticalHead, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-4">
+                                <label class="label-control">ITDRM Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
 
-                </div>
-                <div class="row form-group">
-                    <div class="col-md-12">
+                                @Html.DropDownListFor(a => a.ITDRMVerticalHead, (List<SelectListItem>
+                                         )ViewBag.ITDRMVerticalHeadList, "--Select--", new { @class = "form-control ", @id = "ddlITDRMVerticalHead" })
+                                @Html.ValidationMessageFor(a => a.ITDRMVerticalHead, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Approved by:</h5>
+                            <div class="col-md-4">
+                                <label class="label-control">Business Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
 
-                        <table class="table table-hover table-striped" id="project_detail">
-                            <thead>
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Exception ID</th>
-                                    <th>Partner Name</th>
-                                    <th>Status</th>
-                                    <th>Date Created</th>
-                                    <th>Date Updated</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-border-bottom-0">
-                                @if (Model.lstExceptionDetails != null)
+                                @Html.DropDownListFor(a => a.BusinessGroupHead, (List<SelectListItem>
+                                         )ViewBag.BusinessGroupHeadList, "--Select--", new { @class = "form-control ", @id = "ddlBusinessGroupHead" })
+                                @Html.ValidationMessageFor(a => a.BusinessGroupHead, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-4">
+                                <label class="label-control">CIO Group</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                @Html.DropDownListFor(a => a.CIOGroup, (List<SelectListItem>
+                                         )ViewBag.CIOGroupList, "--Select--", new { @class = "form-control ", @id = "ddlCIOGroup" })
+                                @Html.ValidationMessageFor(a => a.CIOGroup, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-4">
+                                <label class="label-control">ITDRM Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                @Html.DropDownListFor(a => a.ITDRMGroupHead, (List<SelectListItem>
+                                         )ViewBag.ITDRMGroupHeadList, "--Select--", new { @class = "form-control ", @id = "ddlITDRMGroupHead" })
+                                @Html.ValidationMessageFor(a => a.ITDRMGroupHead, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-4">
+                                <label class="label-control">CISO Group Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                @Html.DropDownListFor(a => a.CISOGroupHead, (List<SelectListItem>
+                                         )ViewBag.CISOGroupList, "--Select--", new { @class = "form-control ", @id = "ddlCISOGroupHead" })
+                                @Html.ValidationMessageFor(a => a.CISOGroupHead, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-4">
+                                @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
                                 {
-                                    @foreach (var item in Model.lstExceptionDetails)
-                                    {
-                                        <tr>
-                                            <td>
-                                                @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                                {
-                                                    <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
-                                                }
-                                                else
-                                                {
-                                                    <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
-                                                }
-                                            </td>
-                                            <td class="Appr">@item.CASEID</td>
-                                            <td>@item.PartnerName</td>
-                                            <td>@item.Status</td>
-                                            <td>@item.DateCreated</td>
-                                            <td>@item.DateUpdated</td>
-                                        </tr>
-                                    }
+                                    <input type="submit" name="next" class="action-button" value="Request for exception approval" />
                                 }
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1234</td>
-                                    <td>Swiggy</td>
-                                    <td>Created</td>
-                                    <td>24-07-2023</td>
-                                    <td>24-07-2023</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1245">Edit</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1245">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1245</td>
-                                    <td>PaisaBazar</td>
-                                    <td>Inprogress</td>
-                                    <td>01-07-2023</td>
-                                    <td>01-07-2023</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View/Amend</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1256</td>
-                                    <td>Lentra</td>
-                                    <td>Approved</td>
-                                    <td>11-07-2023</td>
-                                    <td>11-07-2023</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                else
+                                {
+                                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+
+                                    <br />
+
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="~/js/jquery.min.js"></script>
-    <script src="~/js/Common.js"></script>
-    <script>
-        $(document).ready(function () {
-
-        });
-
-
-    </script>
 }

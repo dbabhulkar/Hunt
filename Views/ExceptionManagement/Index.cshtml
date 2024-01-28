@@ -1,201 +1,88 @@
 ﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@model API_Adda.Models.AddEditExceptionModel
 @{
-    ViewData["Title"] = "DiagnoseIssue";
+    ViewData["Title"] = "ExceptionApproval";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<style>
-    [type="radio"]:checked,
-    [type="radio"]:not(:checked) {
-        position: absolute;
-        left: -9999px;
-    }
-
-        [type="radio"]:checked + label,
-        [type="radio"]:not(:checked) + label {
-            position: relative;
-            padding-left: 28px;
-            cursor: pointer;
-            line-height: 20px;
-            display: inline-block;
-            color: #fff;
-        }
-
-            [type="radio"]:checked + label:before,
-            [type="radio"]:not(:checked) + label:before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 18px;
-                height: 18px;
-                border: 1px solid #817e7e;
-                border-radius: 100%;
-                background: #fff;
-            }
-
-            [type="radio"]:checked + label:after,
-            [type="radio"]:not(:checked) + label:after {
-                content: '';
-                width: 12px;
-                height: 12px;
-                background: #20c4c6;
-                position: absolute;
-                top: 3px;
-                left: 3px;
-                border-radius: 100%;
-                -webkit-transition: all 0.2s ease;
-                transition: all 0.2s ease;
-            }
-
-            [type="radio"]:not(:checked) + label:after {
-                opacity: 0;
-                -webkit-transform: scale(0);
-                transform: scale(0);
-            }
-
-            [type="radio"]:checked + label:after {
-                opacity: 1;
-                -webkit-transform: scale(1);
-                transform: scale(1);
-            }
-
-    .diagnosepoints ul li {
-        list-style: none;
-        margin-bottom: 7px;
-    }
-</style>
 <div class="container mt-10">
-    @using (Html.BeginForm("DiagnoseIssue", "Home", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-    {
-        <div class="card form-group" id="seachApi">
-            <div class="card-body">
-                <div class="row form-group">
-                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
-                        <h4>Diagnose UAT Issue</h4>
-                    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row form-group">
+                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                    <h4>
+                        Exception Approval
+                    </h4>
+
+
+                    @*@if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                    {
+                    <a class="btn btn-primary" href="/PartnerOnboarding/AddEditPartnerOnBoarding" id="new" style="font-size: 15px; font-weight: 600;margin-left: 985px;margin-bottom: 8px;">
+                    <i class="bx bx-plus-circle" style="vertical-align: middle;"></i> Add Partner
+                    </a>
+                    }*@
                 </div>
-                <div class="row">
-                    <div class="col-md-4" style="border-right: 1px solid #ddd;">
-                        <div class="col-md-12 text-center form-group">
-                            <div class="btn btn-primary">
-                                <input type="radio" id="obp" name="diagnose" value="OBP" />
-                                <label for="obp">OBP</label>
-                            </div>
-                        </div>
-                        <div class="diagnosepoints">
-                            <ul>
-                                <li>
-                                    1. Please click on the proceed to login to ONM.
-                                </li>
-                                <li>
-                                    2. Post logging to ONM, click on Search Dashboard.
-                                </li>
-                                <li>
-                                    3. Go to 8th folder "Search Logs".
-                                </li>
-                                <li>
-                                    4. Enter the external reference number.
-                                </li>
-                                <li>
-                                    5. Hit search button.
-                                </li>
-                                <li>
-                                    6. Get the logs and analyze.
-                                </li>
-                            </ul>
-                        </div>
+            </div>
 
-                    </div>
-                    <div class="col-md-4" style="border-right: 1px solid #ddd;">
-                        <div class="col-md-12 text-center form-group">
-                            <div class="btn btn-primary">
-                                <input type="radio" id="soa" name="diagnose" value="SOA" />
-                                <label for="soa">SOA</label>
-                            </div>
-                        </div>
-                        <div class="diagnosepoints">
-                            <ul>
-                                <li>
-                                    1. Please click on the proceed to login to ONM.
-                                </li>
-                                <li>
-                                    2. Post logging to ONM, click on Search Dashboard.
-                                </li>
-                                <li>
-                                    3. Go to 8th folder "Search Logs".
-                                </li>
-                                <li>
-                                    4. Enter the external reference number.
-                                </li>
-                                <li>
-                                    5. Hit search button.
-                                </li>
-                                <li>
-                                    6. Get the logs and analyze.
-                                </li>
-                            </ul>
-                        </div>
+        </div>
+        <div class="row form-group">
+            <div class="row form-group">
+                <div class="col-md-12">
 
-                    </div>
+                    <table class="table table-hover table-striped" id="project_detail">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Exception ID</th>
+                                <th>Partner Name</th>
+                                <th>Status</th>
+                                <th>CreatedBy</th>
+                                <th>Date Created</th>
+                                <th>Date Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            @if (Model.lstExceptionDetails != null)
+                            {
+                                @foreach (var item in Model.lstExceptionDetails)
+                                {
+                                    <tr>
 
-                    <div class="col-md-4">
-                        <div class="col-md-12 text-center form-group">
-                            <div class="btn btn-primary">
-                                <input type="radio" id="apigw" name="diagnose" value="APIGW" />
-                                <label for="apigw">APIGW</label>
-                            </div>
-                        </div>
-                        <div class="diagnosepoints">
-                            <ul>
-                                <li>
-                                    1. Please click on the proceed to login to ONM.
-                                </li>
-                                <li>
-                                    2. Post logging to ONM, click on Search Dashboard.
-                                </li>
-                                <li>
-                                    3. Go to 8th folder "Search Logs".
-                                </li>
-                                <li>
-                                    4. Enter the external reference number.
-                                </li>
-                                <li>
-                                    5. Hit search button.
-                                </li>
-                                <li>
-                                    6. Get the logs and analyze.
-                                </li>
-                            </ul>
-                        </div>
+                                        <td class="Appr">@item.CASEID</td>
+                                        <td>@item.PartnerName</td>
+                                        <td>@item.Status</td>
+                                        <td>@item.CreatedBy</td>
+                                        <td>@item.DateCreated</td>
+                                        <td>@item.DateUpdated</td>
+                                    </tr>
+                                }
+                            }
 
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="col-md-12 text-center">
-            <button type="submit" class="btn btn-primary" name="button" id="btnproceed" formtarget="_blank"> Proceed <i class="bx bx-right-arrow"></i></button>
-            <br />
-            <span id="btnprocess_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
-        </div>
-    }
+    </div>
 </div>
 <script src="~/js/jquery.min.js"></script>
-<script src="~/js/Common.js"></script>
 <script>
     $(document).ready(function () {
-        //debugger
-        $("#btnproceed").click(function () {
-            if ($('input[name="diagnose"]:checked').length == 0) {
-                $("#btnprocess_Span").text('Please select the Diagnose UAT Issue options!!!');
-                $("#btnprocess_Span").show();
-                return false;
-            }
-            else {
-                $("#btnprocess_Span").hide();
-                return true;
-            }
-        });
-    });
-</script>
+        var IsSuccess = '@TempData["IsSuccess"]';
+        var msg = '@TempData["Result"]';
+        if (IsSuccess != '' && IsSuccess == 'True' && msg != '') {
+            toastr.success(msg);
+        }
+        else if (IsSuccess != '' && IsSuccess == 'False' && msg != '') {
+            toastr.error(msg);
+        }
 
+        var number = parseInt(@ViewBag.Number);
+
+        if (number == 1) {
+            $("#integration").show();
+        }
+    });
+
+
+</script>

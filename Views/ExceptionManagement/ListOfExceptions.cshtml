@@ -14,7 +14,7 @@
                 <div class="row form-group">
                     <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
                         <h4>
-                            Exception Management -Approval
+                            Exception Management
                         </h4>
                         @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
                         {
@@ -45,6 +45,7 @@
                                     <th>Exception ID</th>
                                     <th>Partner Name</th>
                                     <th>Status</th>
+                                    <th>CreatedBy</th>
                                     <th>Date Created</th>
                                     <th>Date Updated</th>
                                 </tr>
@@ -68,62 +69,13 @@
                                             <td class="Appr">@item.CASEID</td>
                                             <td>@item.PartnerName</td>
                                             <td>@item.Status</td>
+                                            <td>@item.CreatedBy</td>
                                             <td>@item.DateCreated</td>
                                             <td>@item.DateUpdated</td>
                                         </tr>
                                     }
                                 }
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1234</td>
-                                    <td>Swiggy</td>
-                                    <td>Created</td>
-                                    <td>24-07-2023</td>
-                                    <td>24-07-2023</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1245">Edit</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1245">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1245</td>
-                                    <td>PaisaBazar</td>
-                                    <td>Inprogress</td>
-                                    <td>01-07-2023</td>
-                                    <td>01-07-2023</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View/Amend</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1256</td>
-                                    <td>Lentra</td>
-                                    <td>Approved</td>
-                                    <td>11-07-2023</td>
-                                    <td>11-07-2023</td>
-                                </tr>
+
                             </tbody>
                         </table>
                     </div>

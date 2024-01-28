@@ -1,143 +1,315 @@
-﻿@using Microsoft.AspNetCore.Http
+﻿@model API_Adda.Models.AddEditExceptionModel
+@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor Accessor
-@model API_Adda.Models.AddEditExceptionModel
-
 @{
-    ViewData["Title"] = "ListofPartner";
+    ViewData["Title"] = "AddEditException";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@using (Html.BeginForm("ListOfExceptions", "ExceptionManagement", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+
+
+@using (Html.BeginForm("SaveaddeditException", "ExceptionManagement", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
     <div class="container mt-10">
         <div class="card">
             <div class="card-body">
                 <div class="row form-group">
                     <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
-                        <h4>
-                            Exception Management -Approval
-                        </h4>
-                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                        {
-
-                            <a class="close-btn" href="/ExceptionManagement/AddEditException" id="new" style="font-size: 15px; font-weight: 600;"> <i class="bx bx-plus-circle" style="vertical-align:middle;"></i>Create New Exception</a>
-
-                        }
+                        <h4>Create New Exception:</h4>
+                        <a href="/ExceptionManagement/ListOfExceptions/" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
                     </div>
                 </div>
                 <div class="row form-group">
+                    <div>
+                        <fieldset>
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.OriginalOnboardingGASID, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.OriginalOnboardingGASID, new { @class = "form-control" })
+                                    @Html.HiddenFor(a => a.CaseId)
+                                    <span id="OriginalOnboardingGASID_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.OriginalOnboardingGASID, "", new { @class = "text-danger" })*@
 
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.ExceptionRequestor, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.ExceptionRequestor, new { @class = "form-control" })
+                                    <span id="ExceptionRequestor_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.ExceptionRequestor, "", new { @class = "text-danger" })*@
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.APIProjectName, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.APIProjectName, new { @class = "form-control" })
+                                    <span id="APIProjectName_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.APIProjectName, "", new { @class = "text-danger" })*@
+                                </div>
 
-                    <div class="col-6 col-md-4">
-                        <input type="text" class="form-control" placeholder="Exception Id/User Id" />
-                    </div>
-                    <div class="col-6 col-md-4">
-                        <input type="submit" class="btn btn-primary" name="button" id="BtnSaveDraft" value="Search" />
-                    </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.APIProjectDescription, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.APIProjectDescription, new { @class = "form-control" })
+                                    <span id="APIProjectDescription_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.PartnersToBeIntegrated, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.PartnersToBeIntegrated, new { @class = "form-control" })
+                                    <span id="PartnersToBeIntegrated_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.PartnersToBeIntegrated, "", new { @class = "text-danger" })*@
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.ProductAPIToBeConsumed, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.ProductAPIToBeConsumed, new { @class = "form-control" })
+                                    <span id="ProductAPIToBeConsumed_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.ProductAPIToBeConsumed, "", new { @class = "text-danger" })*@
+                                </div>
 
-                </div>
-                <div class="row form-group">
-                    <div class="col-md-12">
+                            </div>
+                            <hr />
 
-                        <table class="table table-hover table-striped" id="project_detail">
-                            <thead>
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Exception ID</th>
-                                    <th>Partner Name</th>
-                                    <th>Status</th>
-                                    <th>Date Created</th>
-                                    <th>Date Updated</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-border-bottom-0">
-                                @if (Model.lstExceptionDetails != null)
-                                {
-                                    @foreach (var item in Model.lstExceptionDetails)
-                                    {
-                                        <tr>
-                                            <td>
-                                                @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                                {
-                                                    <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
-                                                }
-                                                else
-                                                {
-                                                    <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
-                                                }
-                                            </td>
-                                            <td class="Appr">@item.CASEID</td>
-                                            <td>@item.PartnerName</td>
-                                            <td>@item.Status</td>
-                                            <td>@item.DateCreated</td>
-                                            <td>@item.DateUpdated</td>
-                                        </tr>
-                                    }
-                                }
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1234</td>
-                                    <td>Swiggy</td>
-                                    <td>Created</td>
-                                    <td>24-07-2023</td>
-                                    <td>24-07-2023</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1245">Edit</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1245">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1245</td>
-                                    <td>PaisaBazar</td>
-                                    <td>Inprogress</td>
-                                    <td>01-07-2023</td>
-                                    <td>01-07-2023</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View/Amend</a>
-                                        }
-                                        else
-                                        {
-                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View</a>
-                                        }
-                                    </td>
-                                    <td class="Appr">1256</td>
-                                    <td>Lentra</td>
-                                    <td>Approved</td>
-                                    <td>11-07-2023</td>
-                                    <td>11-07-2023</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.RequestedException, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.RequestedException, new { @class = "form-control" })
+                                    <span id="RequestedException_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.ReasonForException, "", new { @class = "text-danger" })*@
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.ReasonForException, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.ReasonForException, new { @class = "form-control", })
+                                    <span id="ReasonForException_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.ReasonForException, "", new { @class = "text-danger" })*@
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.HowExceptionToBeImplemented, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.HowExceptionToBeImplemented, new { @class = "form-control" })
+                                    <span id="HowExceptionToBeImplemented_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.HowExceptionToBeImplemented, "", new { @class = "text-danger" })*@
+                                </div>
+
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.DurationofApproval, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    <div class="row">
+                                        <div class="col-6 col-md-6 col-sm-6 col-lg-6">
+                                            <span style="font-weight:bold;color:red;font-size:8px;"></span>
+                                            <label class="label-control" for="fromDate">Start Date:</label>
+
+                                            <input class="form-control" type="date" id="fromDate" name="fromDate" required />
+                                        </div>
+                                        <div class="col-6 col-md-6 col-sm-6 col-lg-6">
+                                            <label class="label-control" for="toDate">End Date:</label>
+                                            <input class="form-control" type="date" id="toDate" name="toDate" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.ImpactOnBank, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            @Html.DropDownListFor(a => a.ImpactOnBank, new List<SelectListItem>
+                                                     () {
+                                        new SelectListItem { Text="Select",Value=""},
+                                        new SelectListItem { Text="Operational",Value="Operational"},
+                                        new SelectListItem { Text="Material",Value="Material"},
+                                        new SelectListItem { Text="Financial", Value="Financial"},
+                                        new SelectListItem { Text="Information Security", Value="Information Security"},
+                                        new SelectListItem { Text="Reputational", Value="Reputational"},
+                                        new SelectListItem { Text="Service Level", Value="Service Level"},
+                                        new SelectListItem { Text="Legal", Value="Legal"},
+                                        }, new { @class = "form-control", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(a => a.ImpactOnBank, "", new { @class = "text-danger" })
+                                            <span id="ImpactOnBank_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                            @*@Html.DropDownListFor(a => a.ExitScenario, new SelectList(Model.lstExitScenarioOptions, "Value", "Text"), "Select", new { @class = "form-control" })*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    @Html.LabelFor(a => a.ExceptionLevel, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    @Html.TextBoxFor(a => a.ExceptionLevel, new { @class = "form-control" })
+                                    <span id="ExceptionLevel_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                    @*@Html.ValidationMessageFor(a => a.ExceptionLevel, "", new { @class = "text-danger" })*@
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <div class="row form-group">
+                                <div class="col-md-3 file-upload">
+                                    @Html.LabelFor(a => a.RelatedDocumentstoUpload, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                    <div class="file-upload-wrapper form-control" data-text="Select your file!">
+                                        <span id="RelatedDocumentstoUpload_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                        <input name="file-upload-field" type="file" class="file-upload-field" value="">
+                                    </div>
+                                </div>
+                                @*<input type="button" href="/ExceptionManagement/ExceptionLevels" class="btn btn-primary" name="button" id="confirm&continue" value="Confirm & Proceed" />*@
+                        </fieldset>
+                        <input type="submit" class="btn btn-primary d-none" name="button" id="BtnSaveExceptionV" value="SUBMIT" />
+                        <input type="button" class="btn btn-primary" name="button" id="BtnSaveException" onclick="validation('BtnSaveExceptionV')" value="Confirm & Proceed" />
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="~/js/jquery.min.js"></script>
-    <script src="~/js/Common.js"></script>
-    <script>
-        $(document).ready(function () {
 
+}
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/Common.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#ImpactOnBank").on("change", function () {
+            getexceptionlevel();
+        });
+    });
+
+    function validation(id) {
+        debugger;
+
+        if ($("#OriginalOnboardingGASID").val() == '') {
+            $("#OriginalOnboardingGASID_Span").text('Please fill Original Onboarding GASID!!');
+            $("#OriginalOnboardingGASID_Span").show();
+            return false;
+        }
+        else { $("#OriginalOnboardingGASID_Span").hide(); }
+
+        if ($("#ExceptionRequestor").val() == '') {
+            $("#ExceptionRequestor_Span").text('Please fill Exception Requestor');
+            $("#ExceptionRequestor_Span").show();
+            return false;
+        }
+        else { $("#ExceptionRequestor_Span").hide(); }
+
+        if ($("#APIProjectName").val() == '') {
+            $("#APIProjectName_Span").text('Please fill Project Name');
+            $("#APIProjectName_Span").show();
+            return false;
+        }
+        else { $("#APIProjectName_Span").hide(); }
+
+        if ($("#APIProjectDescription").val() == '') {
+            $("#APIProjectDescription_Span").text('Please fill API Project Description');
+            $("#APIProjectDescription_Span").show();
+            return false;
+        }
+        else { $("#APIProjectDescription_Span").hide(); }
+
+        if ($("#PartnersToBeIntegrated").val() == '') {
+            $("#PartnersToBeIntegrated_Span").text('Please fill Partners To Be Integrated');
+            $("#PartnersToBeIntegrated_Span").show();
+            return false;
+        }
+        else { $("#PartnersToBeIntegrated_Span").hide(); }
+
+
+        if ($("#ProductAPIToBeConsumed").val() == '') {
+            $("#ProductAPIToBeConsumed_Span").text('Please fill Product API To Be Consumed');
+            $("#ProductAPIToBeConsumed_Span").show();
+            return false;
+        }
+        else { $("#ProductAPIToBeConsumed_Span").hide(); }
+
+        if ($("#RequestedException").val() == '') {
+            $("#RequestedException_Span").text('Please fill Requested Exception');
+            $("#RequestedException_Span").show();
+            return false;
+        }
+        else { $("#RequestedException_Span").hide(); }
+
+        if ($("#ReasonForException").val() == '') {
+            $("#ReasonForException_Span").text('Please fill Reason For Exception');
+            $("#ReasonForException_Span").show();
+            return false;
+        }
+        else { $("#ReasonForException_Span").hide(); }
+
+
+
+        if ($("#HowExceptionToBeImplemented").val() == '') {
+            $("#HowExceptionToBeImplemented_Span").text('Please fill How Exception To Be Implemented');
+            $("#HowExceptionToBeImplemented_Span").show();
+            return false;
+        }
+        else { $("#HowExceptionToBeImplemented_Span").hide(); }
+
+        //if ($("#ImpactOnBank_Span").val() == '') {
+        //    $("#ImpactOnBank_Span").text('Please select Impact On Bank');
+        //    $("#ImpactOnBank_Span").show();
+        //    return false;
+        //}
+        //else { $("#ConsumerApplication_Span").hide(); }
+
+        if ($("#ExceptionLevel").val() == '') {
+            $("#ExceptionLevel_Span").text('Please fillExceptionLevel');
+            $("#ExceptionLevel_Span").show();
+            return false;
+        }
+        else { $("#ExceptionLevel_Span").hide(); }
+
+
+        if ($("#RelatedDocumentstoUpload").val() == '') {
+            $("#RelatedDocumentstoUpload_Span").text('Please Upload RelatedDocumentstoUpload_Span');
+            $("#RelatedDocumentstoUpload_Span").show();
+            return false;
+        }
+        else { $("#RelatedDocumentstoUpload_Span").hide(); }
+
+        debugger;
+        if ($("#fromDate").val() == '') {
+            alert("Please select From Date !!");
+            return false;
+        }
+        if ($("#toDate").val() == '') {
+            alert("Please select To Date !!");
+            return false;
+        }
+
+        var fromDate = new Date($("#fromDate").val());
+        var toDate = new Date($("#toDate").val());
+        var dayDiff = parseInt((toDate - fromDate) / (1000 * 60 * 60 * 24), 10);
+
+        if (dayDiff > 365) {
+            alert("Duration of approval should not be more than 1 year !!");
+            return false;
+        }
+
+        if ($("#ImpactOnBank").val() == '') {
+            $("#ImpactOnBank_Span").text('Please select Impact On Bank');
+            $("#ImpactOnBank_Span").show();
+            return false;
+        }
+        else { $("#ImpactOnBank_Span").hide(); }
+
+        $("#" + id).click();
+        return true;
+    }
+
+    function getexceptionlevel() {
+        $.ajax({
+            type: "POST",
+            url: '/ExceptionManagement/GetExceptionLevel',
+            data: {
+                ImpactOnBank: $("#ImpactOnBank").val()
+            },
+            dataType: 'json',
+            success: function (response) {
+
+                debugger;
+                if (response != null) {
+                    $('#ExceptionLevel').val(response.exceptionLevel);
+                }
+            }
         });
 
+    }
 
-    </script>
-}
+
+</script>
+
+
+
+
+
+
+
+
