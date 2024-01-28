@@ -1,8 +1,147 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using API_Adda.Models
+@model API_Adda.Models.SearchAPI;
+@{
+    ViewData["Title"] = "apiDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@using (Html.BeginForm("apiDetails", "Home", FormMethod.Post))
+{
+    <div class="container mt-10">
+        <div class="card">
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>API Details</h4>
+
+                        <a href="@Url.Action("search", "home")" data-form-method="post" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+                        @*<a href="@Url.Action("search", "home")" data-form-method="post"> <i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+                    <button>back</button>*@
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-9">
+                        <span class="method-tag badge rounded-pill text-bg-success">Post</span><span id="urltext" class="url-details">
+                            @Html.DisplayFor(x => x.ServiceUrl)
+                            @Html.HiddenFor(x => x.ServiceUrl)
+                            @Html.HiddenFor(x => x.SearchAPIURL)
+                            @Html.HiddenFor(x => x.APIMainId)
+                            @Html.HiddenFor(x => x.lstConsumer)
+                            @Html.HiddenFor(x => x.lstMiddlewares)
+                            @Html.HiddenFor(x => x.lstProducer)
+                            @Html.HiddenFor(x => x.lstServiceProviders)
+                        </span>
+                    </div>
+                    <div class="col-md-3 text-right">
+                        <a class="has-arrow" href="/Home/Test"></a>
+                        <input type="submit" class="btn btn-primary" name="button" value="Test API" />
+                        @*<button id="Test" type="submit" class="btn btn-primary"  value="Test">Test</button>*@
+                        @*<button type="button" class="btn btn-primary">Demo</button>*@
+                    </div>
+                </div>
+                <div class="section form-group">
+                    <div class="heading" style="margin-top: 2%;">
+                        <h4>Overview</h4>
+                    </div>
+                    <p id="serviceDesc">
+                        @Html.DisplayFor(x => x.ServiceDesc)
+                        @Html.HiddenFor(x => x.ServiceDesc)
+                    </p>
+                </div>
+                <div class="wrapper form-group">
+                    <div class="section">
+                        <div class="heading">
+                            <h4>Request</h4>
+                        </div>
+
+                        @Html.TextAreaFor(x => x.Raw, new { @class = "form-control", @rows = 10 })
+                    </div>
+                </div>
+                <div class="wrapper form-group">
+                    <div class="section">
+                        <div class="heading">
+                            <h4>Response</h4>
+                        </div>
+
+
+                        @Html.TextAreaFor(x => x.response, new { @class = "form-control", @rows = 10 })
+
+
+                    </div>
+                </div>
+                @*<div class="wrapper form-group">
+            <div class="section">
+            <div class="heading">
+            <h4>Use Cases</h4>
+            </div>
+            <ul class="usecase">
+            <li>
+            <div class="form-group">
+            <span style="color: #4a4a4a;font-weight: 600;font-size: 14px;">Source System :</span> <span style="font-size: 14px;">Lorem ipsum dolor sit amet</span>
+            </div>
+            <div class="form-group">
+            <span style="color: #4a4a4a;font-weight: 600;font-size: 14px;">Destionation System :</span> <span style="font-size: 14px;">Lorem ipsum dolor sit amet</span>
+            </div>
+            <div class="form-group">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            </div>
+            </li>
+            <li>
+            <div class="form-group">
+            <span style="color: #4a4a4a;font-weight: 600;font-size: 14px;">Source System :</span> <span style="font-size: 14px;">Lorem ipsum dolor sit amet</span>
+            </div>
+            <div class="form-group">
+            <span style="color: #4a4a4a;font-weight: 600;font-size: 14px;">Destionation System :</span> <span style="font-size: 14px;"> Lorem ipsum dolor sit amet</span>
+            </div>
+            <div class="form-group">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            </div>
+            </li>
+            </ul>
+            </div>
+            </div>*@
+
+                <div class="wrapper form-group">
+                    <label class="label-control">Service Document</label>&nbsp; &nbsp;
+                    <a class="btn btn-primary" id="btn_DownloadServiceDocument" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
+                    @*<a class="btn btn-primary" id="btn_DownloadDemoServiceDocument" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>*@
+                </div>
+
+
+            </div>
+
+            <div class="row form-group">
+
+
+                @if (!String.IsNullOrEmpty(Model.UserJourneyFiles))
+                {
+                    <label class="label-control fw-bold">Document</label>
+                    <div class="col-md-12">
+                        <label id="UserJourneyFile" class="label-control">@Model.UserJourneyFiles</label>&nbsp;&nbsp;
+                        <a class="btn btn-primary" id="btn_DownloadUserJorneyDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
+                        @Html.HiddenFor(x => x.UserJourneyFiles)
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+}
+
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/Common.js"></script>
+<script>
+
+    $("a[data-form-method='post']").click(function (event) {
+        event.preventDefault();
+        var element = $(this);
+        var action = element.attr("href");
+        element.closest("form").each(function () {
+            var form = $(this);
+            form.attr("action", action);
+            form.submit();
+        });
+    });
+</script>

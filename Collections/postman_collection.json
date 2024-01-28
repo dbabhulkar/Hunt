@@ -1,0 +1,98 @@
+{
+  "info": {
+    "_postman_id": "b919623f-70ce-47b9-9f58-6f139e1d53dd",
+    "name": "CSC Cash Deposit",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "18987835"
+  },
+  "item": [
+    {
+      "name": "CustomerAndAccountInformationInquiry_GenericInq",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "let csc_acct_no=50100101674310;\r",
+              "\r",
+              "\r",
+              "pm.globals.set(\"CSC_ACCT_NO\",  csc_acct_no)\r",
+              "\r",
+              "let CSC_ACCT_NO =pm.globals.get(\"CSC_ACCT_NO\");"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "\r",
+              "\r",
+              "\r",
+              "\r",
+              "\r",
+              "try {\r",
+              "const responseJson = pm.response.json();\r",
+              "console.log(responseJson)\r",
+              "var MSG=responseJson.status.errorCode\r",
+              "\r",
+              "console.log(MSG)\r",
+              "pm.test(MSG, function () {\r",
+              "pm.expect(responseJson.status.errorCode).is.to.equal(\"0\");\r",
+              "\r",
+              "})\r",
+              "}\r",
+              "catch(e)\r",
+              "{\r",
+              "\r",
+              "   var response = responseBody;\r",
+              "\r",
+              "     pm.test(\"response is \"+response, function () {\r",
+              "\r",
+              "        pm.expect(pm.response.code).to.equal(200).to.be.false;\r",
+              "\r",
+              "     })\r",
+              "  \r",
+              "\r",
+              "\r",
+              "\r",
+              "}\r",
+              "// postman.setNextRequest();"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"sessionContext\": {\r\n        \"channel\": \"CSC\",\r\n        \"userId\": \"CSC_USER\",\r\n        \"externalReferenceNo\": \"{{$randomBankAccount}}\",\r\n        \"bankCode\": \"08\",\r\n        \"transactionBranch\": \"089999\"\r\n    },\r\n    \"CustomerAndAccountInformationInquiryRequestDTO\": {\r\n        \"requestString\": {\r\n            \"accountNumber\": \"{{CSC_ACCT_NO}}\",\r\n            \"informationTypeFlag\": \"min\"\r\n        }\r\n    }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://10.226.163.7:9444/com.ofss.fc.cz.hdfc.obp.webservice/CustomerAndAccountInformationInquiryRest/doCustomerAndAccountInformationInquiry",
+          "protocol": "https",
+          "host": [
+            "10",
+            "226",
+            "163",
+            "7"
+          ],
+          "port": "9444",
+          "path": [
+            "com.ofss.fc.cz.hdfc.obp.webservice",
+            "CustomerA"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -1,6 +1,524 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
+﻿@using API_Adda.Models
+@model API_Adda.Models.SearchAPI;
+@{
+    ViewData["Title"] = "search";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
 
-<p>Use this page to detail your site's privacy policy.</p>
+}
+
+<style>
+    /*.ui-widget.ui-widget-content {
+            width: 615px !important;
+            top: 174px !important;
+            left: 392px !important;
+            height: 250px;
+            overflow: auto;
+            font-size: 13px;
+        }*/
+
+    .dash {
+        /*border: 1px solid #ccc;*/
+        text-align: center;
+        max-height: 190px;
+        overflow: auto;
+    }
+
+    .dash-tbl th {
+        background: #d5feff;
+    }
+</style>
+
+@* @using (Html.BeginForm())@using (Html.BeginForm("search", "Home", FormMethod.Post))*@
+@using (Html.BeginForm("search", "Home", FormMethod.Post))
+{
+    <div class="container mt-10" id="maindiv">
+        <div class="card" id="seachApi">
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>Search API</h4>
+
+                        <a href="/Home" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <span class="error" style="display:none">Please select at-least one service.</span>
+                    <div class="col-md-3">
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <a class="btn btn-primary" name="button" id="btnDashboard" href="/home/search/" style="font-size: 13px;"><i class="bx bxs-dashboard" style="vertical-align: middle;"></i> Dashboard</a>
+                            </div>
+                        </div>
+                        <div class="tabs" id="filtertabs">
+                            <div class="tab">
+                                <div class="filter-section">
+                                    <h4 class="filterHeading" style="display:inline">Filters</h4>
+                                    <input type="submit" class="filter" name="apply_filter" id="applyfilterV" value="Apply Filter" />
+                                    <button id="apply_filter" type="submit" class="filter  d-none"></button>
+                                    @*<button id="apply_filter" type="submit" class="filter">Apply Filter</button>*@
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <input type="radio" id="rd1" name="rd" checked />
+                                <label class="tab-label" for="rd1">Middleware</label>
+                                <div class="tab-content">
+                                    <ul data-accordion class="categories category-m">
+                                        <li>
+                                            <ul>
+                                                @for (int i = 0; i < Model.lstMiddlewares.Count; i++)
+                                                {
+                                                    <li class="subcat">
+                                                        @Html.CheckBoxFor(a => a.lstMiddlewares[i].IsCheck, new { @class = "dummycheckbox" })
+                                                        @Model.lstMiddlewares[i].MiddlewareName
+                                                        @Html.HiddenFor(a => a.lstMiddlewares[i].middlewareId)
+                                                        @Html.HiddenFor(a => a.lstMiddlewares[i].MiddlewareName)
+                                                        <span class="count">@Html.DisplayFor(a => a.lstMiddlewares[i].RecordCount)</span>
+                                                        @Html.HiddenFor(a => a.lstMiddlewares[i].RecordCount)
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <input type="radio" id="rd2" name="rd" />
+                                <label class="tab-label" for="rd2">Service Provider</label>
+                                <div class="tab-content">
+                                    <ul data-accordion class="categories category-m">
+                                        <li>
+                                            <ul>
+                                                @if (Model.lstServiceProviders != null && Model.lstServiceProviders.Count > 0)
+                                                {
+                                                    @for (int i = 0; i < Model.lstServiceProviders.Count; i++)
+                                                    {
+                                                        <li class="subcat">
+
+                                                            @Html.CheckBoxFor(a => a.lstServiceProviders[i].IsCheck, new { @class = "dummycheckbox" })
+                                                            @Model.lstServiceProviders[i].ServiceProvideName
+                                                            @Html.HiddenFor(a => a.lstServiceProviders[i].ServiceProviderId)
+                                                            @Html.HiddenFor(a => a.lstServiceProviders[i].ServiceProvideName)
+                                                            <span class="count">@Html.DisplayFor(a => a.lstServiceProviders[i].RecordCount)</span>
+                                                            @Html.HiddenFor(a => a.lstServiceProviders[i].RecordCount)
+                                                        </li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <input type="radio" id="rd3" name="rd" />
+                                <label class="tab-label" for="rd3">Producer</label>
+                                <div class="tab-content">
+                                    <ul data-accordion class="categories category-m">
+                                        <li>
+                                            <ul>
+                                                @if (Model.lstProducer != null && Model.lstProducer.Count > 0)
+                                                {
+                                                    @for (int i = 0; i < Model.lstProducer.Count; i++)
+                                                    {
+                                                        <li class="subcat">
+
+                                                            @Html.CheckBoxFor(a => a.lstProducer[i].IsCheck, new { @class = "dummycheckbox" })
+                                                            @Model.lstProducer[i].ProducerName
+                                                            @Html.HiddenFor(a => a.lstProducer[i].ProducerId)
+                                                            @Html.HiddenFor(a => a.lstProducer[i].ProducerName)
+                                                            <span class="count">@Html.DisplayFor(a => a.lstProducer[i].RecordCount)</span>
+                                                            @Html.HiddenFor(a => a.lstProducer[i].RecordCount)
+
+                                                        </li>
+                                                    }
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab">
+                                <input type="radio" id="rd4" name="rd" />
+                                <label class="tab-label" for="rd4">Consumer</label>
+                                <div class="tab-content">
+                                    <ul data-accordion class="categories category-m">
+                                        <li>
+                                            <ul>
+                                                @if (Model.lstConsumer != null && Model.lstConsumer.Count > 0)
+                                                {
+                                                    @for (int i = 0; i < Model.lstConsumer.Count; i++)
+                                                    {
+                                                        <li class="subcat">
+
+                                                            @Html.CheckBoxFor(a => a.lstConsumer[i].IsCheck, new { @class = "dummycheckbox" })
+                                                            @Model.lstConsumer[i].ConsumerName
+                                                            @Html.HiddenFor(a => a.lstConsumer[i].ConsumerId)
+                                                            @Html.HiddenFor(a => a.lstConsumer[i].ConsumerName)
+                                                            <span class="count">@Html.DisplayFor(a => a.lstConsumer[i].RecordCount)</span>
+                                                            @Html.HiddenFor(a => a.lstConsumer[i].RecordCount)
+                                                        </li>
+                                                    }
+                                                }
+                                                @*else
+                                            {
+                                            <li>Search not founder</li>
+                                            }*@
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="search">
+                                    @Html.TextBoxFor(a => a.SearchAPIURL)
+                                    <button type="submit" class="search-btn" id="btnsearchvalue"><i class="bx bx-search-alt-2"></i></button>
+                                </div>
+                                @Html.ValidationMessageFor(a => a.SearchAPIURL)
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <ul class="api-listing-wrapper" id="apiList">
+                                @if (Model.searchAPILists != null)
+                                {
+                                    @Html.HiddenFor(Model => Model.searchAPILists.Count)
+                                    @for (int i = 0; i < Model.searchAPILists.Count; i++)
+                                    {
+
+                                        <li>
+                                            @*<a href="@Url.Action("apiDetails", "Home", new { id = @Model.searchAPILists[i].APIMainId,ser=Model.SearchAPIURL })">*@
+                                            <a href="@Url.Action("apiDetails", "home", new { id = @Model.searchAPILists[i].APIMainId,ser=Model.SearchAPIURL })" data-form-method="post">
+                                                <div class="api-listing">
+                                                    <h5 class="url">@Model.searchAPILists[i].ServiceUrl</h5>
+                                                    <p>@Model.searchAPILists[i].ServiceDesc</p>
+                                                    <ul class="inline-badges listing-badges">
+                                                        <li>
+                                                            <div class="bedge listing-bedge middleware" style="padding: 0px;">@Model.searchAPILists[i].ServiceType</div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </a>
+                                            @*<a href="@Url.Action("apiDetails", "home")" data-form-method="post"> <i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>*@
+                                        </li>
+                                    }
+                                }
+                                @*else
+                            {
+                            <div id="apiNotFoundMessage" class="api-listing-wrapper" style="text-align:center; padding: 20px;">
+                            API Not FOUND !!
+                            </div>
+                            }*@
+                            </ul>
+                        </div>
+                        <div id="DashboardValue">
+                            <div class="row form-group">
+                                <div class="col-md-6" style="margin:0 auto;">
+                                    <div class="card dash">
+                                        <div class="card-body">
+                                            <div class="row form-group">
+                                                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #ccc; padding-bottom: 6px;">
+                                                    <h4>Middleware Wise Count</h4>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="row form-group">
+                                                <table class="table table-borderless table-responsive table-striped dash-tbl" id="tble_middleware">
+                                                    <tr>
+                                                        <th>SOA</th>
+                                                        <th>OBP</th>
+                                                        <th>APIGW</th>
+                                                    </tr>
+                                                    @if (Model.lstMiddlewares.Count >= 3)
+                                                    {
+                                                        <tr>
+                                                            <td>@Model.lstMiddlewares[1].RecordCount</td>
+                                                            <td>@Model.lstMiddlewares[0].RecordCount</td>
+                                                            <td>@Model.lstMiddlewares[2].RecordCount</td>
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row form-group">
+                                <div class="col-md-12 text-center">
+                                    <h5 style="font-weight: 600;">Internal</h5>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-6">
+                                    <div class="card" style="border: 1px solid #ccc;text-align:center">
+                                        <div class="card-body">
+                                            <div class="row form-group">
+                                                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #ccc; padding-bottom: 6px;">
+                                                    <h4>Product Processor Wise Count</h4>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="row form-group dash">
+                                                <table class="table table-borderless table-responsive table-striped dash-tbl" id="tble_ProductProcessor">
+                                                    <tr>
+                                                        <th>Product Processor</th>
+                                                        <th>Internal</th>
+
+                                                    </tr>
+                                                    @if (Model.lstInternalProducer != null)
+                                                    {
+                                                        @for (int i = 0; i < Model.lstInternalProducer.Count; i++)
+                                                        {
+                                                            <tr>
+                                                                <td>@Model.lstInternalProducer[i].ProducerName</td>
+                                                                <td>@Model.lstInternalProducer[i].InternalPCount</td>
+
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="    border: 1px solid #ccc; text-align:center">
+                                        <div class="card-body">
+                                            <div class="row form-group">
+                                                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #ccc; padding-bottom: 6px;">
+                                                    <h4>Consumer Wise Count</h4>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="row form-group dash">
+                                                <table class="table table-borderless table-responsive table-striped dash-tbl" id="tble_ProductProcessor">
+                                                    <tr>
+                                                        <th>Consumer Name</th>
+                                                        <th>Internal</th>
+
+                                                    </tr>
+                                                    @if (Model.lstInternalConsumer != null)
+                                                    {
+                                                        @for (int i = 0; i < Model.lstInternalConsumer.Count; i++)
+                                                        {
+                                                            <tr>
+                                                                <td>@Model.lstInternalConsumer[i].ConsumerName</td>
+                                                                <td>@Model.lstInternalConsumer[i].InternalPCount</td>
+
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row form-group">
+                                <div class="col-md-12 text-center">
+                                    <h5 style="font-weight: 600;">External</h5>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-6">
+                                    <div class="card" style="border: 1px solid #ccc;text-align:center">
+                                        <div class="card-body">
+                                            <div class="row form-group">
+                                                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #ccc; padding-bottom: 6px;">
+                                                    <h4>Product Processor Wise Count - External</h4>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="row form-group dash">
+                                                <table class="table table-borderless table-responsive table-striped dash-tbl" id="tble_ProductProcessor">
+                                                    <tr>
+                                                        <th>Product Processor</th>
+                                                        <th>External</th>
+
+                                                    </tr>
+                                                    @if (Model.lstExternalProducer != null)
+                                                    {
+                                                        @for (int i = 0; i < Model.lstExternalProducer.Count; i++)
+                                                        {
+                                                            <tr>
+                                                                <td>@Model.lstExternalProducer[i].ProducerName</td>
+                                                                <td>@Model.lstExternalProducer[i].ExternalPCount</td>
+
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body" style="    border: 1px solid #ccc; text-align:center">
+                                            <div class="row form-group">
+                                                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #ccc; padding-bottom: 6px;">
+                                                    <h4>Consumer Wise Count - External</h4>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="row form-group dash">
+                                                <table class="table table-borderless table-responsive table-striped dash-tbl" id="tble_ProductProcessor">
+                                                    <tr>
+                                                        <th>Consumer Name</th>
+                                                        <th>External</th>
+
+                                                    </tr>
+                                                    @if (Model.lstExternalConsumer != null)
+                                                    {
+                                                        @for (int i = 0; i < Model.lstExternalConsumer.Count; i++)
+                                                        {
+                                                            <tr>
+                                                                <td>@Model.lstExternalConsumer[i].ConsumerName</td>
+                                                                <td>@Model.lstExternalConsumer[i].ExternalPCount</td>
+
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<script src="~/js/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $("#txt_SearchAPI").focus();
+        if ($('#SearchAPIURL').val() == '') {
+            $("#DashboardValue").show();
+        }
+        else {
+            $("#DashboardValue").hide();
+        }
+        //$("#btnDashboard").click(function () {
+        //    $.ajax({
+        //       type: "Get",
+        //       url: "/Home/search"
+        //    });
+        //});
+    });
+
+    function refreshPage() {
+        window.location.reload();
+    }
+    function RedirctDetails(apiId) {
+
+        window.location.href = '/Home/apidetails?Id=' + apiId;
+    };
+
+
+    $(function () {
+        $("#apply_filter").click(function () {
+            debugger;
+            var checked_checkboxes = $("#filtertabs input[type=checkbox]:checked");
+            if (checked_checkboxes.length == 0) {
+                $(".error").show();
+                return false;
+            }
+            var datacount = { dataCheckValue: $('#@Html.IdFor(Model => Model.searchAPILists.Count)').val(), }
+            alert(datacount);
+
+
+
+            //else {
+            //    $("#apply_filter").click();
+            //    return true;
+            //}
+            return true;
+        });
+    });
+
+
+    $("a[data-form-method='post']").click(function (event) {
+        event.preventDefault();
+        var element = $(this);
+        var action = element.attr("href");
+        element.closest("form").each(function () {
+            var form = $(this);
+            form.attr("action", action);
+            form.submit();
+        });
+    });
+    $(function () {
+        debugger;
+        // alert(1);
+        $("#SearchAPIURL").autocomplete(
+            {
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Home/GetAutoTestApi/',
+                        data: { "prefix": request.term },
+                        type: "POST",
+                        success: function (data) {
+                            //  debugger;
+                            //  alert(2);
+                            response($.map(data, function (item) {
+                                return { label: item.serviceURL, val: item.path };
+                            }))
+
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                //select: function (e, i) {
+                //    // debugger;
+
+                //    $("#path").val(i.item.val);
+                //      $("#ServiceUrlValue").val(i.item.value);
+                //    minLength: 1
+
+                //     $("#ServiceNameId").val(i.item.val);
+                //    var path = $("#path").val();
+                //    var ServiceUrlValue = $("#ServiceUrlValue").val();
+                //     $.getJSON("/Home/GetRequestRecord",
+                //     {
+                //        path: path,ServiceUrlValue:ServiceUrlValue
+                //     },
+                //    function (data) {
+                //       // debugger;
+                //        $('#Raw').val(data.request);
+
+                //    });
+
+                //}
+
+
+            });
+        /*if ($('#SearchAPIURL').val() == null || $('#SearchAPIURL').val()=="") {
+            $("#apiNotFoundMessage").hide();
+        }
+        else {
+            $("#apiNotFoundMessage").show();
+        }*/
+    });
+</script>

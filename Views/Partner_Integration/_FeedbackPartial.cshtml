@@ -1,8 +1,32 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model API_Adda.Models.POFeedbackHistory
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div>
+    @using (Html.BeginForm("SaveFeedbackReply", "Partner_Integration", FormMethod.Post))
+    {
+        @Html.HiddenFor(x => Model.ApprovalID)
+        @Html.HiddenFor(x => Model.Feedback)
+        @Html.HiddenFor(x => Model.Department)
+        @Html.HiddenFor(x => Model.ApproverLevel)
+        @Html.HiddenFor(x => Model.CaseId)
+        @Html.HiddenFor(x => Model.createdDate)
+        @Html.HiddenFor(x => Model.Created_Date)
+        @Html.HiddenFor(x => Model.EmpName)
+        @Html.HiddenFor(x => Model.Role)
+        @Html.HiddenFor(x => Model.Feedback_Details)
+        @Html.HiddenFor(x => Model.Status)
+        @*@Html.HiddenFor(x => Model.FeedbackReply)*@
+        @Html.HiddenFor(x => Model.FeedbackBy)
+        @Html.HiddenFor(x => Model.FeedbackAction)
+        @Html.HiddenFor(x => Model.FeedbackID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FeedbackReply, htmlAttributes: new { @class = "control-label" })
+            @Html.TextAreaFor(model => model.FeedbackReply, new { @class = "form-control", placeholder = "Enter your reply here .." })
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="saveFeedbackReply('@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model)).ToString()')">Save</button>
+
+        <!-- Close button added here -->
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closePopup()">Close</button>
+    }
 </div>

@@ -1,8 +1,1281 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@model API_Adda.Models.AdminMaster
+@{
+    ViewData["Title"] = "Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@using (Html.BeginForm("Admins", "Admin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    <div class="container mt-10">
+        <div class="card">
+            <div class="card-body">
+                <div class="tabs">
+                    <ul class="tabs-nav">
+                        <li class="tab-active"><a href="#tab-1">Application Master</a></li>
+                        <li class="UserLists"><a href="#tab-2">User Master</a></li>
+                    </ul>
+                    <div class="tabs-stage">
+                        <div id="tab-1">
+                            <div class="row form-group">
+                                <div class="col-md-8">
+                                    <button type="button" id="Model_addApp" value="Add Application" name="button" class="btn btn-primary openmodel" style="font-size: 13px;">
+                                        <i class="bx bx-plus" style="font-size: 15px;vertical-align: middle;"></i>
+                                        Add Application
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <input class="form-control" type="text" id="myInput" style="width:327px" onkeyup="SearchFunction()" placeholder="Search for Application Short Name.." title="Type in a name">
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-12">
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+                                    <table class="table table-hover table-striped" id="project_detail">
+                                        <thead>
+                                            <tr>
+                                                <th>App Short Name</th>
+                                                <th>Application Name</th>
+                                                <th>Application Purpose</th>
+                                                <th>ITGRC Name</th>
+                                                <th>Hosting DC fields</th>
+                                                <th>Action</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0">
+                                            @if (Model.AppMasterLists != null)
+                                            {
+                                                @for (int i = 0; i < Model.AppMasterLists.Count; i++)
+                                                {
+                                                    <tr>
+                                                        <td class="Appr" style="display:none;">@Model.AppMasterLists[i].Id</td>
+                                                        <td>@Model.AppMasterLists[i].APPShortName</td>
+                                                        <td>@Model.AppMasterLists[i].FullName</td>
+                                                        <td>@Model.AppMasterLists[i].Purpose</td>
+                                                        <td>@Model.AppMasterLists[i].ITGRCName</td>
+                                                        <td>@Model.AppMasterLists[i].HostingDC</td>
+                                                        <td>
+                                                            <a id="btnAppListEdit" class="btnAppListEdit" title="Edit Application" value="@Model.AppMasterLists[i].APPShortName" style="background-color: transparent;background:transparent">
+                                                                <i class="bx bxs-pencil" style="font-size: 20px; margin-top: 2px; color: #5777ba;"></i>
+                                                            </a>
+
+                                                            @*<button type="button" id="btnAppListEdit" class="btnAppListEdit" name="button" value="@Model.AppMasterLists[i].APPShortName"><i class="bx bx-pencil"></i></button>*@
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="tab-2">
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    <button type="button" id="modal_adduser" value="Add User" name="button" class="btn btn-primary openUsermodel" style="font-size: 13px;">
+                                        <i class="bx bx-plus" style="font-size: 15px;vertical-align: middle;"></i>
+                                        Add User
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-12">
+
+                                    <table class="table table-hover table-striped" id="project_detail">
+                                        <thead>
+                                            <tr>
+                                                <th>User ID</th>
+                                                <th>User Name</th>
+                                                <th>Status </th>
+                                                <th>Date Created</th>
+                                                <th>User Role   </th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0">
+                                            @if (Model.UserMasterLists != null)
+                                            {
+                                                @for (int i = 0; i < Model.UserMasterLists.Count; i++)
+                                                {
+                                                    <tr>
+                                                        <td class="nr">@Model.UserMasterLists[i].UserID</td>
+                                                        <td>@Model.UserMasterLists[i].UserName</td>
+                                                        <td>@Model.UserMasterLists[i].Status</td>
+                                                        <td>@Model.UserMasterLists[i].DateCreated</td>
+                                                        <td>@Model.UserMasterLists[i].UserRole</td>
+                                                        <td>
+                                                            <a id="btnUserListEdit" class="btnUserListEdit" title="Edit User" value="@Model.UserMasterLists[i].UserID" style="background-color: transparent;background:transparent">
+                                                                <i class="bx bxs-pencil" style="font-size: 20px; margin-top: 2px; color: #5777ba;"></i>
+                                                            </a>
+                                                            @*<button type="button" id="btnUserListEdit" class="btnUserListEdit" name="button" value="@Model.UserMasterLists[i].UserID"><i class="bx bx-pencil"></i></button>*@
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="mySizeChartModal" class="ebcf_modal">
+
+        <div class="ebcf_modal-content">
+            <div class="ebcf_modal-header">
+                <h5 id="AddEditApp" style="display:none;"></h5>
+                <a href="#" class="ebcf_close">&times;</a>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-3">
+                    <label id="Appid" style="display:none"></label>
+                    <label class="label-control">Application Short Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.TextBoxFor(a => a.APPShortName, new { @class = "form-control", onpaste = "return handlePaste(event)", autocomplete = "off" })
+                </div>
+                <div class="col-md-3">
+                    <label class="label-control">Application Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.TextBoxFor(a => a.FullName, new { @class = "form-control" })
+                </div>
+                <div class="col-md-3">
+                    <label class="label-control">Application Purpose</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.TextBoxFor(a => a.Purpose, new { @class = "form-control" })
+                </div>
+                <div class="col-md-3">
+                    <label class="label-control">Hosting DC fields</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @*<select class="form-control">
+                    *@
+                    @Html.DropDownListFor(a => a.HostingDC, new SelectList(Model.AllddHostingDC, "ID", "Val"), new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-3">
+                    <label class="label-control">ITGRC no.</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.TextBoxFor(a => a.ITGRCCode, new { @class = "form-control" })
+                </div>
+                <div class="col-md-3">
+                    <label class="label-control">ITGRC Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @*<input type="text" class="form-control" />*@
+                    @Html.TextBoxFor(a => a.ITGRCName, new { @class = "form-control" })
+                </div>
+                <div class="col-md-3">
+                    <label class="label-control">Status</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.DropDownListFor(a => a.status, new SelectList(Model.AllddStatus, "ID", "Val"), new { @class = "form-control" })
+                </div>
+            </div>
+            <hr />
+            <div class="row form-group">
+                <div class="col-md-3">
+                    <h3 style="font-size: 18px;font-weight: 600;">Add SPOC Details</h3>
+                </div>
+            </div>
+            <div id="attributes">
+                <div class="attr row form-group">
+                    <div class="col-md-2">
+                        <label class="label-control">Department</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.DropDownListFor(a => a.Department, new SelectList(Model.AllddDeparment, "ID", "Val"), new { @class = "form-control" })
+                        <span id="Department_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control">Employee Code</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        <input type="text" id="txtempcode" class="form-control">
+                        <span id="Empcode_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control">Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        <input type="text" id="txtName" class="form-control">
+                        <span id="Name_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control">Email</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        <input type="text" id="txtEmail" class="form-control">
+                        <span id="Email_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control">Spoc Level</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.DropDownListFor(a => a.SpocLevel, new SelectList(Model.SpocLevels, "ID", "Val"), new { @class = "form-control" })
+                        <span id="spocLevel_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btnrowAddDelete btn btn-success" type="button" style="margin-top: 20px;"><i class="bx bx-plus"></i></button>
+                    </div>
+                </div>
+                <table id="tbladdspoc" style="display:none;" class="TableAddDelete table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Employee code</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Level</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblspocbody"></tbody>
+                </table>
+                @*<div class="attr row form-group">
+                        <div class="col-md-3">
+                            <label class="label-control">Department</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            @Html.DropDownListFor(a => a.Department, new SelectList(Model.AllddDeparment, "ID", "Val"), new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-3">
+                            <label class="label-control">Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            <input type="text" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="label-control">Email</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            <input type="text" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-danger remove" type="button" style="margin-top: 20px; font-size:25px;padding: 8px;    line-height: 6px;">&times; </button>
+                        </div>
+                    </div>*@
+                @*<div class="attr">
+                        <input name="" id="" type="text" placeholder="Name" class="required-entry">
+                    </div>*@
+            </div>
+            <div class="row form-group">
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-4 text-center">
+                    <label id="Appvalidation" style="display:none;font-weight:bold;color:red;font-size: 12px;"></label>
+                </div>
+                <div class="col-md-4">
+                </div>
+            </div>
+            <div class="row form-group text-center">
+                <div class="col-md-12">
+                    <button type="button" id="butAppSubmit" name="button" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+
+
+
+            <div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="userModal" class="user_modal">
+
+        <div class="user_modal-content">
+            <div class="ebcf_modal-header">
+                <h5 id="AddEditUser" style="display:none;"></h5>
+                <a href="#" class="ebcf_close">&times;</a>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-2">
+                    <label class="label-control">User ID</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.TextBoxFor(a => a.UserID, new { @class = "form-control" })
+                </div>
+                <div class="col-md-2">
+                    <label class="label-control">User Role</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.DropDownListFor(a => a.UserRole, new SelectList(Model.AllddUserRole, "ID", "Val"), new { @class = "form-control" ,id = "UserRoleDropdown" })
+                </div>
+                <div class="col-md-2">
+                    <label class="label-control">ApproverDept</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                    @Html.DropDownListFor(a => a.ApproverDept, new SelectList(Model.AllddApproverDept, "ID", "Val"), new { @class = "form-control", id = "ApproverDeptDropdown"  })
+                </div>
+                    <div class="col-md-2">
+                        <label class="label-control">User Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.UserName, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control">Email ID  </label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.Emailid, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-2">
+                        <label class="label-control">Status</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.DropDownListFor(a => a.Userstatus, new SelectList(Model.AllddStatus, "ID", "Val"), new { @class = "form-control" })
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control">Last Login Date</label>@*&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                        @Html.TextBoxFor(a => a.LastLoginDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control"> Created Date</label>&nbsp;&nbsp;<span id="visibiltycreate" style="display:none;font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.CreatedDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                    <div class="col-md-2">
+                        <label class="label-control">Updated Date</label>@*&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                        @Html.TextBoxFor(a => a.UpdatedDate, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <label id="Uservalidation" style="display:none;font-weight:bold;color:red;font-size: 12px;"></label>
+                    </div>
+                    <div class="col-md-4">
+                    </div>
+                </div>
+                <div class="row form-group text-center">
+                    <div class="col-md-12">
+                        <button type="button" id="butUserSubmit" name="button" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+
+                <div>
+
+                </div>
+            </div>
+
+        </div>
+        }
+        <script src="~/js/jquery.min.js"></script>
+        <script src="~/js/Common.js"></script>
+        <script>
+
+
+            function handlePaste(e) {
+                e.preventDefault();
+                alert("Copy + paste not allowed! ");
+                return false;
+            }
+            // Show the first tab by default
+            //$('.tabs-stage div').hide();
+    $(document).ready(function () {
+        checkUserRoleDropdown();
+
+        // Handle change event of User Role dropdown
+        $("#UserRoleDropdown").change(function () {
+            checkUserRoleDropdown();
+        });
+
+        function checkUserRoleDropdown() {
+            var selectedUserRole = $("#UserRoleDropdown").val();
+            var activeUserRoles = ["VH", "GH", "FH"];
+
+            // Check if the selected user role is in the active list
+            if (activeUserRoles.includes(selectedUserRole)) {
+                // Enable the ApproverDept dropdown
+                $("#ApproverDeptDropdown").prop("disabled", false);
+            } else {
+                // Disable the ApproverDept dropdown
+                $("#ApproverDeptDropdown").prop("disabled", true);
+                $("#ApproverDeptDropdown").val('--Select--')
+            }
+        }
+
+                debugger;
+                $('#tab-1').show();
+                $('#tab-2').hide();
+                $('#tab-1').addClass('tab-active');
+
+                $("#APPShortName").change(function () {
+                    debugger;
+                    var abc = $('#APPShortName').val(); // Corrected to use parentheses
+                    abc = abc.replaceAll(' ', '');
+                    $('#APPShortName').val(abc);
+                });
+
+
+            });
+            // Change tab class and display content
+            $('.tabs-nav a').on('click', function (event) {
+                debugger;
+                event.preventDefault();
+                $('.tabs-nav li').removeClass('tab-active');
+                $(this).parent().addClass('tab-active');
+                $('#tab-1').hide();
+                $('#tab-2').hide();
+                $($(this).attr('href')).show();
+            });
+            $('.btnUserListEdit').click(function () {
+                var userid = $(this).closest("tr").find(".nr").text();
+                debugger;
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/GetUserDetail',
+                    data: {
+                        data: userid
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response != null) {
+                            $('#UserID').val(response.userID);
+                            $('#UserRole').val(response.userRole);
+                            $('#UserName').val(response.userName);
+                            $('#Emailid').val(response.emailid);
+                            debugger;
+                            if (response.userstatus == 1) {
+                                $('#Userstatus').val('Active');
+                            }
+                            else {
+                                $('#Userstatus').val('Inactive');
+                            }
+                            $('#CreatedDate').val(response.createdDate);
+                            $('#visibiltycreate').show();
+                            $('#UpdatedDate').val(response.updatedDate);
+                            $('#LastLoginDate').val(response.lastLoginDate);
+                            $("#butUserSubmit").html('Update');
+                            $('#UserID').prop("disabled", true);
+                            $('#userModal').show();
+                        }
+                        else {
+                            toastr.error("Information not available against this User Id.");
+                        }
+                    }
+                });
+            });
+            $('.btnAppListEdit').click(function () {
+                var Appids = $(this).closest("tr").find(".Appr").text();
+                $("#tbladdspoc tbody").empty();
+                debugger;
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/GetAppDetail',
+                    data: {
+                        data: Appids
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        debugger;
+                        if (response != null) {
+                            $('#Appid').val(response.appId);
+                            $('#APPShortName').val(response.appshortName);
+                            $('#FullName').val(response.appFullName);
+                            $('#Purpose').val(response.purpose);
+                            $('#ITGRCName').val(response.itgrcName);
+                            $('#ITGRCCode').val(response.itgrcCode);
+                            $('#HostingDC').val(response.hostingDC);
+                            if (response.status == 1) {
+                                $('#status').val('Active');
+                            }
+                            else {
+                                $('#status').val('Inactive');
+                            }
+                            $("#butAppSubmit").html('Update');
+                            $('#ITGRCCode').prop("disabled", true);
+                            $('#ITGRCName').prop("disabled", true);
+                            debugger
+                            editspocs(response.spocMasterLists);
+                            $('#mySizeChartModal').show();
+                            $('#tbladdspoc').show();
+                        }
+                        else {
+                            toastr.error("Information not available against this Application.");
+                        }
+                    }
+                });
+            });
+            $('#modal_adduser').click(function () {
+                debugger
+                $('#visibiltycreate').hide();
+                $('#UserID').val("");
+                $('#UserRole').val($("#UserRole option:first").val());
+                $('#UserName').val("");
+                $('#Emailid').val("");
+                $('#Userstatus').val($("#Userstatus option:first").val());
+                $('#CreatedDate').val("");
+                $('#UpdatedDate').val("");
+                $('#LastLoginDate').val("");
+                $("#butUserSubmit").html('Submit');
+                $('#UserID').prop("disabled", false);
+                $('#userModal').show();
+            });
+            $('#Model_addApp').click(function () {
+                $('#APPShortName').val("");
+                $('#FullName').val("");
+                $('#Purpose').val("");
+                $('#ITGRCName').val("");
+                $('#ITGRCCode').val("");
+                $('#HostingDC').val($("#HostingDC option:first").val());
+                $('#status').val($("#status option:first").val());
+                $("#butAppSubmit").html('Submit');
+                $("#tbladdspoc tbody").empty();
+                $('#APPShortName').prop("disabled", false);
+                $('#ITGRCCode').prop("disabled", false);
+                $('#ITGRCName').prop("disabled", false);
+                $('#mySizeChartModal').show();
+            });
+            $('#butAppSubmit').click(function () {
+                debugger;
+                $('#Appvalidation').hide();
+                var ValidationApp = ValidateAppMaster();
+                if (ValidationApp == 'Success') {
+                    var disAppmaster = {};
+                    disAppmaster.appId = $('#Appid').val();
+                    disAppmaster.AppShortName = $('#APPShortName').val();
+                    disAppmaster.appFullName = $('#FullName').val();
+                    disAppmaster.purpose = $('#Purpose').val();
+                    disAppmaster.itgrcName = $('#ITGRCName').val();
+                    disAppmaster.itgrcCode = $('#ITGRCCode').val();
+                    disAppmaster.hostingDC = $('#HostingDC').val();
+                    if ($('#status').val() == 'Active') {
+                        disAppmaster.status = 1;
+                    }
+                    else {
+                        disAppmaster.status = 0;
+                    }
+                    var spocMasterLists = [];
+                    $('#tblspocbody tr').each(function (e) {
+                        var obj = {};
+                        obj.SPOCDepartment = $(this).find("td:eq(0)").text();
+                        obj.SpocEMPCode = $(this).find("td:eq(1)").text();
+                        obj.SPOCName = $(this).find("td:eq(2)").text();
+                        obj.EmailAddress = $(this).find("td:eq(3)").text();
+                        obj.SPOCLevel = $(this).find("td:eq(4)").text();
+                        obj.APPShortName = $('#APPShortName').val();
+                        spocMasterLists.push(obj);
+                    });
+                    disAppmaster.spocMasterLists = spocMasterLists;
+                    disAppmaster.btnValue = $('#butAppSubmit').text();
+                    $.ajax({
+                        type: "POST",
+                        url: '/Admin/AddUpdateAppMaster',
+                        data: {
+                            disAppmaster: disAppmaster
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response != null) {
+                                /**/
+                                if (response === "Application " + $('#APPShortName').val() + " has been added successfully.") {
+                                    $('#mySizeChartModal').hide();
+                                    alert(response);
+                                    location.reload(true);
+                                }
+                                else if (response === "Application " + $('#APPShortName').val() + " has been updated successfully.") {
+                                    $('#mySizeChartModal').hide();
+                                    alert(response);
+                                    location.reload(true);
+                                }
+                                else {
+                                    alert(response);
+                                }
+                                //$('#mySizeChartModal').hide();
+                                //alert(response);
+                                //debugger;
+                                //location.reload(true);
+                            }
+                            else {
+                                toastr.error("Information not available against this Application.");
+                            }
+                        }
+                    });
+                }
+                else {
+                    $('#Appvalidation').text(ValidationApp);
+                    $('#Appvalidation').show();
+                }
+            });
+            $('#butUserSubmit').click(function () {
+                debugger;
+                $('#Uservalidation').hide();
+                var ValidationUser = ValidateUserMaster();
+                if (ValidationUser == 'Success') {
+                    var disUsermaster = {};
+                    disUsermaster.UserID = $('#UserID').val();
+                    disUsermaster.UserRole = $('#UserRole').val();
+                    disUsermaster.UserName = $('#UserName').val();
+                    disUsermaster.Emailid = $('#Emailid').val();
+                    if ($('#Userstatus').val() == 'Active') {
+                        disUsermaster.userstatus = 1;
+                    }
+                    else {
+                        disUsermaster.userstatus = 0;
+                    }
+                    disUsermaster.CreatedDate = $('#CreatedDate').val();
+                    disUsermaster.UpdatedDate = $('#UpdatedDate').val();
+                    disUsermaster.LastLoginDate = $('#LastLoginDate').val();
+                    disUsermaster.btnValue = $('#butUserSubmit').text();
+                    $.ajax({
+                        type: "POST",
+                        url: '/Admin/AddUpdateUserMaster',
+                        data: {
+                            disUsermaster: disUsermaster
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response != null) {
+                                if (response === "User Id " + $('#UserID').val() + " has been added successfully.") {
+                                    $('#userModal').hide();
+                                    alert(response);
+                                    location.reload(true);
+                                }
+                                else if (response === "User Id " + $('#UserID').val() + " has been updated successfully.") {
+                                    $('#userModal').hide();
+                                    alert(response);
+                                    location.reload(true);
+                                }
+                                else {
+                                    alert(response);
+                                }
+                                //$('#mySizeChartModal').hide();
+                                //alert(response);
+                                //debugger;
+                                //location.reload(true);
+                            }
+                            //if (response != null) {
+                            //    $('#userModal').hide();
+                            //    alert(response);
+                            //    debugger;
+                            //    location.reload(true);
+                            //    //$.ajax({
+                            //    //    type: "POST",
+                            //    //    url: '/Admin/Admins',
+                            //    //});
+
+                            //    // debugger;
+                            //    //$('.UserLists').click(function(){
+                            //    //var usertest = "";
+                            //    //});
+                            //}
+                            else {
+                                toastr.error("Information not available against this User.");
+                            }
+                        }
+                    });
+                }
+                else {
+                    $('#Uservalidation').text(ValidationUser);
+                    $('#Uservalidation').show();
+                }
+            });
+            function ValidateUserMaster() {
+                var ErrorMsg = "";
+                if ($('#UserID').val() != "") {
+                    $('#Uservalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter user id !!!';
+                    $('#UserID').focus();
+                    return ErrorMsg;
+                }
+                if ($('#UserRole :selected').val() == '-- Select --') {
+                    ErrorMsg = 'Select user role !!!';
+                    return ErrorMsg;
+                }
+                else {
+                    $('#Uservalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                if ($('#UserName').val() != "") {
+                    $('#Uservalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter user name !!!';
+                    $('#UserName').focus();
+                    return ErrorMsg;
+                }
+                if ($('#Emailid').val() != "") {
+                    $('#Uservalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter email id !!!';
+                    $('#Emailid').focus();
+                    return ErrorMsg;
+                }
+                if ($('#Userstatus :selected').val() == '-- Select --') {
+                    ErrorMsg = 'Select status !!!';
+                    return ErrorMsg;
+                }
+                else {
+                    $('#Uservalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                return ErrorMsg;
+            }
+            //function ValidateAppMaster() {
+            //    var ErrorMsg = "";
+            //    if ($('#APPShortName').val() != "") {
+            //        $('#Appvalidation').text("");
+            //        ErrorMsg = "Success";
+            //    }
+            //    else {
+            //        ErrorMsg = 'Enter APP Short Name !!!';
+            //        return ErrorMsg;
+            //    }
+            //    if ($('#FullName').val() != "") {
+            //        $('#Appvalidation').text("");
+            //        ErrorMsg = "Success";
+            //    }
+            //    else {
+            //        ErrorMsg = 'Enter APP Full Name !!!';
+            //        return ErrorMsg;
+            //    }
+            //    if ($('#Purpose').val() != "") {
+            //        $('#Appvalidation').text("");
+            //        ErrorMsg = "Success";
+            //    }
+            //    else {
+            //        ErrorMsg = 'Enter APP Purpose !!!';
+            //        return ErrorMsg;
+            //    }
+            //    if ($('#ITGRCName').val() != "") {
+            //        $('#Appvalidation').text("");
+            //        ErrorMsg = "Success";
+            //    }
+            //    else {
+            //        ErrorMsg = 'Enter ITGRC Name !!!';
+            //        return ErrorMsg;
+            //    }
+            //     if( $('#HostingDC').val() == "Bank Landing Zone" ||  $('#HostingDC').val() == 'Bank DC')
+            //    {
+            //        $('#ITGRCCode').text("");
+            //        ErrorMsg = "Enter ITGRC no. it's mandatory.!!!";
+            //    }
+            //    //if ($('#ITGRCCode').val() != "") {
+            //    //    $('#Appvalidation').text("");
+            //    //    ErrorMsg = "Success";
+            //    //}
+            //    else {
+            //        ErrorMsg = 'welcome';
+            //        return ErrorMsg;
+            //    }
+            //    if ($('#HostingDC :selected').val() != "-- Select --") {
+            //        $('#Appvalidation').text("");
+            //        ErrorMsg = "Success";
+            //    }
+            //    else {
+            //        ErrorMsg = 'Select Hosting DC !!!';
+            //        return ErrorMsg;
+            //    }
+            //    if ($('#status :selected').val() != "-- Select --") {
+            //        $('#Appvalidation').text("");
+            //        ErrorMsg = "Success";
+            //    }
+            //    else {
+            //        ErrorMsg = 'Select Status !!!';
+            //        return ErrorMsg;
+            //    }
+            //    if ($("#tbladdspoc tr").length > 1) {
+            //        $('#Appvalidation').text("");
+            //        ErrorMsg = "Success";
+            //    }
+            //    else {
+            //        ErrorMsg = 'Add Spocs person names !!!';
+            //        return ErrorMsg;
+            //    }
+
+            //    return ErrorMsg;
+            //}
+
+            function ValidateAppMaster() {
+                var ErrorMsg = "";
+                if ($('#APPShortName').val() != "") {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter application short name !!!';
+                    return ErrorMsg;
+                }
+                if ($('#FullName').val() != "") {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter application full name !!!';
+                    return ErrorMsg;
+                }
+                if ($('#Purpose').val() != "") {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter application purpose !!!';
+                    return ErrorMsg;
+                }
+                if ($('#ITGRCName').val() != "") {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter ITGRC name !!!';
+                    return ErrorMsg;
+                }
+                if ($('#ITGRCCode').val() != "") {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter ITGRC code !!!';
+                    return ErrorMsg;
+                }
+                if ($('#HostingDC :selected').val() != "-- Select --") {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Select Hosting DC !!!';
+                    return ErrorMsg;
+                }
+                if ($('#status :selected').val() != "-- Select --") {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Select status !!!';
+                    return ErrorMsg;
+                }
+                if ($("#tbladdspoc tr").length > 1) {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    if ($('#Department :selected').val() != '-- Select --') {
+                        $('#Appvalidation').text("");
+                        ErrorMsg = "Success";
+                    }
+                    else {
+                        ErrorMsg = 'Select department !!!';
+                        return ErrorMsg;
+                    }
+                    if ($('#txtempcode').val() != "") {
+                        $('#Appvalidation').text("");
+                        ErrorMsg = "Success";
+                    }
+                    else {
+                        ErrorMsg = 'Enter employee code !!!';
+                        return ErrorMsg;
+                    }
+                    if ($('#txtName').val() != "") {
+                        $('#Appvalidation').text("");
+                        ErrorMsg = "Success";
+                    }
+                    else {
+                        ErrorMsg = "Enter SPOC's person name !!!";
+                        return ErrorMsg;
+                    }
+                    if ($('#txtEmail').val() != "") {
+                        $('#Appvalidation').text("");
+                        ErrorMsg = "Success";
+                    }
+                    else {
+                        ErrorMsg = 'Enter email id !!!';
+                        return ErrorMsg;
+                    }
+                    if ($('#SpocLevel :selected').val() != '-- Select --') {
+                        $('#Appvalidation').text("");
+                        ErrorMsg = "Success";
+                    }
+                    else {
+                        ErrorMsg = 'Select SPOC level !!!';
+                        return ErrorMsg;
+                    }
+                }
+                if ($("#tbladdspoc tr").length > 1) {
+                    $('#Appvalidation').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = "Add SPOC's details !!!";
+                    return ErrorMsg;
+                }
+                return ErrorMsg;
+            }
+
+
+
+
+
+            $('#FullName').on('input', function (event) {
+                var inputValue = $(this).val();
+
+                // Check if the input starts with a space
+                if (inputValue.startsWith(' ')) {
+                    $(this).val(inputValue.trim()); // Remove the space from the beginning
+                }
+            });
+            $('#Purpose').on('input', function (event) {
+                var inputValue = $(this).val();
+
+                // Check if the input starts with a space
+                if (inputValue.startsWith(' ')) {
+                    $(this).val(inputValue.trim()); // Remove the space from the beginning
+                }
+            });
+            $('#ITGRCName').on('input', function (event) {
+                var inputValue = $(this).val();
+
+                // Check if the input starts with a space
+                if (inputValue.startsWith(' ')) {
+                    $(this).val(inputValue.trim()); // Remove the space from the beginning
+                }
+            });
+            //$('#ITGRCCode').on('input', function(event) {
+            //    var inputValue = $(this).val();
+
+            //    // Check if the input is not equal to "0" or is empty
+            //    if (inputValue !== '0' && inputValue !== '') {
+            //        // Allow the input
+            //        $(this).val(inputValue);
+            //    } else {
+            //        // Clear the input if it's "0" or empty
+            //        $(this).val('');
+            //    }
+            //});
+
+
+
+            $('#UserID').on("input", function () {
+                $('#Uservalidation').text("");
+                var userid = $('#UserID').val();
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/GetUserName',
+                    data: {
+                        UserID: userid
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response != null) {
+                            $('#UserName').val(response.userName);
+                            $('#Emailid').val(response.emailId);
+                        }
+                    }
+                });
+            });
+
+            $('#ITGRCCode').keypress(function (e) {
+
+                var charCode = (e.which) ? e.which : event.keyCode
+
+                if (String.fromCharCode(charCode).match(/[^0-9]/g))
+
+                    return false;
+
+            });
+
+
+            //------------------------------------------SpocScript---------------------------------------------------------------------------------
+            $('#txtempcode').on("input", function () {
+
+                var userid = $('#txtempcode').val();
+                $.ajax({
+                    type: "POST",
+                    url: '/Admin/GetUserName',
+                    data: {
+                        UserID: userid
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response != null) {
+                            $('#txtName').val(response.userName);
+                            $('#txtEmail').val(response.emailId);
+                        }
+                    }
+                });
+            });
+
+            //$('#HostingDC').on("input", function () {
+            //    var appShortName = $('#APPShortName').val();
+            //    if ($('#HostingDC').val() === "External") {
+            //        if (appShortName == "") {
+            //            alert("Please enter App Short Name first");
+            //            $('#HostingDC').val('');
+            //        }
+            //        else {
+            //        $('#ITGRCCode').val('EXTERNAL-' + appShortName);
+            //        $('#ITGRCName').val(appShortName);
+            //        $('#ITGRCCode').prop("disabled", true); // Disable editing when HostingDC is External
+            //        $('#ITGRCName').prop("disabled", true); // Disable editing when ITGRCName is External
+            //        }
+            //    }
+            //    else {
+            //        $('#ITGRCCode').val('');
+            //        $('#ITGRCName').val('');
+            //        $('#ITGRCCode').prop("disabled", false); // Enable editing when HostingDC is not External
+            //        $('#ITGRCName').prop("disabled", false); // Enable editing when HostingDC is not External
+            //    }
+            //});
+            $('#HostingDC').on("input", function () {
+                var appShortName = $('#APPShortName').val();
+                var hostingDCValue = $('#HostingDC').val(); // Get the current value of HostingDC dropdown
+
+                if (hostingDCValue === "External" && (appShortName == null || appShortName.trim() === "")) {
+                    alert("Please enter Application Short Name first !!!");
+                    $('#HostingDC').val($('#HostingDC option:first').val()); // Set HostingDC to its first value
+                    $('#HostingDC').trigger('change'); // Trigger change event to ensure other associated actions are performed
+                }
+                else if (hostingDCValue === "External") {
+                    $('#ITGRCCode').val('EXTERNAL-' + appShortName);
+                    $('#ITGRCName').val(appShortName);
+                    $('#ITGRCCode').prop("disabled", true); // Disable editing when HostingDC is External
+                    $('#ITGRCName').prop("disabled", true); // Disable editing when ITGRCName is External
+                } else if (hostingDCValue === "Bank DC" || hostingDCValue === "Bank Landing Zone") {
+                    $('#ITGRCCode').val('APPID-');
+                    $('#ITGRCName').val('');
+                    $('#ITGRCCode').prop("disabled", false);
+                    $('#ITGRCName').prop("disabled", false);
+                } else {
+                    $('#ITGRCCode').val('');
+                    $('#ITGRCName').val('');
+                    $('#ITGRCCode').prop("disabled", false); // Enable editing when HostingDC is not External
+                    $('#ITGRCName').prop("disabled", false); // Enable editing when HostingDC is not External
+                }
+            });
+            $("#APPShortName").keyup(function () {
+                var appShortName = $('#APPShortName').val();
+                if ($("#HostingDC").val() === "External") {
+                    $('#ITGRCCode').val('EXTERNAL-' + appShortName);
+                    $('#ITGRCName').val(appShortName);
+                }
+            });
+
+            debugger;
+            $('.btnrowAddDelete').click(function () {
+                debugger;
+                $('#tbladdspoc').show();
+                var ValidationSpocs = ValidationSpoc();
+                if (ValidationSpocs == 'Success') {
+                    var txtDepartment = $('#Department').val();
+                    var txtEmpCode = $('#txtempcode').val();
+                    var txtSpocName = $('#txtName').val();
+                    var txtspocEmail = $('#txtEmail').val();
+                    var txtSpocLevel = $('#SpocLevel').val();
+
+                    var EmpCodeValid = ExistEmpCheck(txtEmpCode);
+                    if (EmpCodeValid == 'AlreadyEmpcode') {
+                        alert('empcode already Insert,change this empcod');
+                    }
+                    else {
+
+                        $('.TableAddDelete tbody').append("<tr><td>" + txtDepartment + "</td><td>" + txtEmpCode + "</td><td>" + txtSpocName + "</td><td>" + txtspocEmail + "</td><td>" + txtSpocLevel + "</td><td><button type='button' class='btndeleterowadded close-btn'><i class='bx bx-x-circle' style='color: red;'></i></button></td></tr>");
+                        $('#Department').val($("#Department option:first").val());
+                        $('#txtempcode').val('');
+                        $('#txtName').val('');
+                        $('#txtEmail').val('');
+                        $('#SpocLevel').val($("#SpocLevel option:first").val());
+                    }
+                }
+            });
+            $(document).on('click', 'button.btndeleterowadded', function () {
+                $(this).closest('tr').remove();
+                return false;
+            });
+
+            function ValidationSpoc() {
+                var ErrorMsg = "";
+                if ($('#Department :selected').val() == '-- Select --') {
+                    ErrorMsg = 'Select department !!!';
+                    $('#Department_Span').text(ErrorMsg);
+                    $('#Department_Span').show();
+                    return ErrorMsg;
+                }
+                else {
+                    $('#Department_Span').text("");
+                    ErrorMsg = "Success";
+                }
+                if ($('#txtempcode').val() != "") {
+                    $('#Empcode_Span').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter employee code !!!';
+                    $('#Empcode_Span').text(ErrorMsg);
+                    $('#Empcode_Span').show();
+                    return ErrorMsg;
+                }
+                if ($('#txtName').val() != "") {
+                    $('#Name_Span').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = "Enter SPOC's person name !!!";
+                    $('#Name_Span').text(ErrorMsg);
+                    $('#Name_Span').show();
+                    return ErrorMsg;
+                }
+                if ($('#txtEmail').val() != "") {
+                    $('#Email_Span').text("");
+                    ErrorMsg = "Success";
+                }
+                else {
+                    ErrorMsg = 'Enter email id !!!';
+                    $('#Email_Span').text(ErrorMsg);
+                    $('#Email_Span').show();
+                    return ErrorMsg;
+                }
+                if ($('#SpocLevel :selected').val() == '-- Select --') {
+                    ErrorMsg = 'Select SPOC Level !!!';
+                    $('#spocLevel_Span').text(ErrorMsg);
+                    $('#spocLevel_Span').show();
+                    return ErrorMsg;
+                }
+                else {
+                    $('#spocLevel_Span').text("");
+                    ErrorMsg = "Success";
+                }
+
+                return ErrorMsg;
+
+            }
+            function ExistEmpCheck(response) {
+                var msg;
+                $('#tblspocbody tr').each(function (e) {
+
+                    if ($(this).find("td:eq(1)").text() == response) {
+                        msg = 'AlreadyEmpcode';
+                    }
+                    else {
+                        msg = 'NewEmpcode';
+                    }
+                });
+                return msg;
+            }
+            function editspocs(response) {
+                debugger
+
+                if (response != null) {
+                    debugger
+                    var output = response.map(i => "<tr><td>"
+                        + i.spocDepartment + "</td><td>"
+                        + i.spocEMPCode + "</td><td>"
+                        + i.spocName + "</td><td>"
+                        + i.emailAddress + "</td><td>"
+                        + i.spocLevel + "</td><td>"
+                        + "<button type='button' class='btndeleterowadded close-btn'><i class='bx bx-x-circle' style='color: red;'></i></button>" + "</td></tr>");
+                    $("#tblspocbody").html(output);
+                }
+            }
+
+            $(function () {
+                $('#APPShortName').on('keypress', function (e) {
+                    if (e.which == 32) {
+                        return false;
+                    }
+                });
+            });
+            function SearchFunction() {
+                var input, filter, table, tr, td, i, txtValue;
+                input = document.getElementById("myInput");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("project_detail");
+                tr = table.getElementsByTagName("tr");
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[1];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+            ///////////  Modal Popup  ///////////
+
+
+            // Get the modal
+            var ebModal = $('#mySizeChartModal');
+
+            // Get the button that opens the modal
+            var ebBtn = $(".openmodel");
+
+            // Get the <span> element that closes the modal
+            //var ebSpan = $(".ebcf_close")[0];
+            var ebSpan = $(".ebcf_close");
+
+            // When the user clicks the button, open the modal
+
+
+            ebBtn.click(function () {
+                debugger;
+                ebModal.show();
+            })
+
+
+            // When the user clicks on <span> (x), close the modal
+            ebSpan.click(function () {
+                debugger;
+                ebModal.hide();
+            })
+
+            // When the user clicks anywhere outside of the modal, close it
+            //window.click(function (event) {
+            //    debugger;
+            //    if (event.target == ebModal) {
+            //        ebModal.hide();
+            //    }
+            //})
+
+            //$(document).on('click', function (e) {
+            //    debugger;
+            //    if (!(($(e.target).closest("#mySizeChartModal").length > 0) || ($(e.target).closest(".openmodel").length > 0))) {
+            //        $("#mySizeChartModal").hide();
+            //    }
+            //});
+
+            ///////////  Modal User Popup  ///////////
+
+
+            // Get the modal
+            var userModal = $('#userModal');
+
+            // Get the button that opens the modal
+            var userBtn = $(".openUsermodel");
+
+            // Get the <span> element that closes the modal
+            //var ebSpan = $(".ebcf_close")[0];
+            var userSpan = $(".ebcf_close");
+
+            // When the user clicks the button, open the modal
+
+
+            userBtn.click(function () {
+                debugger;
+                userModal.show();
+            })
+
+
+            // When the user clicks on <span> (x), close the modal
+            userSpan.click(function () {
+                debugger;
+                userModal.hide();
+            })
+
+            // When the user clicks anywhere outside of the modal, close it
+            //window.click(function (event) {
+            //    debugger;
+            //    if (event.target == ebModal) {
+            //        ebModal.hide();
+            //    }
+            //})
+
+            //$(document).on('click', function (e) {
+            //    debugger;
+            //    if (!(($(e.target).closest("#mySizeChartModal").length > 0) || ($(e.target).closest(".openmodel").length > 0))) {
+            //        $("#mySizeChartModal").hide();
+            //    }
+            //});
+            $("#btnAppListEdit").click(function () {
+                $("#AddEditApp").html("Edit Application");
+                $('#AddEditApp').show();
+            });
+
+            $("#Model_addApp").click(function () {
+                $("#AddEditApp").html("Add Application");
+                $('#AddEditApp').show();
+            });
+            $("#btnUserListEdit").click(function () {
+                $("#AddEditUser").html("Edit User");
+                $('#AddEditUser').show();
+            });
+            $("#modal_adduser").click(function () {
+                $("#AddEditUser").html("Add User");
+                $('#AddEditUser').show();
+            });
+
+        </script>

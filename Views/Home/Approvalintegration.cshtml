@@ -1,8 +1,3093 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@model API_Adda.Models.NewIntegration
+@{
+    ViewData["Title"] = "Appprovalintegration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var ServiceIDTest = 0;
+    var actionName = "View";
+
+
+
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@*<style>
+        .ui-widget.ui-widget-content {
+            width: 250px !important;
+            top: 250px !important;
+            left: 367px !important;
+            height: 250px;
+            overflow: auto;
+            font-size: 13px;
+        }
+    </style>*@
+
+<div class="container mt-10">
+    @*<div>
+    <a href="/home/NewIntegrationList/" class="btn btn-primary" style="width:75px; margin-bottom:20px;">Back</a>
+    </div>id="integration",Appprovalintegration*@
+    <div class="card" id="Appprovalintegration">
+        @*@using (Html.BeginForm("ApprovalWorkFlow", "Home", FormMethod.Post, new { @enctype = "multipart/form-data" }))*@
+        @using (Html.BeginForm("Appprovalintegration", "Home", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+        {
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>Appproval Integration</h4>
+
+                        <a href="/home/NewIntegrationList/" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ProjectMgrBTG, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.ProjectMgrBTG, new { @class = "form-control", @maxlength = "90" })
+                        <span id="ProjectMgrBTG_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.ProjectMgrBTG)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ProjectMgrIT, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.ProjectMgrIT, new { @class = "form-control", @maxlength = "90" })
+                        <span id="ProjectMgrIT_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.ProjectMgrIT)
+                    </div>
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ProjectName, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.ProjectName, new { @class = "form-control", @maxlength = "90" })
+                        <span id="ProjectName_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.ProjectName)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ProjectId, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.ProjectId, new { @class = "form-control", @maxlength = "90" })
+                        <span id="ProjectId_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.ProjectId)
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.GoLiveDate, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        <div class="input-group">
+                            @Html.EditorFor(a => a.GoLiveDate, new { htmlAttributes = new { @class = "form-control" } })
+
+                            <div class="input-group-addon">
+                                <span class="icon-arrow-down"></span>
+                            </div>
+                        </div>
+                        <span id="GoLiveDate_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.GoLiveDate)
+
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.BusinesssJustification, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.BusinesssJustification, new { @class = "form-control", @maxlength = "90" })
+                        <span id="BusinesssJustification_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.BusinesssJustification)
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.BusinessSponsor, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.BusinessSponsor, new { @class = "form-control", @maxlength = "90" })
+                        <span id="BusinessSponsor_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.BusinessSponsor)
+
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ExecutiveSponsor, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.ExecutiveSponsor, new { @class = "form-control", @maxlength = "90" })
+                        <span id="ExecutiveSponsor_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.ExecutiveSponsor)
+                    </div>
+                </div>
+
+                <div class="row form-group">
+
+                    @*<label class="label-control"> @ViewBag.Role </label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                @Html.LabelFor(a => a.Role, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                    @if (ViewBag.Role == "BTGUSER")
+                    {
+                        <div class="col-md-3">
+
+                            <label class="label-control">BTG USER</label><span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            @if (Model.BTGUserNameFillList != null)
+                            {
+                                @Html.DropDownListFor(x => x.BTGUSER, new SelectList(Model.BTGUserNameFillList, "UserName", "UserName"), new { @class = "form-control" })
+                                <span id="BTGRole_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            }
+                        </div>
+                        <div class="col-md-3">
+                            <label class="label-control">IT USER</label><span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            @if (Model.ITUserNameFillList != null)
+                            {
+                                @Html.DropDownListFor(x => x.ITUSER, new SelectList(Model.ITUserNameFillList, "UserName", "UserName"), new { @class = "form-control", @disabled = "disabled" })
+                            }
+                        </div>
+
+
+                    }
+                    else if (ViewBag.Role == "ITUSER")
+                    {
+                        <div class="col-md-3">
+                            <label class="label-control">BTG USER</label><span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            @Html.DropDownListFor(x => x.BTGUSER, new SelectList(Model.BTGUserNameFillList, "UserName", "UserName"), new { @class = "form-control", @disabled = "disabled" })
+                        </div>
+                        <div class="col-md-3">
+                            <label class="label-control">IT USER</label><span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            @Html.DropDownListFor(x => x.ITUSER, new SelectList(Model.ITUserNameFillList, "UserName", "UserName"), new { @class = "form-control" })
+                            <span id="ITRole_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        </div>
+
+
+
+                    }
+                    else if (ViewBag.Role == "ITARCHITECH")
+                    {
+                        <div class="col-md-3">
+                            <label class="label-control">BTG USER</label><span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            @Html.DropDownListFor(x => x.BTGUSER, new SelectList(Model.BTGUserNameFillList, "UserName", "UserName"), new { @class = "form-control", @disabled = "disabled" })
+                            <span id="Role_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="label-control">IT USER</label><span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            @Html.DropDownListFor(x => x.ITUSER, new SelectList(Model.ITUserNameFillList, "UserName", "UserName"), new { @class = "form-control", @disabled = "disabled" })
+
+                        </div>
+
+                    }
+
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.CostCenterCode, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.CostCenterCode, new { @class = "form-control", @maxlength = "90" })
+                        <span id="CostCenterCode_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @Html.ValidationMessageFor(a => a.CostCenterCode)
+                    </div>
+
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ChannelId, new { @class = "label-control" })@*&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                        @Html.TextBoxFor(a => a.ChannelId, new { @class = "form-control", @maxlength = "90" })
+                        @*<span id="CostCenterCode_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    @Html.ValidationMessageFor(a => a.CostCenterCode)*@
+                    </div>
+
+
+
+                    <div class="col-md-6">
+
+
+                        @Html.HiddenFor(x => x.IntegrationId)
+                        @Html.HiddenFor(x => x.BTGUSER)
+                        @Html.HiddenFor(x => x.ITUSER)
+                        @Html.HiddenFor(x => x.IN_Platform)
+                        @Html.HiddenFor(x => x.ParentIntegrationId)
+                        @Html.HiddenFor(x => x.CreatedAt)
+
+
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ContainerName, new { @class = "label-control" })@*&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                        @Html.TextBoxFor(a => a.ContainerName, new { @class = "form-control", @maxlength = "90" })
+                        @*<span id="CostCenterCode_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    @Html.ValidationMessageFor(a => a.CostCenterCode)*@
+                    </div>
+                    <div class="col-md-3">
+                        @Html.LabelFor(a => a.ConsumerApplication, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextBoxFor(a => a.ConsumerApplication, new { @class = "form-control", @maxlength = "90", @placeholder = "Application Name / Application ITGRC" })
+                        <span id="ConsumerApplication_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                        @*@Html.ValidationMessageFor(a => a.CostCenterCode)*@
+                    </div>
+                    @*<div class="col-md-3">
+                <label class="label-control">Middleware Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                @Html.DropDownListFor(a => a.MiddlewareNameId, new SelectList(Model.MiddlewareName, "ID", "Val"), new { @class = "form-control" })
+                <span id="MiddlewareName_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                @Html.ValidationMessageFor(a => a.MiddlewareNameId)
+                </div>*@
+                    <div class="col-md-3 SDD">
+                        @if (@Accessor.HttpContext.Session.GetString("Role") == "ITUSER" || @Accessor.HttpContext.Session.GetString("Role") == "ITARCHITECH")
+                        {
+                            @Html.HiddenFor(a => a.modifySequenceDiagFileName)
+                            @if (Model.integrationLists != null)
+                            {
+                                @Html.LabelFor(a => a.SequenceDiagDocument, new { @class = "label-control" }) <span style="font-weight:bold;color:red;font-size: 12px;"></span>
+                                @if (@Model.SqfileName != string.Empty && @Model.SqfileName != null)
+                                {
+                                    @Html.TextBoxFor(a => a.SequenceDiagDocument, "", new { type = "file", @class = "demo1", @placeholder = @Model.SqfileName, accept = ".zip,.ZIP,.7z,.7Z,.doc,.DOC,.xls,.XLS,.xlsx,.XLSX,.pdf,.PDF" })
+                                    @*<div class="kwt-file">
+                    <div class="kwt-file__drop-area">
+                    <span class="kwt-file__choose-file ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
+                    <path d="M67.508 468.467c-58.005-58.013-58.016-151.92 0-209.943l225.011-225.04c44.643-44.645 117.279-44.645 161.92 0 44.743 44.749 44.753 117.186 0 161.944l-189.465 189.49c-31.41 31.413-82.518 31.412-113.926.001-31.479-31.482-31.49-82.453 0-113.944L311.51 110.491c4.687-4.687 12.286-4.687 16.972 0l16.967 16.971c4.685 4.686 4.685 12.283 0 16.969L184.983 304.917c-12.724 12.724-12.73 33.328 0 46.058 12.696 12.697 33.356 12.699 46.054-.001l189.465-189.489c25.987-25.989 25.994-68.06.001-94.056-25.931-25.934-68.119-25.932-94.049 0l-225.01 225.039c-39.249 39.252-39.258 102.795-.001 142.057 39.285 39.29 102.885 39.287 142.162-.028A739446.174 739446.174 0 0 1 439.497 238.49c4.686-4.687 12.282-4.684 16.969.004l16.967 16.971c4.685 4.686 4.689 12.279.004 16.965a755654.128 755654.128 0 0 0-195.881 195.996c-58.034 58.092-152.004 58.093-210.048.041z">
+                    <input class="demo1 kwt-file__input" id="SequenceDiagDocument" name="SequenceDiagDocument" placeholder="Select Files" type="file" accept=".zip,.ZIP,.7z,.7Z,.doc,.DOC,.xls,.XLS,.xlsx,.XLSX,.pdf,.PDF">
+                    </path>
+                    </svg>
+                    </span>
+
+                    <span class="kwt-file__msg fileclear" id="fileclear">@Model.SqfileName</span>
+                    <div class="kwt-file__delete docdelete" style="display: block !important;">
+                    <input type="submit" name="button" id="btndocdelete" value="Document" class="d-none" />
+                    <span id="SequenceDiagDocument_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    </div>
+                    </div>*@
+                                }
+                                else
+                                {
+
+                                    @Html.TextBoxFor(a => a.SequenceDiagDocument, "", new { type = "file", @class = "demo1", @placeholder = "Select Files", accept = ".zip,.ZIP,.7z,.7Z,.doc,.DOC,.xls,.XLS,.xlsx,.XLSX,.pdf,.PDF" })
+                                }
+
+                            }
+                            else
+                            {
+
+                                @Html.LabelFor(a => a.SequenceDiagDocument, new { @class = "label-control" }) <span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                @if (@Model.SqfileName != string.Empty && @Model.SqfileName != null)
+                                {
+
+                                    @*<div class="kwt-file">
+                    <div class="kwt-file__drop-area">
+                    <span class="kwt-file__choose-file ">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
+                    <path d="M67.508 468.467c-58.005-58.013-58.016-151.92 0-209.943l225.011-225.04c44.643-44.645 117.279-44.645 161.92 0 44.743 44.749 44.753 117.186 0 161.944l-189.465 189.49c-31.41 31.413-82.518 31.412-113.926.001-31.479-31.482-31.49-82.453 0-113.944L311.51 110.491c4.687-4.687 12.286-4.687 16.972 0l16.967 16.971c4.685 4.686 4.685 12.283 0 16.969L184.983 304.917c-12.724 12.724-12.73 33.328 0 46.058 12.696 12.697 33.356 12.699 46.054-.001l189.465-189.489c25.987-25.989 25.994-68.06.001-94.056-25.931-25.934-68.119-25.932-94.049 0l-225.01 225.039c-39.249 39.252-39.258 102.795-.001 142.057 39.285 39.29 102.885 39.287 142.162-.028A739446.174 739446.174 0 0 1 439.497 238.49c4.686-4.687 12.282-4.684 16.969.004l16.967 16.971c4.685 4.686 4.689 12.279.004 16.965a755654.128 755654.128 0 0 0-195.881 195.996c-58.034 58.092-152.004 58.093-210.048.041z">
+                    <input class="demo1 kwt-file__input" id="SequenceDiagDocument" name="SequenceDiagDocument" placeholder="Select Files" type="file" accept=".zip,.ZIP,.7z,.7Z,.doc,.DOC,.xls,.XLS,.xlsx,.XLSX,.pdf,.PDF">
+                    </path>
+                    </svg>
+                    </span>
+
+                    <span class="kwt-file__msg fileclear" id="fileclear">@Model.SqfileName</span>
+                    <div class="kwt-file__delete docdelete" style="display: block !important;">
+                    <input type="submit" name="button" id="btndocdelete" value="Document" class="d-none" />
+                    </div>
+                    </div>
+                    </div>*@
+
+                                    @Html.TextBoxFor(a => a.SequenceDiagDocument, "", new { type = "file", @class = "demo1", @placeholder = @Model.SqfileName, accept = ".zip,.ZIP,.7z,.7Z,.doc,.DOC,.xls,.XLS,.xlsx,.XLSX,.pdf,.PDF" })
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(a => a.SequenceDiagDocument, "", new { type = "file", @class = "demo1", @placeholder = "Select Files", accept = ".zip,.ZIP,.7z,.7Z,.doc,.DOC,.xls,.XLS,.xlsx,.XLSX,.pdf,.PDF" })
+                                }
+                            }
+                        }
+
+                        @Html.HiddenFor(x => x.SequenceDiagFiles)
+                        @Html.HiddenFor(x => x.SequenceDiagDocument)
+                        @Html.HiddenFor(x => x.SqfileName)
+                        @Html.HiddenFor(x => x.modifySequenceDiagFileName)
+                    </div>
+
+                </div>
+
+                <hr />
+                <div class="row form-group">
+                    <div class="col-md-12" style="overflow-x:scroll">
+                        <table class="_table table table-hover table-striped" id="new_api">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Service Name Internal</th>
+                                    <th>Service Name External</th>
+                                    <th>Purpose</th>
+                                    <th width="20%">Existing / New</th>
+                                    <th>Producer Application</th>
+                                    <th>Rest / SOAP</th>
+                                    <th>Transformation, if any (in case of new service)</th>
+                                    <th>Volume (in TPS)</th>
+                                    <th width="20%">Service Type</th>
+                                    <th>API Type</th>
+                                    <th>API Category</th>
+                                    <th>API Risk Classification</th>
+                                    @*<th>Partner Risk Score</th>*@
+                                    <th>Domain Name</th>
+                                    <th>Consumer DC</th>
+                                    <th>Producer DC</th>
+                                    <th>Platform </th>
+                                    <th>Middleware Name</th>
+                                </tr>
+                            </thead>
+
+
+
+                            <tbody id="table_body">
+
+                                @if (Model.serviceDetails != null)
+                                {
+                                    @for (int i = 0; i < Model.serviceDetails.Count; i++)
+
+                                    {
+                                        {
+
+                                            ServiceIDTest = Model.serviceDetails[i].ServiceID;
+
+                                        }
+                                        Model.serviceDetails[i].ServiceID = ServiceIDTest;
+
+                                        <tr>
+                                            <td>
+                                                @if (Accessor.HttpContext.Session.GetString("AccessRight") == "AccessRight")
+                                                {
+                                                    actionName = "Edit";
+                                                }
+
+
+                                                <button type="button" class="btn btn-primary btn-sm EditRowApproval" name="button" value="Edit+@ServiceIDTest" id="EditrowApproval">@actionName</button>
+                                                @*<button type="submit" class="btn btn-primary btn-lg d-none EditRowHide" name="button" value="Edit+@ServiceIDTest" id="Edit-@ServiceIDTest">Edit</button>*@
+                                                <button type="submit" class="btn btn-primary btn-lg d-none EditRowHide" name="button" value="Edit+@ServiceIDTest" id="Edit-@ServiceIDTest">@actionName</button>
+                                            </td>
+                                            <td>
+
+                                                <label>@Model.serviceDetails[i].InternalServiceName</label>
+                                                @*@Html.LabelFor(x => x.serviceDetails[i].ServiceName, new { @class = "form-control ", @readonly = "readonly", @disabled = "disabled" })*@
+                                                @*@Html.TextBoxFor(x => x.serviceDetails[i].ServiceName, new { @class = "form-control ", @readonly = "readonly", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                <label>@Model.serviceDetails[i].ExternalServiceName</label>
+                                                @*@Html.TextBoxFor(x => x.serviceDetails[i].ConsumerApplication, new { @class = "form-control ", @readonly = "readonly", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                <label>@Model.serviceDetails[i].Purpose</label>
+                                                @*@Html.TextBoxFor(x => x.serviceDetails[i].Purpose, new { @class = "form-control ", @readonly = "readonly", @disabled = "disabled" })*@
+
+
+                                            </td>
+                                            <td>
+                                                <label>@Model.ExistingNewList.Where(x => x.ID == Model.serviceDetails[i].Existing_New_Id).Select(x => x.Val).FirstOrDefault()</label>
+                                                @*@Html.DropDownListFor(x => x.serviceDetails[i].Existing_New_Id, new SelectList(Model.ExistingNewList, "ID", "Val"), new { @class = "form-control ", @disabled = "disabled" })*@
+
+                                            </td>
+
+                                            <td>
+                                                <label>@Model.serviceDetails[i].ProducerApplication</label>
+                                                @*@Html.TextBoxFor(x => x.serviceDetails[i].ProducerApplication, new { @class = "form-control ", @readonly = "readonly", @disabled = "disabled" })*@
+
+                                            </td>
+
+                                            <td>
+                                                <label>@Model.RestSoapList.Where(x => x.ID == Model.serviceDetails[i].Rest_SOAP_Id).Select(x => x.Val).FirstOrDefault()</label>
+
+                                                @*@Html.DropDownListFor(x => x.serviceDetails[i].Rest_SOAP_Id, new SelectList(Model.RestSoapList, "ID", "Val"), new { @class = "form-control", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                @*@Html.TextBoxFor(x => x.serviceDetails[i].Transformation, new { @class = "form-control ", @readonly = "readonly", @disabled = "disabled" })*@
+                                                <label>@Model.serviceDetails[i].Transformation</label>
+
+                                            </td>
+                                            <td>
+                                                <label>@Model.serviceDetails[i].Volume</label>
+                                                @*@Html.TextBoxFor(x => x.serviceDetails[i].Volume, new { @class = "form-control ", @readonly = "readonly", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                <label>@Model.ServiceTypeList.Where(x => x.ID == Model.serviceDetails[i].ServiceType_Id).Select(x => x.Val).FirstOrDefault()</label>
+                                                @*@Html.DropDownListFor(x => x.serviceDetails[i].ServiceType_Id, new SelectList(Model.ServiceTypeList, "ID", "Val"), new { @class = "form-control ", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                <label>@Model.APITypeList.Where(x => x.ID == Model.serviceDetails[i].APIType_Id).Select(x => x.Val).FirstOrDefault()</label>
+                                                @*@Html.DropDownListFor(x => x.serviceDetails[i].APIType_Id, new SelectList(Model.APITypeList, "ID", "Val"), new { @class = "form-control ", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                @*<label>@Model.serviceDetails[i].RistClassify</label>*@
+                                                <label>@Model.APICategoryList.Where(x => x.ID == Model.serviceDetails[i].APICategory_Id).Select(x => x.Val).FirstOrDefault()</label>
+                                                @*@Html.DropDownListFor(x => x.serviceDetails[i].APICategory_Id, new SelectList(Model.APICategoryList, "ID", "Val"), new { @class = "form-control ", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                <label>@Model.serviceDetails[i].RistClassify</label>
+                                                @*<label>@Model.APIRiskScoreList.Where(x => x.ID == Model.serviceDetails[i].APIRiskScore_Id).Select(x => x.Val).FirstOrDefault()</label>*@
+                                                @*@Html.DropDownListFor(x => x.serviceDetails[i].APIRiskScore_Id, new SelectList(Model.APIRiskScoreList, "ID", "Val"), new { @class = "form-control ", @disabled = "disabled" })*@
+
+                                            </td>
+                                            @*<td>*@
+                                            @*<label>@Model.PartnerRiskScoreList.Where(x => x.ID == Model.serviceDetails[i].PartnerRiskScore_Id).Select(x => x.Val).FirstOrDefault()</label>*@
+                                            @*@Html.DropDownListFor(x => x.serviceDetails[i].PartnerRiskScore_Id, new SelectList(Model.PartnerRiskScoreList, "ID", "Val"), new { @class = "form-control ", @disabled = "disabled" })*@
+
+                                            @*</td>*@
+                                            <td>
+                                                <label>@Model.DomainNameList.Where(x => x.ID == Model.serviceDetails[i].DomainName_Id).Select(x => x.Val).FirstOrDefault()</label>
+                                                @*@Html.DropDownListFor(x => x.serviceDetails[i].DomainName_Id, new SelectList(Model.DomainNameList, "ID", "Val"), new { @class = "form-control ", @disabled = "disabled" })*@
+
+                                            </td>
+                                            <td>
+                                                @*<label>@Model.ConsumerDCList.Where(x => x.ID == Model.serviceDetails[i].ConsumerDC_Id).Select(x => x.Val).FirstOrDefault()</label>*@
+                                                <label>@Model.serviceDetails[i].ConsumerDC</label>
+                                            </td>
+                                            <td>
+                                                @*<label>@Model.ProducerDCList.Where(x => x.ID == Model.serviceDetails[i].ProducerDC_Id).Select(x => x.Val).FirstOrDefault()</label>*@
+                                                <label>@Model.serviceDetails[i].ProducerDC</label>
+                                            </td>
+                                            <td>
+                                                <label>@Model.serviceDetails[i].Platform</label>
+                                            </td>
+                                            <td>
+                                                <label>@Model.MiddlewareName.Where(x => x.ID == Model.serviceDetails[i].MiddlewareNameId).Select(x => x.Val).FirstOrDefault()</label>
+                                            </td>
+                                            <td style="display:none">
+                                                <label>@Model.serviceDetails[i].SfileName</label>
+                                            </td>
+                                            <td style="display:none">
+                                                <label>@Model.serviceDetails[i].modifyExpectedAPISpecificationFileName</label>
+                                            </td>
+                                            <td style="display:none">
+                                                <label>@Model.serviceDetails[i].ExpectedAPISpecificationFiles</label>
+                                            </td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].ServiceID)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].Existing_New_Id)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].Rest_SOAP_Id)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].ServiceType_Id)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].APIType_Id)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].APICategory_Id)</td>
+                                            @*<td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].APIRiskScore_Id)</td>*@
+                                            @*<td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].PartnerRiskScore_Id)</td>*@
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].DomainName_Id)</td>
+                                            @*<td style="display:none">@Html.CheckBoxFor(x => x.serviceDetails[i].IsAPIGW)</td>*@
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].InternalServiceName)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].Purpose)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].ExternalServiceName)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].ProducerApplication)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].Transformation)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].Volume)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].ConsumerDC)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].ProducerDC)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].Platform) </td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].modifyExpectedAPISpecificationFileName)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].ExpectedAPISpecificationFiles)</td>
+                                            <td style="display:none">@Html.TextBoxFor(x => x.serviceDetails[i].MiddlewareNameId)</td>
+                                            @*<td>@Html.HiddenFor(x => x.serviceDetails[i].OprationApi)</td>
+                                <td>@Html.HiddenFor(x => x.serviceDetails[i].ApiHandle)</td>
+                                <td>@Html.HiddenFor(x => x.serviceDetails[i].FinancialTransaction)</td>
+                                <td>@Html.HiddenFor(x => x.serviceDetails[i].EstimateValue)</td>
+                                <td>@Html.HiddenFor(x => x.serviceDetails[i].Availability)</td>*@
+                                            <td>@Html.HiddenFor(x => x.serviceDetails[i].TotalScore)</td>
+                                            <td>@Html.HiddenFor(x => x.serviceDetails[i].RistClassify)</td>
+
+
+                                        </tr>
+
+                                    }
+                                }
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <hr />
+
+                </div>
+                @if (Model.FeedbackHistoryList != null)
+                {
+
+                    @if (Model.FeedbackHistoryList.Count > 0)
+                    {
+                        <hr />
+
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <label class="label-control fw-bold">Work Flow History :</label>
+                                <table class="_table table table-hover table-striped" id="">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee Name</th>
+                                            <th>Role</th>
+                                            <th>Feedback Details</th>
+                                            <th>Work Flow Status</th>
+                                            <th>Action</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table_body">
+
+                                        @if (Model.FeedbackHistoryList != null)
+                                        {
+                                            for (int i = 0; i < Model.FeedbackHistoryList.Count; i++)
+                                            {
+                                                <tr>
+                                                    <td>@Model.FeedbackHistoryList[i].EmpName</td>
+                                                    <td>@Model.FeedbackHistoryList[i].Role</td>
+                                                    <td>@Model.FeedbackHistoryList[i].Feedback_Details</td>
+                                                    <td>@Model.FeedbackHistoryList[i].Status</td>
+                                                    <td>@Model.FeedbackHistoryList[i].Created_Date</td>
+
+                                                    <td>@Html.HiddenFor(x => Model.FeedbackHistoryList[i].EmpName)</td>
+                                                    <td>@Html.HiddenFor(x => Model.FeedbackHistoryList[i].Role)</td>
+                                                    <td>@Html.HiddenFor(x => Model.FeedbackHistoryList[i].Feedback_Details)</td>
+                                                    <td>@Html.HiddenFor(x => Model.FeedbackHistoryList[i].Created_Date)</td>
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                        <hr />
+                    }
+                }
+
+
+                <div class="row form-group">
+                    <div class="col-md-10">
+                        <label class="label-control fw-bold">Feedback/Reviewer Comment</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                        @Html.TextAreaFor(a => a.Feedback, new { @class = "form-control", @cols = "40", @rows = "5", @maxlength = "450" })
+                        <span id="Feedback_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        @if (!String.IsNullOrEmpty(Model.UserJourneyFiles))
+                        {
+                            <label class="label-control fw-bold">
+                                User Journey Document
+                            </label>
+                            <div class="col-md-12">
+                                <label id="UserJourneyFile" class="label-control">@Model.UserJourneyFiles</label>&nbsp;&nbsp;
+                                <a class="btn btn-primary" id="btn_DownloadUserJorneyDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
+
+                                <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.UserJourneyFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+
+                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.UserJourneyFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                                    <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
+                                </a>
+                                @Html.HiddenFor(x => x.UserJourneyFiles)
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-3">
+                        @if (!String.IsNullOrEmpty(Model.RDConceptNoteFiles))
+                        {
+                            <label class="label-control fw-bold">
+                                RD Concept Note Document
+                            </label>
+                            <div class="col-md-12">
+                                <label id="RDConceptNoteFile" class="label-control">@Model.RDConceptNoteFiles</label>&nbsp;&nbsp;
+                                <a class="btn btn-primary" id="btn_DownloadRDConceptNoteDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
+                                <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.RDConceptNoteFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+
+                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.RDConceptNoteFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                                    <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
+                                </a>
+                                @Html.HiddenFor(x => x.RDConceptNoteFiles)
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-3">
+                        @if (!String.IsNullOrEmpty(Model.SequenceDiagFiles))
+                        {
+                            <label class="label-control fw-bold">
+                                Sequence Diagram
+                            </label>
+                            <div class="col-md-12">
+
+                                <label id="SequenceDiagFile" class="label-control">@Model.SequenceDiagFiles</label>&nbsp;&nbsp;
+                                <a class="btn btn-primary" id="btn_DownloadSequenceDiagDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
+                                <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.SequenceDiagFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.SequenceDiagFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                                    <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
+                                </a>
+                                @Html.HiddenFor(x => x.SequenceDiagFiles)
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-3">
+                        @if (Model.IntegrationId != 0 && Model.workflowstatus == 3)
+                        {
+                            <label id="DownloadIntegrationDoc" class="label-control"><b>OBP Document</b></label>
+                            <a class="btn btn-primary" id="btn_DownloadIntegrationDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
+                        }
+                    </div>
+                </div>
+
+
+
+
+                @if (Accessor.HttpContext.Session.GetString("AccessRight") == "AccessRight")
+                {
+
+                    <div class="form-group">
+                        <div class="col-md-12 text-center">
+                            <input type="button" class="btn btn-info" style="display:none" name="button" id="btnFeedbackV" value="Feedback to User" onclick="validation('btnFeedback')" />
+                            <input type="submit" class="btn btn-info d-none" name="button" id="btnFeedback" value="Feedback to User" />
+
+                            <input type="button" class="btn btn-primary" style="display:none" name="button" id="btnReviewedV" value="Reviewed" onclick="validation('btnReviewed')" />
+                            <input type="submit" class="btn btn-primary d-none" name="button" id="btnReviewed" value="Reviewed" />
+
+                            <input type="button" class="btn btn-success" style="display:none" name="button" id="btnApprovedV" value="Approved" onclick="validation('btnApproved')" />
+                            <input type="submit" class="btn btn-success d-none" name="button" id="btnApproved" value="Approved" />
+
+                            <input type="button" class="btn btn-primary" style="display:none" name="button" id="btnArchitechReviewV" value="Architech Review" onclick="validation('btnArchitechReview')" />
+                            <input type="submit" class="btn btn-primary d-none" name="button" id="btnArchitechReview" value="Architech Review" />
+
+                            <input type="button" class="btn btn-danger" style="display:none" name="button" id="btnRejectV" value="Reject" onclick="validation('btnReject')" />
+                            <input type="submit" class="btn btn-danger d-none" name="button" id="btnReject" value="Reject" />
+
+                        </div>
+                    </div>
+                }
+                @*<div class="row form-group" style="margin-top:5%;">
+            <div class="col-md-12 text-center">
+            @if (ViewBag.SubmitValue == "Update")
+            {
+            <input type="submit" class="btn btn-primary" name="button" id="BtnSaveIntegration" value="Save" />
+            }
+            else if (ViewBag.SubmitValue == "Update")
+            {
+            <input type="submit" class="btn btn-primary" name="button" id="BtnSaveIntegration" value="Update" />
+            }
+            </div>
+            </div>*@
+
+                @*-------------------Start-------------------PopUp ---------------------------------------------------------------------------------*@
+
+                <div id="addnew_popup" class="card addnew-popup">
+                    <div class="card-body">
+                        <div class="row form-group">
+                            <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                                <h4>Service Details</h4>
+                                <button class="close-btn" id="popup_close">
+                                    <i class="bx bx-x-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row form-group">
+                            <div class="col-md-3">
+                                <label class="label-control">Select Existing / New </label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                <div style="display:none">@Html.TextBoxFor(x => x.serviceDetails1.ServiceID)</div>
+                                <div>
+                                    @*@Html.DropDownListFor(x => x.serviceDetails1.Existing_New_Id, new SelectList(Model.ExistingNewList, "ID", "Val"), new { @class = "form-control", @onchange = "QuestionlistWithData('" + Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model)).ToString() + "')" })*@
+                                    @Html.DropDownListFor(x => x.serviceDetails1.Existing_New_Id, new SelectList(Model.ExistingNewList, "ID", "Val"), new { @class = "form-control" })
+                                    @*@Html.HiddenFor(x => x.serviceDetails1.Existing_New)*@
+
+                                    <span id="Existing_New_Id_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                </div>
+                                @*<select class="form-control" id="drp_type">
+                            <option>Existing</option>
+                            <option> New</option>
+                            </select>*@
+
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Producer Application</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @*<input type="text" class="form-control" id="Producer_Application">*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.ProducerApplication, new { @class = "form-control", @maxlength = "90" })
+                                <span id="ProducerApplication_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Service Name External</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @*<input type="text" class="form-control" id="Consumer_Application">*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.ExternalServiceName, new { @class = "form-control", @maxlength = "90" })
+
+                                <span id="ConsumerApplication_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Service Name Internal</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                <div class="textbox">
+
+                                    @Html.TextBoxFor(x => x.serviceDetails1.InternalServiceName, new { @class = "form-control", @maxlength = "4950" })
+                                    <input id="ServiceNameId" name="ServiceNameId" style="color:red;display:none" type="text" value="Enter Name" />
+                                    <span id="ServiceName_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-3">
+                                <label class="label-control">Consumer DC</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @*@Html.DropDownListFor(x => x.serviceDetails1.ConsumerDC_Id, new SelectList(Model.ConsumerDCList, "ID", "Val"), new { @class = "form-control", @onchange = "setPlatform(this)" }),@disabled = "disabled"*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.ConsumerDC, new { @class = "form-control", @maxlength = "90" })
+                                <span id="ConsumerDC_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Producer DC</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @*@Html.DropDownListFor(x => x.serviceDetails1.ProducerDC_Id, new SelectList(Model.ProducerDCList, "ID", "Val"), new { @class = "form-control", @onchange = "setPlatform(this)" })*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.ProducerDC, new { @class = "form-control", @maxlength = "90" })
+                                <span id="ProducerDC_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Platform</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @Html.TextBoxFor(x => x.serviceDetails1.Platform, new { @class = "form-control", @maxlength = "90" })
+                                <span id="Platform_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Service Type</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                @Html.DropDownListFor(x => x.serviceDetails1.ServiceType_Id, new SelectList(Model.ServiceTypeList, "ID", "Val"), new { @class = "form-control" })
+                                <span id="ServiceType_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+
+                            <div class="col-md-3">
+                                <label class="label-control">Purpose</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @*<input type="text" class="form-control" id="purpose">*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.Purpose, new { @class = "form-control", @maxlength = "90" })
+                                <span id="Purpose_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Volume (in TPS)</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @*@Html.TextBoxFor(x => x.serviceDetails1.Volume, new { @class = "form-control", @min = "0", @maxlength = "90", @type = "number" })*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.Volume, new { @class = "form-control", @type = "number", onkeypress = "return isNumberKey(event)" })
+
+                                <span id="Volume_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="label-control">Select Rest/SOAP</label> @*&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                                @Html.DropDownListFor(x => x.serviceDetails1.Rest_SOAP_Id, new SelectList(Model.RestSoapList, "ID", "Val"), new { @class = "form-control" })
+                                <span id="Rest_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+
+
+                            <div class="col-md-3">
+                                <label class="label-control">API Type</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @Html.DropDownListFor(x => x.serviceDetails1.APIType_Id, new SelectList(Model.APITypeList, "ID", "Val"), new { @class = "form-control " })
+                                <span id="APIType_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                            </div>
+
+                        </div>
+                        <div class="row form-group">
+
+
+                            <div class="col-md-3">
+                                <label class="label-control">API Category</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @Html.DropDownListFor(x => x.serviceDetails1.APICategory_Id, new SelectList(Model.APICategoryList, "ID", "Val"), new { @class = "form-control " })
+                                <span id="APICategory_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Domain Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @Html.DropDownListFor(x => x.serviceDetails1.DomainName_Id, new SelectList(Model.DomainNameList, "ID", "Val"), new { @class = "form-control " })
+                                <span id="DomainName_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                            @*<div id="DivApiClassify">*@
+
+                            <div class="col-md-3 ApiClassify">
+                                <label class="label-control">API Risk Score</label>@*&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.TotalScore, new { @class = "form-control", @readonly = "readonly" })
+                                @*@Html.DropDownListFor(x => x.serviceDetails1.PartnerRiskScore_Id, new SelectList(Model.PartnerRiskScoreList, "ID", "Val"), new { @class = "form-control " })*@
+                                @*<span id="PartnerRiskScore_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>*@
+                            </div>
+
+                            <div class="col-md-3 ApiClassify">
+                                <label class="label-control">API Risk Classification</label>@*&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                                @Html.TextBoxFor(x => x.serviceDetails1.RistClassify, new { @class = "form-control", @readonly = "readonly" })
+                                @*@Html.DropDownListFor(x => x.serviceDetails1.APIRiskScore_Id, new SelectList(Model.APIRiskScoreList, "ID", "Val"), new { @class = "form-control " })*@
+                                @*<span id="APIRiskScore_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>*@
+                            </div>
+                            @*  <div class="col-md-3">
+                        @if (@Model.serviceDetails1 != null)
+                        {
+                        @if (!String.IsNullOrEmpty(@Model.serviceDetails1.ExpectedAPISpecificationFiles))
+                        {
+                        @Html.LabelFor(a => a.serviceDetails1.ExpAPISPCFDocument, new { @class = "label-control" })
+                        <div class="col-md-12">
+                        @Html.HiddenFor(x => x.serviceDetails1.ExpectedAPISpecificationFiles)
+                        <label id="ExpectedAPISpecificationFiles" class="label-control">@Model.serviceDetails1.ExpectedAPISpecificationFiles</label>&nbsp;&nbsp;
+                        <a class="btn btn-primary" id="btn_DownloadExpAPISPCFDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
+                        <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.serviceDetails1.ExpectedAPISpecificationFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+                        <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.serviceDetails1.ExpectedAPISpecificationFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                        <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
+                        </a>
+
+                        </div>
+
+
+                        }
+                        }
+                        </div>*@
+                            @*</div>*@
+                        </div>
+
+                        <div class="row form-group">
+
+                            <div class="col-md-4 Transformation">
+                                <label class="label-control">Transformation, if any (in case of new service)</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @Html.TextBoxFor(x => x.serviceDetails1.Transformation, new { @class = "form-control", @maxlength = "90" })
+
+                                <span id="Transformation_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                @*<input type="text" class="form-control" id="Transformation">*@
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label-control">Middleware Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @Html.DropDownListFor(x => x.serviceDetails1.MiddlewareNameId, new SelectList(Model.MiddlewareName, "ID", "Val"), new { @class = "form-control " })
+                                <span id="MiddlewareName_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                        </div>
+
+                        <div id="DivQAns">
+
+                            @if (ViewBag.ExistingNewId == 2)
+                            {
+                                @if (actionName != "View")
+                                {
+                                    @if (Model.QuestionList != null)
+                                    {
+
+                                        var QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim()).ToList();
+
+                                        @if (Model.IN_Platform.Trim() != "Internal")
+                                        {
+                                            @if (ViewBag.APICategory == null)
+                                            {
+                                                QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim() && x.APICategoryId == Model.serviceDetails[0].APICategory_Id).ToList();
+                                            }
+                                            else
+                                            {
+                                                QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim() && x.APICategoryId == ViewBag.APICategory).ToList();
+                                            }
+                                        }
+                                        @if (QuestionLists.Count > 0)
+                                        {
+
+                                            @for (int i = 0; i < QuestionLists.Count; i++)
+                                            {
+                                                <div class="row form-group">
+                                                    <div class="col-md-6">
+                                                        <label class="label-control">
+                                                            <label>@QuestionLists[i].Question</label>
+
+                                                            @*@Html.Hidden("hdnQuestio",QuestionLists[i].ID)*@
+
+                                                            <span style="font-weight:bold;color:red;font-size: 12px;">    *</span>
+                                                        </label>
+
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        @{
+                                                            var dropdownVal = Model.QDropValuesList.Where(x => x.QID == QuestionLists[i].ID).ToList();
+
+                                                        }
+
+
+                                                        @*@Model.QuestinonselectedList[i].Weightage=Model.QuestinonselectedList[i].Where(x => x.QusServiceID == ViewBag.currentserviceid)*@
+                                                        @if (dropdownVal != null)
+                                                        {
+
+
+                                                            @if (Model.QuestinonselectedList != null)
+                                                            {
+                                                                var checkques = Model.QuestinonselectedList.Where(x => x.QusServiceID == ViewBag.currentserviceid).ToList();
+
+                                                                @if ((Model.QuestinonselectedList.Where(x => x.QusServiceID == ViewBag.currentserviceid).ToList()).Count > 0)
+                                                                {
+
+                                                                    @Html.DropDownListFor(x => x.QuestinonselectedList[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue" })
+
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.DropDownListFor(x => x.QuestinonselectedList[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue" })
+                                                                }
+                                                            }
+                                                            else if (Model.QuestinonselectedList == null)
+                                                            {
+                                                                @Html.DropDownListFor(x => x.QuestinonselectedList[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue" })
+                                                            }
+
+
+                                                        }
+                                                        @*@Html.DropDownListFor(x => x.QuestinonselectedList[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue " })*@
+
+                                                    </div>
+                                                    <div class="col-md-3">
+
+                                                        <span id="'QdropValue_' " style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim()).ToList();
+
+                                    @if (Model.QuestinonselectedList != null)
+                                    {
+                                        @*@if (Model.serviceDetails[0].Platform.Trim() != "Internal")*@
+                                        @if (Model.IN_Platform != "Internal")
+                                        {
+                                            QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim() && x.APICategoryId == Model.serviceDetails[0].APICategory_Id).ToList();
+                                        }
+                                        @if (QuestionLists.Count > 0 && Model.QuestinonselectedList.Count > 0)
+                                        {
+                                            @for (int i = 0; i < QuestionLists.Count; i++)
+                                            {
+                                                <div class="row form-group">
+                                                    <div class="col-md-6">
+                                                        <label class="label-control">
+                                                            <label>@QuestionLists[i].Question</label>
+                                                            <span style="font-weight:bold;color:red;font-size: 12px;">    *</span>
+                                                        </label>
+
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        @{
+
+                                                            var dropdownVal = Model.QDropValuesList.Where(x => x.QID == Model.QuestinonselectedList[i].QID).ToList();
+
+                                                        }
+
+
+                                                        @if (dropdownVal != null)
+                                                        {
+
+
+                                                            @Html.DropDownListFor(x => x.QuestinonselectedList[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue", @disabled = "disabled" })
+                                                            @*@Html.DropDownListFor(x => questioncount[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue", @disabled = "disabled" })*@
+                                                        }
+
+                                                    </div>
+                                                    <div class="col-md-3">
+
+                                                        <span id="'QdropValue_' " style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+
+                            @*---------------------------------------------------add questiondata inlist----------------------*@
+
+                            @if (Model.QuestionServiceDetailsList != null)
+                            {
+
+
+                                @for (int i = 0; i < Model.QuestionServiceDetailsList.Count; i++)
+                                {
+                                    <div class="row form-group" style="Display:none">
+                                        <div class="col-md-3">
+                                            @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QusServiceID)
+                                            @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QID)
+                                            @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QuesOptionsID)
+                                            @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].Val)
+                                            @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].Weightage)
+
+                                            @*@Html.HiddenFor(x => x.QuestionServiceDetails1[1].QusServiceID)*@
+
+                                        </div>
+
+                                    </div>
+                                }
+                            }
+
+                            @*@if (Model.QuestinonselectedList != null)
+                        {
+
+
+                        @for (int i = 0; i < Model.QuestinonselectedList.Count; i++)
+                        {
+                        <div class="row form-group" style="Display:none">
+                        <div class="col-md-3">
+                        @Html.HiddenFor(x => x.QuestinonselectedList[i].QusServiceID)
+                        @Html.HiddenFor(x => x.QuestinonselectedList[i].QID)
+                        @Html.HiddenFor(x => x.QuestinonselectedList[i].QuesOptionsID)
+                        @Html.HiddenFor(x => x.QuestinonselectedList[i].Val)
+                        @Html.HiddenFor(x => x.QuestinonselectedList[i].Weightage)
+
+                        </div>
+
+                        </div>
+                        }
+                        }*@
+
+
+
+
+                            @*@if (Model.QuestionServiceDetails1 != null)
+                        {
+                        @for (int i = 0; i < Model.QuestionServiceDetails1.Count; i++)
+                        {
+                        <div class="row form-group" style="Display:none">
+                        <div class="col-md-3">
+                        @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QusServiceID)
+                        @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QID)
+                        @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QuesOptionsID)
+                        @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].Val)
+                        @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].Weightage)
+
+
+
+                        </div>
+
+                        </div>
+                        }
+                        }*@
+
+                            @*--------------------------------------------------------end-----------------------------------------------*@
+
+                            <div class="row form-group">
+
+                                <div class="col-md-3 ">
+                                    <label class="label-control"> API Risk Score</label>
+                                    @Html.TextBoxFor(x => x.serviceDetails1.TotalScore, null, new { @class = "form-control TotalScorecal", @readonly = "readonly" })
+                                    <span id="TotalScore_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                </div>
+
+                                <div class="col-md-3 ">
+                                    <label class="label-control">API Risk Classification</label>
+                                    @Html.TextBoxFor(x => x.serviceDetails1.RistClassify, null, new { @class = "form-control RistClassifycal", @readonly = "readonly" })
+                                    <span id="RistClassify_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                </div>
+                                <div class="col-md-3 ">
+                                    @if (actionName != "View")
+                                    {
+                                        <input type="button" class="btn btn-primary" name="button" id="btncalculate" value="Calculate" style="margin-top: 20px;" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @*----------------------------------------------Outbound set---------------------------------------------------------------------*@
+
+
+                        @*<div id="DivQAnsoutbound">
+
+                    @if (actionName != "View")
+                    {
+                    @if (Model.QuestionList != null)
+                    {
+
+                    var QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim()).ToList();
+
+                    @if (Model.IN_Platform.Trim() != "Internal")
+                    {
+                    @if (Model.serviceDetails[0].APICategory_Id == 14)
+                    {
+                    QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim() && x.APICategoryId == 15).ToList();
+                    }
+                    @if (Model.serviceDetails[0].APICategory_Id == 15)
+                    {
+                    QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim() && x.APICategoryId == 14).ToList();
+                    }
+                    }
+                    @if (QuestionLists.Count > 0)
+                    {
+                    @for (int i = 0; i < QuestionLists.Count; i++)
+                    {
+                    <div class="row form-group">
+                    <div class="col-md-6">
+                    <label class="label-control">
+                    <label>@QuestionLists[i].Question</label>
+
+
+
+                    <span style="font-weight:bold;color:red;font-size: 12px;">    *</span>
+                    </label>
+
+                    </div>
+                    <div class="col-md-3">
+                    @{
+                    var dropdownVal = Model.QDropValuesList.Where(x => x.QID == QuestionLists[i].ID).ToList();
+                    }
+
+                    @Html.DropDownListFor(x => x.QuestinonselectedList[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue1" })
+
+                    </div>
+                    <div class="col-md-3">
+
+                    <span id="'QdropValue1_' " style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    </div>
+                    }
+                    }
+                    }
+                    }
+                    else
+                    {
+                    var QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim()).ToList();
+
+                    @if (Model.QuestinonselectedList != null)
+                    {
+
+                    @if (Model.IN_Platform != "Internal")
+                    {
+                    QuestionLists = Model.QuestionList.Where(x => x.QType == Model.IN_Platform.Trim() && x.APICategoryId == Model.serviceDetails[0].APICategory_Id).ToList();
+                    }
+                    @if (QuestionLists.Count > 0 && Model.QuestinonselectedList.Count > 0)
+                    {
+                    @for (int i = 0; i < QuestionLists.Count; i++)
+                    {
+                    <div class="row form-group">
+                    <div class="col-md-6">
+                    <label class="label-control">
+                    <label>@QuestionLists[i].Question</label>
+                    <span style="font-weight:bold;color:red;font-size: 12px;">    *</span>
+                    </label>
+
+                    </div>
+                    <div class="col-md-3">
+                    @{
+
+                    var dropdownVal = Model.QDropValuesList.Where(x => x.QID == Model.QuestinonselectedList[i].QID).ToList();
+                    }
+
+                    @if (dropdownVal != null)
+                    {
+                    @Html.DropDownListFor(x => x.QuestinonselectedList[i].Weightage, new SelectList(dropdownVal, "Weightage", "Val"), new { @class = "form-control QdropValue", @disabled = "disabled" })
+                    }
+
+                    </div>
+                    <div class="col-md-3">
+
+                    <span id="'QdropValue_' " style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    </div>
+                    }
+                    }
+                    }
+
+                    }
+
+
+                    @---------------------------------------------------add questiondata inlist----------------------
+
+                    @if (Model.QuestionServiceDetailsList != null)
+                    {
+
+
+                    @for (int i = 0; i < Model.QuestionServiceDetailsList.Count; i++)
+                    {
+                    <div class="row form-group" style="Display:none">
+                    <div class="col-md-3">
+                    @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QusServiceID)
+                    @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QID)
+                    @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].QuesOptionsID)
+                    @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].Val)
+                    @Html.HiddenFor(x => x.QuestionServiceDetailsList[i].Weightage)
+                    </div>
+
+                    </div>
+                    }
+                    }
+
+                    @*--------------------------------------------------------end-----------------------------------------------
+
+                    <div class="row form-group">
+
+                    <div class="col-md-3 ">
+                    <label class="label-control">Risk Score</label>
+                    @Html.TextBoxFor(x => x.serviceDetails1.TotalScore, null, new { @class = "form-control outrisk", @readonly = "readonly" })
+                    <span id="TotalScore_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+
+                    <div class="col-md-3 ">
+                    <label class="label-control">Risk Classification</label>
+                    @Html.TextBoxFor(x => x.serviceDetails1.RistClassify, null, new { @class = "form-control outclass", @readonly = "readonly" })
+                    <span id="RistClassify_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    <div class="col-md-3 ">
+                    <input type="button" class="btn btn-primary" name="button" id="btncalculateout" value="Calculate" style="margin-top: 20px;" />
+
+                    </div>
+                    </div>
+                    </div>*@
+
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+
+                                @if (Accessor.HttpContext.Session.GetString("AccessRight") == "AccessRight")
+                                {
+                                    <input type="button" class="btn btn-primary" name="button" id="btnadd" value="Update" />
+                                    <input type="submit" class="btn btn-primary d-none" name="button" id="btnaddsubmit" value="Update" />
+                                }
+
+                            </div>
+                        </div>
+
+
+                        <br />
+                        <br />
+                        <div id="newQueTest" class="d-none">
+                        </div>
+                    </div>
+                </div>
+
+                @*---------------------------------------End-PopUp ---------------------------------------------------------------------------------*@
+
+
+
+            </div>
+        }
+    </div>
 </div>
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/Common.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.kwt-file__delete').hide();
+        $("#GoLiveDate").on("change", function () {
+            var selectedDate = $(this).val();
+            if (selectedDate) {
+                var selectedDateObject = new Date(selectedDate);
+                selectedDateObject.setHours(0, 0, 0, 0);
+                if (selectedDateObject < currentDate) {
+                    $(this).val("");
+                    $("#GoLiveDate_Span").text("Please Select Future Date!");
+                    $("#GoLiveDate_Span").show(); // Show the error message span
+                } else {
+                    $("#GoLiveDate_Span").text("");
+                    $("#GoLiveDate_Span").hide();
+                }
+            }
+        });
+
+        if ($("#MiddlewareNameId").val() != 0) {
+            $("#MiddlewareNameId").prop("readonly", true);
+            $('#MiddlewareNameId').css('background-color', '#e9e9e9');
+            $('#MiddlewareNameId').css('color', '#333');
+            $('#MiddlewareNameId').css('cursor', 'not-allowed');
+            $('#MiddlewareNameId').css('pointer-events', 'none');
+        }
+        debugger;
+        $("#DivQAnsoutbound").hide();
+        //alert('test');
+        var APIcategoryoldvalue = $('#serviceDetails1_APICategory_Id').val();
+
+        //if ($("#serviceDetails1_Platform").val() == 'Internal & External' && $('#serviceDetails1_Existing_New_Id').val()=='2' )
+        //   {
+        //            $("#DivQAns").hide();
+        //    }
+        $("#serviceDetails1_Platform").prop('readonly', true);
+        $("#serviceDetails1_Platform").css('background-color', '#e9e9e9');
+        $('#serviceDetails1_Platform').css('color', '#333');
+
+        $("#serviceDetails1_ConsumerDC").prop('readonly', true);
+        $("#serviceDetails1_ConsumerDC").css('background-color', '#e9e9e9');
+        $('#serviceDetails1_ConsumerDC').css('color', '#333');
+
+
+        $("#serviceDetails1_ProducerDC").prop('readonly', true);
+        $("#serviceDetails1_ProducerDC").css('background-color', '#e9e9e9');
+        $('#serviceDetails1_ProducerDC').css('color', '#333');
+
+
+        $("#serviceDetails1_APICategory_Id").prop('readonly', true);
+        $("#serviceDetails1_APICategory_Id").css('background-color', '#e9e9e9');
+        $('#serviceDetails1_APICategory_Id').css('color', '#333');
+
+
+        $(".Transformation").hide();
+
+
+        $('#serviceDetails1_Existing_New_Id').on('change', function () {
+            debugger;
+            $(".Transformation").hide();
+            $("#serviceDetails1_ServiceName").prop('disabled', false);
+            if (this.value == 2) {
+                // onchangepagerefresh();
+                BindQuestiondetaillist();
+
+                $("#serviceDetails1_ProducerApplication").prop('readonly', false);
+                $('#serviceDetails1_ProducerApplication').css('background-color', '#fff');
+                $('#serviceDetails1_ProducerApplication').css('color', '#212529');
+
+                $("#serviceDetails1_APIType_Id").prop("readonly", false);
+                $('#serviceDetails1_APIType_Id').css('background-color', '#fff');
+                $('#serviceDetails1_APIType_Id').css('color', '#212529');
+
+
+                $("#serviceDetails1_DomainName_Id").prop("readonly", false);
+                $('#serviceDetails1_DomainName_Id').css('background-color', '#fff');
+                $('#serviceDetails1_DomainName_Id').css('color', '#212529');
+
+
+                $("#serviceDetails1_Rest_SOAP_Id").prop("readonly", false);
+                $('#serviceDetails1_Rest_SOAP_Id').css('background-color', '#fff');
+                $('#serviceDetails1_Rest_SOAP_Id').css('color', '#212529');
+
+
+                $("#serviceDetails1_APICategory_Id").prop("readonly", false);
+                $('#serviceDetails1_APICategory_Id').css('background-color', '#fff');
+                $('#serviceDetails1_APICategory_Id').css('color', '#212529');
+
+                $(".Transformation").show();
+                //if ($("#serviceDetails1_Platform").val() != 'Internal & External')
+                //{
+                $("#DivQAns").show();
+                // }
+                //$("#DivQAns").show();
+
+                $(".ApiClassify").hide();
+                //$("#serviceDetails1_ProducerApplication").prop("disabled", false);
+                //$("#serviceDetails1_APIType_Id").prop("disabled", false);
+                //$("#serviceDetails1_DomainName_Id").prop("disabled", false);
+                //$("#serviceDetails1_Rest_SOAP_Id").prop("disabled", false);
+                //$("#serviceDetails1_APICategory_Id").prop("disabled", false);
+
+                //$("#serviceDetails1_ServiceName").val('');
+                //$("#serviceDetails1_Purpose").val('');
+                //$("#serviceDetails1_ConsumerApplication").val('');
+                //$("#serviceDetails1_ProducerApplication").val('');
+                //$("#serviceDetails1_Volume").val('');
+                //$("#serviceDetails1_Transformation").val('');
+                //$('#serviceDetails1_Rest_SOAP_Id').val(0);
+                //$('#serviceDetails1_ServiceType_Id').val(0);
+                //$('#serviceDetails1_APIRiskScore_Id').val(0);
+                //$('#serviceDetails1_PartnerRiskScore_Id').val(0);
+                //$('#serviceDetails1_APICategory_Id').val(0);
+                //$('#serviceDetails1_DomainName_Id').val(0);
+                //$('#serviceDetails1_APIType_Id').val(0);
+                //$('#serviceDetails1_ConsumerDC_Id').val(0);
+                //$('#serviceDetails1_ProducerDC_Id').val(0);
+                //$("#serviceDetails1_Platform").val('');
+            }
+            else {
+                $(".Transformation").hide();
+                $("#DivQAns").hide();
+                $(".ApiClassify").show();
+            }
+            if (this.value == 0) {
+                $("#serviceDetails1_ProducerApplication").prop('readonly', false);
+                $('#serviceDetails1_ProducerApplication').css('background-color', '#fff');
+                $('#serviceDetails1_ProducerApplication').css('color', '#212529');
+
+                $("#serviceDetails1_APIType_Id").prop("readonly", false);
+                $('#serviceDetails1_APIType_Id').css('background-color', '#fff');
+                $('#serviceDetails1_APIType_Id').css('color', '#212529');
+
+
+                $("#serviceDetails1_DomainName_Id").prop("readonly", false);
+                $('#serviceDetails1_DomainName_Id').css('background-color', '#fff');
+                $('#serviceDetails1_DomainName_Id').css('color', '#212529');
+
+
+                $("#serviceDetails1_Rest_SOAP_Id").prop("readonly", false);
+                $('#serviceDetails1_Rest_SOAP_Id').css('background-color', '#fff');
+                $('#serviceDetails1_Rest_SOAP_Id').css('color', '#212529');
+
+
+                $("#serviceDetails1_APICategory_Id").prop("readonly", false);
+                $('#serviceDetails1_APICategory_Id').css('background-color', '#fff');
+                $('#serviceDetails1_APICategory_Id').css('color', '#212529');
+            }
+            //debugger
+            if (serviceDetails1_TotalScore >= 45) {
+                RClasify = "High";
+                $('#serviceDetails1_TotalScore').css({ 'color': 'red', 'font-weight': 'bold' });
+                $('#serviceDetails1_RistClassify').css({ 'color': 'red', 'font-weight': 'bold' });
+            }
+            else if (serviceDetails1_TotalScore > 25 && serviceDetails1_TotalScore < 45) {
+                RClasify = "Medium";
+                $('#serviceDetails1_TotalScore').css({ 'color': 'blue', 'font-weight': 'bold' });
+                $('#serviceDetails1_RistClassify').css({ 'color': 'blue', 'font-weight': 'bold' });
+            }
+            else if (serviceDetails1_TotalScore <= 25) {
+                RClasify = "Low";
+                $('#serviceDetails1_TotalScore').css({ 'color': 'green', 'font-weight': 'bold' });
+                $('#serviceDetails1_RistClassify').css({ 'color': 'green', 'font-weight': 'bold' });
+            }
+
+            //alert( this.value );
+        });
+
+        $('#serviceDetails1_APICategory_Id').on('change', function () {
+            debugger;
+            //onchangepagerefresh();
+            //if ($('#serviceDetails1_Existing_New_Id').val() == '2')
+            //{
+
+
+
+            //    if ($('#serviceDetails1_APICategory_Id').val() != APIcategoryoldvalue)
+            //    {
+
+            //          $("#DivQAns").hide();
+            //          $("#DivQAnsoutbound").show();
+
+            //    }
+
+            //    else if ($('#serviceDetails1_APICategory_Id').val() == APIcategoryoldvalue)
+            //    {
+            //          $("#DivQAns").show();
+            //          $("#DivQAnsoutbound").hide();
+            //    }
+
+            //}
+
+
+        });
+
+
+
+
+
+
+
+        $('.QdropValue').on('change', function () {
+            debugger;
+            //$("#serviceDetails1_TotalScore").val("0");
+            //$("#serviceDetails1_RistClassify").val("");
+            $(".TotalScorecal").val("0");
+            $(".RistClassifycal").val("");
+        });
+
+
+        //$('#serviceDetails1_ConsumerDC_Id').on('change', function () {
+        //    debugger
+        //    if ($('#serviceDetails1_Existing_New_Id').value == 2 && $('#serviceDetails1_Platform').value != "") {
+
+        //        $("#DivQAns").show();
+        //    }
+        //});
+        //$('#serviceDetails1_ProducerDC_Id').on('change', function () {
+        //    debugger
+        //    if ($('#serviceDetails1_Existing_New_Id').value == 2 && $('#serviceDetails1_Platform').value != "") {
+        //        $("#DivQAns").show();
+        //    }
+        //});
+        // $('#serviceDetails1_ConsumerDC_Id').on('change', function () {
+        //    if (this.value == 46 || this.value == 47) {
+        //        $("#serviceDetails1_ExternalServiceName").prop("disabled", true);
+        //    }
+        //    else {
+        //         $("#serviceDetails1_ExternalServiceName").prop("disabled", false);
+        //    }
+
+        //})
+        var integrationId = getUrlVars()["integrationId"];
+
+        if (integrationId == "") {
+            var now = new Date();
+            var day = ("0" + now.getDate()).slice(-2);
+            var month = ("0" + (now.getMonth() + 1)).slice(-2);
+            var today = now.getFullYear() + "-" + (month) + "-" + (day);
+            document.getElementById("GoLiveDate").min = today;
+        }
+        else {
+            // debugger;
+            //if ($("#GoLiveDate").val() != '') {
+
+            //    var goliveday = $("#GoLiveDate").val();
+
+            //  var now = new Date();
+            //  var day = ("0" + now.getDate()).slice(-2);
+            //  var month = ("0" + (now.getMonth() + 1)).slice(-2);
+            //  var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+            //    if(goliveday<today)
+            //        document.getElementById("GoLiveDate").min = goliveday;
+            //    else if (goliveday > today)
+            //         document.getElementById("GoLiveDate").min = today;
+            //}
+        }
+
+        var IsSuccess = '@TempData["IsSuccess"]';
+        var msg = '@TempData["Result"]';
+        if (IsSuccess != '' && IsSuccess == 'True' && msg != '') {
+            toastr.success(msg);
+        }
+        else if (IsSuccess != '' && IsSuccess == 'False' && msg != '') {
+            toastr.error(msg);
+        }
+
+        var number = parseInt(@ViewBag.Number);
+
+        if (number == 1) {
+            $("#integration").show();
+        }
+        if ('@ViewBag.UserType' == 'BTGUSER') {
+            $('#btnFeedbackV').show();
+            $('#btnReviewedV').show();
+            $('#btnRejectV').show();
+            $('#btnApprovedV').hide();
+            $('#btnArchitechReviewV').hide();
+
+        }
+        else if ('@ViewBag.UserType' == 'ITUSER') {
+
+            $('#btnReviewedV').hide();
+            $('#btnFeedbackV').show();
+            $('#btnApprovedV').show();
+            $('#btnArchitechReviewV').show();
+            $('#btnRejectV').show();
+        }
+        else if ('@ViewBag.UserType' == 'ITARCHITECH') {
+            $('#btnReviewedV').hide();
+            $('#btnArchitechReviewV').hide();
+            $('#btnFeedbackV').show();
+            $('#btnApprovedV').show();
+            $('#btnRejectV').show();
+        }
+
+
+        var IsMode = '@TempData["PopupEdit"]';
+        if (IsMode == "EditMode") {
+            debugger;
+            $("#addnew_popup").addClass('popup-show');
+            $("#btnadd").val("Update");
+
+            if ($("#serviceDetails1_RistClassify").val() == 'High') {
+                $('.TotalScorecal').css({ 'color': 'red', 'font-weight': 'bold' });
+                $('.RistClassifycal').css({ 'color': 'red', 'font-weight': 'bold' });
+            }
+            else if ($("#serviceDetails1_RistClassify").val() == 'Medium') {
+                $('.TotalScorecal').css({ 'color': 'blue', 'font-weight': 'bold' });
+                $('.RistClassifycal').css({ 'color': 'blue', 'font-weight': 'bold' });
+            }
+            else if ($("#serviceDetails1_RistClassify").val() == 'Low') {
+                $('.TotalScorecal').css({ 'color': 'green', 'font-weight': 'bold' });
+                $('.RistClassifycal').css({ 'color': 'green', 'font-weight': 'bold' });
+            }
+            $("#serviceDetails1_ServiceName").prop('disabled', false);
+            if ($("#serviceDetails1_Existing_New_Id").val() == "2") {
+                //onchangepagerefresh();
+                $(".Transformation").show();
+                //if ($("#serviceDetails1_Platform").val() != 'Internal & External')
+                //{
+                //    $("#DivQAns").show();
+                //}
+                $("#DivQAns").show();
+                // $("#DivApiClassify").show();
+                $(".ApiClassify").hide();
+
+            }
+            else if ($("#serviceDetails1_Existing_New_Id").val() == "1") {
+                // onchangepagerefresh();
+                $("#serviceDetails1_ProducerApplication").prop('readonly', true);
+                $('#serviceDetails1_ProducerApplication').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_ProducerApplication').css('color', '#333');
+                //$('#serviceDetails1_ProducerApplication').css('pointer-events', 'none');
+                //$("#serviceDetails1_ProducerApplication").readOnly =true;
+                $("#serviceDetails1_APIType_Id").prop("readonly", true);
+                $('#serviceDetails1_APIType_Id').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_APIType_Id').css('color', '#333');
+                $('#serviceDetails1_APIType_Id').css('cursor', 'not-allowed');
+                $('#serviceDetails1_APIType_Id').css('pointer-events', 'none');
+
+                $("#serviceDetails1_DomainName_Id").prop("readonly", true);
+                $('#serviceDetails1_DomainName_Id').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_DomainName_Id').css('color', '#333');
+                $('#serviceDetails1_DomainName_Id').css('cursor', 'not-allowed');
+                $('#serviceDetails1_DomainName_Id').css('pointer-events', 'none');
+
+                $("#serviceDetails1_Rest_SOAP_Id").prop("readonly", true);
+                $('#serviceDetails1_Rest_SOAP_Id').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_Rest_SOAP_Id').css('color', '#333');
+                $('#serviceDetails1_Rest_SOAP_Id').css('cursor', 'not-allowed');
+                $('#serviceDetails1_Rest_SOAP_Id').css('pointer-events', 'none');
+
+                $("#serviceDetails1_APICategory_Id").prop("readonly", true);
+                $('#serviceDetails1_APICategory_Id').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_APICategory_Id').css('color', '#333');
+                $('#serviceDetails1_APICategory_Id').css('cursor', 'not-allowed');
+                $('#serviceDetails1_APICategory_Id').css('pointer-events', 'none');
+
+                //Added by CKP on 07/06/2023
+                $("#serviceDetails1_ProducerDC_Id").prop("readonly", true);
+                $('#serviceDetails1_ProducerDC_Id').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_ProducerDC_Id').css('color', '#333');
+                $('#serviceDetails1_ProducerDC_Id').css('cursor', 'not-allowed');
+                $('#serviceDetails1_ProducerDC_Id').css('pointer-events', 'none');
+
+                $("#serviceDetails1_ServiceType_Id").prop("readonly", true);
+                $('#serviceDetails1_ServiceType_Id').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_ServiceType_Id').css('color', '#333');
+                $('#serviceDetails1_ServiceType_Id').css('cursor', 'not-allowed');
+                $('#serviceDetails1_ServiceType_Id').css('pointer-events', 'none');
+
+                $("#serviceDetails1_APIRiskScore_Id").prop("readonly", true);
+                $('#serviceDetails1_APIRiskScore_Id').css('background-color', '#e9e9e9');
+                $('#serviceDetails1_APIRiskScore_Id').css('color', '#333');
+                $('#serviceDetails1_APIRiskScore_Id').css('cursor', 'not-allowed');
+                $('#serviceDetails1_APIRiskScore_Id').css('pointer-events', 'none');
+
+                $("#DivQAns").hide();
+                $(".ApiClassify").show();
+            }
+
+            debugger
+            if ($("#serviceDetails1_Platform").val() == "Internal") {
+                $("#serviceDetails1_ExternalServiceName").prop('readonly', true);
+                $("#serviceDetails1_ExternalServiceName").css('background-color', '#e9e9e9');
+                $('#serviceDetails1_ExternalServiceName').css('color', '#333');
+            }
+            if ($("#serviceDetails1_Platform").val() != "Internal") {
+                $("#serviceDetails1_ExternalServiceName").removeAttr("readonly");
+                $("#serviceDetails1_ExternalServiceName").css({
+                    "background-color": "",
+                    "color": "" // You can also reset the text color if needed
+                });
+            }
+            //var consId = $("#ConsumerApplicationId").val();
+            //if (consId!=null && consId!='' && consId!='0') {
+            //     $.getJSON("/Home/GetConsumerAppId",
+            //     {
+            //        Id: consId
+            //     },
+            //    function (data) {
+
+            //        debugger;
+            //        if ($("#ConsumerApplication") != '')
+            //        {
+            //            $('#serviceDetails1_ConsumerDC').val(data.consumerDC);
+            //            ConsumerDC = $('#serviceDetails1_ConsumerDC').val();
+            //            RulesetPlatform();
+            //            Externalservicereadonly();
+            //        }
+            //        else
+            //        {
+            //             $('#serviceDetails1_ConsumerDC').val('');
+            //        }
+
+
+            //    });
+            //}
+        }
+        var Editbydb = '@TempData["Editbydb"]';
+        if (Editbydb != '') {
+            // debugger;
+            //   alert(2);
+            $("form")[0].action = Editbydb;
+        }
+    });
+
+    $("#btncalculate").click(function () {
+        debugger
+        var combined = 0;
+        $('select.QdropValue option:selected').each(function () {
+            combined += Number($(this).val());
+        });
+
+
+        //alert(combined);
+
+        if ($("#IN_Platform").val().trim() == 'Internal') {
+            if (combined >= 45) {
+                RClasify = "High";
+                //    $('#serviceDetails1_TotalScore').css({ 'color': 'red', 'font-weight': 'bold' });
+                //    $('#serviceDetails1_RistClassify').css({ 'color': 'red', 'font-weight': 'bold' });
+                $('.TotalScorecal').css({ 'color': 'red', 'font-weight': 'bold' });
+                $('.RistClassifycal').css({ 'color': 'red', 'font-weight': 'bold' });
+            }
+            else if (combined > 25 && combined < 45) {
+                RClasify = "Medium";
+                //$('#serviceDetails1_TotalScore').css({ 'color': 'blue', 'font-weight': 'bold' });
+                //$('#serviceDetails1_RistClassify').css({ 'color': 'blue', 'font-weight': 'bold' });
+                $('.TotalScorecal').css({ 'color': 'blue', 'font-weight': 'bold' });
+                $('.RistClassifycal').css({ 'color': 'blue', 'font-weight': 'bold' });
+            }
+            else if (combined <= 25) {
+                RClasify = "Low";
+                //$('#serviceDetails1_TotalScore').css({ 'color': 'green', 'font-weight': 'bold' });
+                //$('#serviceDetails1_RistClassify').css({ 'color': 'green', 'font-weight': 'bold' });
+                $('.TotalScorecal').css({ 'color': 'green', 'font-weight': 'bold' });
+                $('.RistClassifycal').css({ 'color': 'green', 'font-weight': 'bold' });
+            }
+            $("#serviceDetails1_TotalScore").val(combined);
+            $("#serviceDetails1_RistClassify").val(RClasify);
+            $(".TotalScorecal").val(combined);
+            $(".RistClassifycal").val(RClasify);
+        }
+        else if ($("#IN_Platform").val().trim() == 'External') {
+            if ($('#serviceDetails1_APICategory_Id').find(":selected").val() == 14) {
+                if (combined >= 65) {
+                    RClasify = "High";
+                    //$('#serviceDetails1_TotalScore').css({ 'color': 'red', 'font-weight': 'bold' });
+                    //$('#serviceDetails1_RistClassify').css({ 'color': 'red', 'font-weight': 'bold' });
+                    $('.TotalScorecal').css({ 'color': 'red', 'font-weight': 'bold' });
+                    $('.RistClassifycal').css({ 'color': 'red', 'font-weight': 'bold' });
+                }
+                else if (combined > 40 && combined < 65) {
+                    RClasify = "Medium";
+                    //$('#serviceDetails1_TotalScore').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    //$('#serviceDetails1_RistClassify').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    $('.TotalScorecal').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    $('.RistClassifycal').css({ 'color': 'blue', 'font-weight': 'bold' });
+                }
+                else if (combined <= 40) {
+                    RClasify = "Low";
+                    //$('#serviceDetails1_TotalScore').css({ 'color': 'green', 'font-weight': 'bold' });
+                    // $('#serviceDetails1_RistClassify').css({ 'color': 'green', 'font-weight': 'bold' });
+                    $('.TotalScorecal').css({ 'color': 'green', 'font-weight': 'bold' });
+                    $('.RistClassifycal').css({ 'color': 'green', 'font-weight': 'bold' });
+                }
+                $("#serviceDetails1_TotalScore").val(combined);
+                $("#serviceDetails1_RistClassify").val(RClasify);
+                $(".TotalScorecal").val(combined);
+                $(".RistClassifycal").val(RClasify);
+            }
+            else if ($('#serviceDetails1_APICategory_Id').find(":selected").val() == 15) {
+                if (combined >= 50) {
+                    RClasify = "High";
+                    //$('#serviceDetails1_TotalScore').css({ 'color': 'red', 'font-weight': 'bold' });
+                    //$('#serviceDetails1_RistClassify').css({ 'color': 'red', 'font-weight': 'bold' });
+                    $('.TotalScorecal').css({ 'color': 'red', 'font-weight': 'bold' });
+                    $('.RistClassifycal').css({ 'color': 'red', 'font-weight': 'bold' });
+                }
+                else if (combined > 30 && combined < 50) {
+                    RClasify = "Medium";
+                    //$('#serviceDetails1_TotalScore').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    //$('#serviceDetails1_RistClassify').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    $('.TotalScorecal').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    $('.RistClassifycal').css({ 'color': 'blue', 'font-weight': 'bold' });
+                }
+                else if (combined <= 30) {
+                    RClasify = "Low";
+                    //$('#serviceDetails1_TotalScore').css({ 'color': 'green', 'font-weight': 'bold' });
+                    //$('#serviceDetails1_RistClassify').css({ 'color': 'green', 'font-weight': 'bold' });
+                    $('.TotalScorecal').css({ 'color': 'green', 'font-weight': 'bold' });
+                    $('.RistClassifycal').css({ 'color': 'green', 'font-weight': 'bold' });
+                }
+                $("#serviceDetails1_TotalScore").val(combined);
+                $("#serviceDetails1_RistClassify").val(RClasify);
+                $(".TotalScorecal").val(combined);
+                $(".RistClassifycal").val(RClasify);
+            }
+        }
+
+        //});
+        //$("#sum").html(combined);
+        //}).trigger("change");
+
+        //var options = $('#QdropValue option:selected');
+
+        //var values = $.map(options ,function(option) {
+        //    return option.value;
+        //});
+
+        //var calcValidation = calculationValidation();
+        //if (calcValidation == true)
+        //{
+        //    var cmbOprationApi = $("#serviceDetails1_OprationApi").val();
+        //    var cmbApiHandle = $("#serviceDetails1_ApiHandle").val();
+        //    var cmbFTransac = $("#serviceDetails1_FinancialTransaction").val();
+        //    var cmbEstimate = $("#serviceDetails1_EstimateValue").val();
+        //    var cmbAvailability = $("#serviceDetails1_Availability").val();
+
+        //    var QOprationApi = 0;
+        //    var QApiHandle = 0;
+        //    var QFTransac = 0;
+        //    var QEstimate = 0;
+        //    var QAvailability = 0;
+        //    var TotalValue = 0;
+        //    if (cmbOprationApi != "0") {
+        //        if (cmbOprationApi == "1" || cmbOprationApi == "2" || cmbOprationApi == "3") {
+        //            QOprationApi = 10;
+        //        }
+        //        else {
+        //            QOprationApi = 2;
+        //        }
+        //    }
+        //    if (cmbApiHandle != "0") {
+        //        if (cmbApiHandle == "1") {
+        //            QApiHandle = 12.5;
+        //        }
+        //        else if (cmbApiHandle == "2") {
+        //            QApiHandle = 5;
+        //        }
+        //        else {
+        //            QApiHandle = 0;
+        //        }
+        //    }
+        //    if (cmbFTransac != "0") {
+        //        if (cmbFTransac == "1") {
+        //            QFTransac = 12.5;
+        //        }
+        //        else if (cmbFTransac == "2") {
+        //            QFTransac = 5;
+        //        }
+        //        else {
+        //            QFTransac = 0;
+        //        }
+        //    }
+        //    if (cmbEstimate != "0") {
+        //        if (cmbEstimate == "1") {
+        //            QEstimate = 5;
+        //        }
+        //        else {
+        //            QEstimate = 2;
+        //        }
+        //    }
+        //    if (cmbAvailability != "0") {
+        //        if (cmbAvailability == "1") {
+        //            QAvailability = 10;
+        //        }
+        //        else if (cmbAvailability == "2") {
+        //            QAvailability = 2;
+        //        }
+        //        else {
+        //            QAvailability = 0;
+        //        }
+        //    }
+        //    TotalValue = QOprationApi + QApiHandle + QFTransac + QEstimate + QAvailability;
+        //    if (TotalValue >= 45) {
+        //        RClasify = "High";
+        //        $('#serviceDetails1_TotalScore').css({ 'color': 'red','font-weight': 'bold'});
+        //        $('#serviceDetails1_RistClassify').css({'color':'red','font-weight': 'bold'});
+        //    }
+        //    else if (TotalValue > 25 && TotalValue < 45) {
+        //        RClasify = "Medium";
+        //        $('#serviceDetails1_TotalScore').css({ 'color': 'blue','font-weight': 'bold'});
+        //        $('#serviceDetails1_RistClassify').css({'color':'blue','font-weight': 'bold'});
+        //    }
+        //    else if (TotalValue <= 25) {
+        //        RClasify = "Low";
+        //        $('#serviceDetails1_TotalScore').css({ 'color': 'green', 'font-weight': 'bold' });
+        //        $('#serviceDetails1_RistClassify').css({ 'color': 'green','font-weight': 'bold'});
+        //    }
+        //    $("#serviceDetails1_TotalScore").val(TotalValue);
+        //    $("#serviceDetails1_RistClassify").val(RClasify);
+        //}
+    });
+
+
+    ////--------------------------------whenapicategorychangevalidation----------------------------
+
+
+    $("#btncalculateout").click(function () {
+        debugger
+        var combined = 0;
+        $('select.QdropValue1 option:selected').each(function () {
+            combined += Number($(this).val());
+        });
+
+        if ($("#IN_Platform").val().trim() == 'Internal') {
+            if (combined >= 45) {
+                RClasify = "High";
+                $('.outrisk').css({ 'color': 'red', 'font-weight': 'bold' });
+                $('.outclass').css({ 'color': 'red', 'font-weight': 'bold' });
+            }
+            else if (combined > 25 && combined < 45) {
+                RClasify = "Medium";
+                $('.outrisk').css({ 'color': 'blue', 'font-weight': 'bold' });
+                $('.outclass').css({ 'color': 'blue', 'font-weight': 'bold' });
+            }
+            else if (combined <= 25) {
+                RClasify = "Low";
+                $('.outrisk').css({ 'color': 'green', 'font-weight': 'bold' });
+                $('.outclass').css({ 'color': 'green', 'font-weight': 'bold' });
+            }
+            $(".outrisk").val(combined);
+            $(".outclass").val(RClasify);
+        }
+        else if ($("#IN_Platform").val().trim() == 'External') {
+            if ($('#serviceDetails1_APICategory_Id').find(":selected").val() == 14) {
+                if (combined >= 65) {
+                    RClasify = "High";
+                    $('.outrisk').css({ 'color': 'red', 'font-weight': 'bold' });
+                    $('.outclass').css({ 'color': 'red', 'font-weight': 'bold' });
+                }
+                else if (combined > 40 && combined < 65) {
+                    RClasify = "Medium";
+                    $('.outrisk').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    $('.outclass').css({ 'color': 'blue', 'font-weight': 'bold' });
+                }
+                else if (combined <= 40) {
+                    RClasify = "Low";
+                    $('.outrisk').css({ 'color': 'green', 'font-weight': 'bold' });
+                    $('.outclass').css({ 'color': 'green', 'font-weight': 'bold' });
+                }
+                $(".outrisk").val(combined);
+                $(".outclass").val(RClasify);
+            }
+            else if ($('#serviceDetails1_APICategory_Id').find(":selected").val() == 15) {
+                if (combined >= 50) {
+                    RClasify = "High";
+                    $('.outrisk').css({ 'color': 'red', 'font-weight': 'bold' });
+                    $('.outclass').css({ 'color': 'red', 'font-weight': 'bold' });
+                }
+                else if (combined > 30 && combined < 50) {
+                    RClasify = "Medium";
+                    $('.outrisk').css({ 'color': 'blue', 'font-weight': 'bold' });
+                    $('.outclass').css({ 'color': 'blue', 'font-weight': 'bold' });
+                }
+                else if (combined <= 30) {
+                    RClasify = "Low";
+                    $('.outrisk').css({ 'color': 'green', 'font-weight': 'bold' });
+                    $('.outclass').css({ 'color': 'green', 'font-weight': 'bold' });
+                }
+                $(".outrisk").val(combined);
+                $(".outclass").val(RClasify);
+            }
+        }
+
+
+    });
+
+
+
+
+    function calculationValidation() {
+        var cmbOprationApi = $("#serviceDetails1_OprationApi").val();
+        var cmbApiHandle = $("#serviceDetails1_ApiHandle").val();
+        var cmbFTransac = $("#serviceDetails1_FinancialTransaction").val();
+        var cmbEstimate = $("#serviceDetails1_EstimateValue").val();
+        var cmbAvailability = $("#serviceDetails1_Availability").val();
+        $('#ValidOprationApi').text('');
+        $('#ValidApiHandle').text('');
+        $('#ValidFTrasac').text('');
+        $('#ValidEstimateValue').text('');
+        $('#ValidAvailability').text('');
+        if (cmbOprationApi == 0) {
+            $("#ValidOprationApi").text('Selection Required');
+            $("#ValidOprationApi").show();
+            return false;
+        }
+        else if (cmbApiHandle == 0) {
+            $("#ValidApiHandle").text('Selection Required');
+            $("#ValidApiHandle").show();
+            return false;
+        }
+        else if (cmbFTransac == 0) {
+            $("#ValidFTrasac").text('Selection Required');
+            $("#ValidFTrasac").show();
+            return false;
+        }
+        else if (cmbEstimate == 0) {
+            $("#ValidEstimateValue").text('Selection Required');
+            $("#ValidEstimateValue").show();
+            return false;
+        }
+        else if (cmbAvailability == 0) {
+            $("#ValidAvailability").text('Selection Required');
+            $("#ValidAvailability").show();
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    //////////// Add New Popup /////////
+    //$("#adddrow").click(function () {
+    //       debugger;
+    //       $("#addnew_popup").addClass('popup-show');
+
+    //       event.preventDefault();
+
+    //   });
+    $(".EditRowApproval").click(function () {
+        debugger;
+
+        //if ($("#serviceDetails1_Platform").val() == 'Internal & External' && $('#serviceDetails1_Existing_New_Id').val() == '2') {
+        //    $("#DivQAns").hide();
+        //}
+        //else {
+        //    $("#DivQAns").show();
+        //}
+
+
+        //$("#addnew_popup").addClass('popup-show');
+        var Id = this.parentNode.children[1].id;
+        $("#" + Id).click();
+
+        event.preventDefault();
+
+    });
+
+    $("#popup_close").click(function () {
+        //  debugger;
+        $("#addnew_popup").removeClass('popup-show');
+
+        event.preventDefault();
+
+    });
+
+    ///--------------------btn Feedback Validation----------------------------//
+
+    //$("#btnFeedbackV").click(function () {
+    //    //debugger;
+
+    //    if ($("#ProjectMgrBTG").val() == '') {
+    //        $("#ProjectMgrBTG_Span").text('Please fill ProjectMgrBTG');
+    //        $("#ProjectMgrBTG_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#ProjectMgrBTG_Span").hide(); }
+
+    //    if ($("#ProjectMgrIT").val() == '') {
+    //        $("#ProjectMgrIT_Span").text('Please fill ProjectMgrIT');
+    //        $("#ProjectMgrIT_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#ProjectMgrIT_Span").hide(); }
+
+    //    if ($("#ProjectName").val() == '') {
+    //        $("#ProjectName_Span").text('Please fill ProjectName');
+    //        $("#ProjectName_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#ProjectName_Span").hide(); }
+
+
+
+    //     if ($("#ProjectId").val() == '') {
+    //        $("#ProjectId_Span").text('Please fill ProjectId');
+    //        $("#ProjectId_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#ProjectId_Span").hide(); }
+
+    //     if ($("#GoLiveDate").val() == '') {
+    //        $("#GoLiveDate_Span").text('Please fill GoLiveDate');
+    //        $("#GoLiveDate_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#GoLiveDate_Span").hide(); }
+
+
+    //    if ($("#BusinesssJustification").val() == '') {
+    //        $("#BusinesssJustification_Span").text('Please fill BusinesssJustification');
+    //        $("#BusinesssJustification_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#BusinesssJustification_Span").hide(); }
+
+    //     if ($("#BusinessSponsor").val() == '') {
+    //        $("#BusinessSponsor_Span").text('Please fill BusinessSponsor');
+    //        $("#BusinessSponsor_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#BusinessSponsor_Span").hide(); }
+
+    //     if ($("#ExecutiveSponsor").val() == '') {
+    //        $("#ExecutiveSponsor_Span").text('Please fill ExecutiveSponsor');
+    //        $("#ExecutiveSponsor_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#ExecutiveSponsor_Span").hide(); }
+
+    //    if ($("#CostCenterCode").val() == '') {
+    //        $("#CostCenterCode_Span").text('Please fill CostCenterCode');
+    //        $("#CostCenterCode_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#CostCenterCode_Span").hide(); }
+
+    //    if ($("#Feedback_Span").val() == '') {
+    //        $("#Feedback_Span").text('Please fill Feedback/Reviewer Comment');
+    //        $("#Feedback_Span").show();
+    //        return false;
+    //    }
+    //    else { $("#Feedback_Span").hide(); }
+
+
+
+
+    //     $("#btnFeedback").click();
+    //        return true;
+    //});
+
+    function validation(id) {
+
+        debugger;
+        //alert(id);
+
+        if ($("#ProjectMgrBTG").val() == '') {
+            $("#ProjectMgrBTG_Span").text('Please fill ProjectMgrBTG');
+            $("#ProjectMgrBTG_Span").show();
+            return false;
+        }
+        else { $("#ProjectMgrBTG_Span").hide(); }
+
+        if ($("#ProjectMgrIT").val() == '') {
+            $("#ProjectMgrIT_Span").text('Please fill ProjectMgrIT');
+            $("#ProjectMgrIT_Span").show();
+            return false;
+        }
+        else { $("#ProjectMgrIT_Span").hide(); }
+
+        if ($("#ProjectName").val() == '') {
+            $("#ProjectName_Span").text('Please fill ProjectName');
+            $("#ProjectName_Span").show();
+            return false;
+        }
+        else { $("#ProjectName_Span").hide(); }
+
+
+
+        if ($("#ProjectId").val() == '') {
+            $("#ProjectId_Span").text('Please fill ProjectId');
+            $("#ProjectId_Span").show();
+            return false;
+        }
+        else { $("#ProjectId_Span").hide(); }
+
+        if ($("#GoLiveDate").val() == 'dd-mm-yyyy' || $("#GoLiveDate").val() == '') {
+            $("#GoLiveDate_Span").text('Please fill valid GoLiveDate');
+            $("#GoLiveDate_Span").show();
+            return false;
+        }
+        else { $("#GoLiveDate_Span").hide(); }
+
+
+        if ($("#BusinesssJustification").val() == '') {
+            $("#BusinesssJustification_Span").text('Please fill BusinesssJustification');
+            $("#BusinesssJustification_Span").show();
+            return false;
+        }
+        else { $("#BusinesssJustification_Span").hide(); }
+
+        if ($("#BusinessSponsor").val() == '') {
+            $("#BusinessSponsor_Span").text('Please fill BusinessSponsor');
+            $("#BusinessSponsor_Span").show();
+            return false;
+        }
+        else { $("#BusinessSponsor_Span").hide(); }
+
+        if ($("#ExecutiveSponsor").val() == '') {
+            $("#ExecutiveSponsor_Span").text('Please fill ExecutiveSponsor');
+            $("#ExecutiveSponsor_Span").show();
+            return false;
+        }
+        else {
+            $("#ExecutiveSponsor_Span").hide();
+        }
+        if ($("#BTGUSER").val() == '-- Select --' && '@ViewBag.Role' == "BTGUSER") {
+            $("#BTGRole_Span").text('Please select BTGUSER');
+            $("#BTGRole_Span").show();
+            return false;
+        }
+        else {
+            $("#BTGRole_Span").hide();
+        }
+        debugger;
+        if ($("#ITUSER").val() == '-- Select --' && '@ViewBag.Role' == "ITUSER") {
+            $("#ITRole_Span").text('Please select IT USER');
+            $("#ITRole_Span").show();
+            return false;
+        }
+        else {
+            $("#ITRole_Span").hide();
+        }
+        //if ($("#SequenceDiagDocument").val() == '') {
+        //    $("#SequenceDiagDocument_Span").text('Please Upload SequenceDiagDocument_Span');
+        //    $("#SequenceDiagDocument_Span").show();
+        //    return false;
+        //}
+        //else { $("#SequenceDiagDocument_Span").hide(); }
+        //else if ($("#ITUSER").val() == '-- Select --')
+        //{
+        //    $("#Role_Span").text('Please select ITUSER');
+        //    $("#Role_Span").show();
+        //    return false;
+        //}
+        //else if ($("#ITARCHITECH").val() == '-- Select --')
+        //{
+        //    $("#Role_Span").text('Please select ITARCHITECH');
+        //    $("#Role_Span").show();
+        //    return false;
+        //}
+
+
+
+
+        if ($("#CostCenterCode").val() == '') {
+            $("#CostCenterCode_Span").text('Please fill CostCenterCode');
+            $("#CostCenterCode_Span").show();
+            return false;
+        }
+        else { $("#CostCenterCode_Span").hide(); }
+
+        if ($("#ConsumerApplication").val() == '') {
+            $("#ConsumerApplication_Span").text('Please fill ConsumerApplication');
+            $("#ConsumerApplication_Span").show();
+            return false;
+        }
+        else { $("#ConsumerApplication_Span").hide(); }
+
+        //if ($("#serviceDetails1_MiddlewareNameId").val() == '0') {
+        //    alert('Please select Middleware name in service details');
+        //    return;
+        //}
+
+
+        if ($("#Feedback").val() == '') {
+            $("#Feedback_Span").text('Please fill Feedback/Reviewer Comment');
+            $("#Feedback_Span").show();
+            return false;
+        }
+        else { $("#Feedback_Span").hide(); }
+
+        $("#" + id).click();
+        return true;
+    }
+
+
+
+    $("#btnadd").click(function () {
+        //debugger;
+        if ($("#serviceDetails1_Existing_New_Id").val() == "0") {
+            $("#Existing_New_Id_Span").text('Please select Existing / New');
+            $("#Existing_New_Id_Span").show();
+
+            return false;
+        }
+        else { $("#Existing_New_Id_Span").hide(); }
+
+
+        //if ($("#serviceDetails1_ProducerApplication").val() == '')
+        //{
+        //    $("#ProducerApplication_Span").text('Please fill ProducerApplication');
+        //    $("#ProducerApplication_Span").show();
+
+        //        return false;
+        //}
+        // else {
+        //     $("#ProducerApplication_Span").hide();
+        // }
+
+        if ($("#serviceDetails1_Purpose").val() == '') {
+            $("#Purpose_Span").text('Please fill purpose');
+            $("#Purpose_Span").show();
+
+            return false;
+        }
+        else { $("#Purpose_Span").hide(); }
+        // if ($("#serviceDetails1_ConsumerApplication").val() == '')
+        //{
+        //    $("#ConsumerApplication_Span").text('Please fill consumer application');
+        //    $("#ConsumerApplication_Span").show();
+
+        //        return false;
+        //}
+        // else {$("#ConsumerApplication_Span").hide();}
+        if ($("#serviceDetails1_ProducerApplication").val() == '') {
+            $("#ProducerApplication_Span").text('Please fill producer application');
+            $("#ProducerApplication_Span").show();
+
+            return false;
+        }
+        else { $("#ProducerApplication_Span").hide(); }
+        //if ($("#serviceDetails1_Rest_SOAP_Id").val() == "0")
+        //{
+        //    $("#Rest_Span").text('Please select REST / SOAP');
+        //    $("#Rest_Span").show();
+
+        //        return false;
+        //}
+        //else {
+        //    $("#Rest_Span").hide();
+        //}
+        if ($("#serviceDetails1_APIType_Id").val() == "0") {
+            $("#APIType_Span").text('Please select API Type');
+            $("#APIType_Span").show();
+
+            return false;
+        }
+        else { $("#APIType_Span").hide(); }
+
+
+        if ($("#serviceDetails1_Volume").val() == '') {
+            $("#Volume_Span").text('Please fill integer value');
+            $("#Volume_Span").show();
+
+            return false;
+        }
+        else { $("#Volume_Span").hide(); }
+
+        //----------------------new-----------
+        if ($("#serviceDetails1_ConsumerDC_Id").val() == "0") {
+            $("#ConsumerDC_Span").text('Please select Consumer DC');
+            $("#ConsumerDC_Span").show();
+
+            return false;
+        }
+        else { $("#ConsumerDC_Span").hide(); }
+
+
+        if ($("#serviceDetails1_ProducerDC_Id").val() == "0") {
+            $("#ProducerDC_Span").text('Please select Producer DC');
+            $("#ProducerDC_Span").show();
+
+            return false;
+        }
+        else { $("#ProducerDC_Span").hide(); }
+
+        //if ($("#serviceDetails1_Platform").val() == '')
+        //{
+        //    $("#Platform_Span").text('Please fill Platform');
+        //    $("#Platform_Span").show();
+
+        //        return false;
+        //}
+        //else { $("#Platform_Span").hide(); }
+        //-------------new end
+
+
+
+        if ($("#serviceDetails1_ServiceType_Id").val() == "0") {
+            $("#ServiceType_Span").text('Please select Service Type');
+            $("#ServiceType_Span").show();
+
+            return false;
+        }
+        else { $("#ServiceType_Span").hide(); }
+        // if ($("#serviceDetails1_APIRiskScore_Id").val() == "0") {
+        //    $("#APIRiskScore_Span").text('Please select APIRiskScore');
+        //    $("#APIRiskScore_Span").show();
+
+        //        return false;
+        //}
+        //else {$("#APIRiskScore_Span").hide();}
+
+        // if ($("#serviceDetails1_PartnerRiskScore_Id").val() == "0") {
+        //    $("#PartnerRiskScore_Span").text('Please select PartnerRiskScore');
+        //    $("#PartnerRiskScore_Span").show();
+
+        //        return false;
+        //}
+        //   else {$("#PartnerRiskScore_Span").hide();}
+        if ($("#serviceDetails1_APICategory_Id").val() == "0") {
+            $("#APICategory_Span").text('Please select API Category');
+            $("#APICategory_Span").show();
+
+            return false;
+        }
+        else { $("#APICategory_Span").hide(); }
+        if ($("#serviceDetails1_DomainName_Id").val() == "0") {
+            $("#DomainName_Span").text('Please select Domain Name');
+            $("#DomainName_Span").show();
+
+            return false;
+        }
+        else { $("#DomainName_Span").hide(); }
+
+        if ($("#serviceDetails1_Existing_New_Id").val() == "2") {
+            if ($("#serviceDetails1_Transformation").val() == '') {
+                $("#Transformation_Span").text('Please fill transformation, if any (in case of new service)');
+                $("#Transformation_Span").show();
+
+                return false;
+            }
+            else { $("#Transformation_Span").hide(); }
+        }
+        if ($("#serviceDetails1_Existing_New_Id").val() == "2") {
+            if ($("#serviceDetails1_TotalScore").val() == '') {
+                $("#TotalScore_Span").text('Please calculate the risk Classification value.');
+                $("#TotalScore_Span").show();
+
+                return false;
+            }
+            else { $("#TotalScore_Span").hide(); }
+        }
+        if ($("#serviceDetails1_Existing_New_Id").val() == "2") {
+            //if ($("#serviceDetails1_RistClassify").val() == '')
+            if ($(".RistClassifycal").val() == '') {
+                $("#RistClassify_Span").text('Please check the risk Classification.');
+                $("#RistClassify_Span").show();
+
+                return false;
+            }
+            else { $("#RistClassify_Span").hide(); }
+        }
+        //if ($("#serviceDetails1_MiddlewareNameId").val() == '0') {
+        //    $("#MiddlewareName_Span").text('Please select Middleware name');
+        //    $("#MiddlewareName_Span").show();
+        //    return false;
+        //}
+        //else {
+        //    $("#MiddlewareName_Span").hide();
+        //}
+        //-------------------ddl validation---------------
+
+        $("#btnaddsubmit").click();
+        $('.form-control').prop('disabled', false);
+        return true;
+        // alert('validation')
+    });
+
+
+    $(function mydiv() {
+        //debugger
+        $('#btnEdit').click(function () {
+            $("#ServiceModal").modal("hide");
+            var obj = {};
+            obj.ServiceID = $(this).attr('data-id');
+
+            $.ajax({
+                url: 'Appprovalintegration',
+                data: JSON.stringify(obj),
+                type: 'POST',
+                dataType: 'html',
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    //  var id = JSON.parse(response).ServiceID;
+                    var name = JSON.parse(response).ServiceName;
+                    var Purpose = JSON.parse(response).Purpose;
+                    $('#txtServiceName').val(name);
+                    $('#txtPurpose').val(Purpose);
+                    $("#ServiceModal").modal("show");
+                }
+            });
+        });
+    });
+
+    function getUrlVars() {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < hashes.length; i++) {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    }
+
+
+    $(function () {
+        //debugger;
+        //alert('sunny');
+        $("#serviceDetails1_InternalServiceName").autocomplete(
+            {
+
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Home/AutoFilterExistingServiceName/',
+                        data: { "prefix": request.term },
+                        type: "POST",
+                        success: function (data) {
+                            // debugger;
+                            if ($("#serviceDetails1_Existing_New_Id").val() == "1") {
+                                response($.map(data, function (item) {
+                                    return { label: item.exServiceName, val: item.exServiceId };
+                                }))
+                            }
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, i) {
+                    // debugger;
+
+                    $("#ServiceNameId").val(i.item.val);
+                    var recordId = $("#ServiceNameId").val();
+                    $.getJSON("/Home/GetExistingServiceRecordById",
+                        {
+                            id: recordId
+                        },
+                        function (data) {
+                            // debugger;
+
+
+                            $('#serviceDetails1_ProducerApplication').val(data.producerApplication);
+                            $('#serviceDetails1_APIType_Id').val(data.apiTypeId);
+                            $('#serviceDetails1_DomainName_Id').val(data.domainId);
+                            $('#serviceDetails1_Rest_SOAP_Id').val(data.restSoapId);
+                            $('#serviceDetails1_APICategory_Id').val(data.apiCatId);
+
+                            $("#serviceDetails1_ProducerApplication").prop('readonly', true);
+                            $('#serviceDetails1_ProducerApplication').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_ProducerApplication').css('color', '#333');
+                            //$('#serviceDetails1_ProducerApplication').css('pointer-events', 'none');
+                            //$("#serviceDetails1_ProducerApplication").readOnly =true;
+                            $("#serviceDetails1_APIType_Id").prop("readonly", true);
+                            $('#serviceDetails1_APIType_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_APIType_Id').css('color', '#333');
+                            $('#serviceDetails1_APIType_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_APIType_Id').css('pointer-events', 'none');
+
+                            $("#serviceDetails1_DomainName_Id").prop("readonly", true);
+                            $('#serviceDetails1_DomainName_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_DomainName_Id').css('color', '#333');
+                            $('#serviceDetails1_DomainName_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_DomainName_Id').css('pointer-events', 'none');
+
+                            $("#serviceDetails1_Rest_SOAP_Id").prop("readonly", true);
+                            $('#serviceDetails1_Rest_SOAP_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_Rest_SOAP_Id').css('color', '#333');
+                            $('#serviceDetails1_Rest_SOAP_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_Rest_SOAP_Id').css('pointer-events', 'none');
+
+                            $("#serviceDetails1_APICategory_Id").prop("readonly", true);
+                            $('#serviceDetails1_APICategory_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_APICategory_Id').css('color', '#333');
+                            $('#serviceDetails1_APICategory_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_APICategory_Id').css('pointer-events', 'none');
+
+
+                            // $('RecordType').val(data.Type);
+                        });
+                },
+                minLength: 1
+
+            });
+
+
+    });
+
+    //-----------------------------------------ExternalAutofill--------------------------------------------
+
+    $(function () {
+        debugger;
+        //alert('Test1');
+        $("#serviceDetails1_ExternalServiceName").autocomplete(
+            {
+
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Home/AutoExternalServiceNameFilter/',
+                        data: { "prefix": request.term },
+                        type: "POST",
+                        success: function (data) {
+                            //////   debugger;
+                            //alert('Test2')
+                            if ($("#serviceDetails1_Existing_New_Id").val() == "1") {
+                                // debugger;
+                                //alert('Test2');
+                                response($.map(data, function (item) {
+                                    return { label: item.externalServicName, val: item.externalServiceNameId };
+                                }))
+                            }
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, i) {
+                    //debugger;
+
+                    $("#serviceDetails1_ExternalServiceName").val(i.item.val);
+                    var ExternalService = $("#serviceDetails1_ExternalServiceName").val();
+                    $.getJSON("/Home/GetExternalServiceNameRecordById",
+                        {
+                            ExternalServiceText: ExternalService
+                        },
+                        function (data) {
+
+                            debugger;
+
+
+
+                            $('#serviceDetails1_InternalServiceName').val(data.internalServiceName);
+                            //$('#serviceDetails1_ProducerApplication').val(data.producerApplication);
+                            $('#serviceDetails1_APIType_Id').val(data.apiTypeId);
+                            $('#serviceDetails1_DomainName_Id').val(data.domainId);
+                            $('#serviceDetails1_Rest_SOAP_Id').val(data.restSoapId);
+                            $('#serviceDetails1_APICategory_Id').val(data.apiCatId);
+                            //$('#serviceDetails1_ProducerDC_Id').val(data.producerDCId);
+                            $('#serviceDetails1_ServiceType_Id').val(data.serviceTypeId);
+                            $('#serviceDetails1_APIRiskScore_Id').val(data.apiRiskScoreId);
+
+                            // // $("#serviceDetails1_ProducerApplication").prop("disabled", true);
+                            //$("#serviceDetails1_ProducerApplication").prop('readonly', true);
+                            //$('#serviceDetails1_ProducerApplication').css('background-color', '#e9e9e9');
+                            //$('#serviceDetails1_ProducerApplication').css('color', '#333');
+                            //$('#serviceDetails1_ProducerApplication').css('pointer-events', 'none');
+                            //$("#serviceDetails1_ProducerApplication").readOnly =true;
+                            $("#serviceDetails1_APIType_Id").prop("readonly", true);
+                            $('#serviceDetails1_APIType_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_APIType_Id').css('color', '#333');
+                            $('#serviceDetails1_APIType_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_APIType_Id').css('pointer-events', 'none');
+
+                            $("#serviceDetails1_DomainName_Id").prop("readonly", true);
+                            $('#serviceDetails1_DomainName_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_DomainName_Id').css('color', '#333');
+                            $('#serviceDetails1_DomainName_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_DomainName_Id').css('pointer-events', 'none');
+
+                            $("#serviceDetails1_Rest_SOAP_Id").prop("readonly", true);
+                            $('#serviceDetails1_Rest_SOAP_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_Rest_SOAP_Id').css('color', '#333');
+                            $('#serviceDetails1_Rest_SOAP_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_Rest_SOAP_Id').css('pointer-events', 'none');
+
+                            $("#serviceDetails1_APICategory_Id").prop("readonly", true);
+                            $('#serviceDetails1_APICategory_Id').css('background-color', '#e9e9e9');
+                            $('#serviceDetails1_APICategory_Id').css('color', '#333');
+                            $('#serviceDetails1_APICategory_Id').css('cursor', 'not-allowed');
+                            $('#serviceDetails1_APICategory_Id').css('pointer-events', 'none');
+
+                        });
+                },
+                minLength: 1
+
+            });
+
+
+    });
+
+    //--------------------------set Value in Platfrom--------------------//
+
+    function setPlatform(val) {
+
+        var ConsumerIN = "";
+        var ConsumerOut = "";
+        var ProducerIN = "";
+        var ProducerOut = "";
+        var ConsumerDC_Id = $("#serviceDetails1_ConsumerDC_Id").val();
+        var ProducerDC_Id = $("#serviceDetails1_ProducerDC_Id").val();
+
+        //-----------
+        if (ConsumerDC_Id == 46 || ConsumerDC_Id == 47) {
+            ConsumerIN = "IN";
+        }
+        if (ProducerDC_Id == 49 || ProducerDC_Id == 50) {
+            ProducerIN = "IN";
+        }
+        if (ConsumerDC_Id == 48 || ProducerDC_Id == 50) {
+            ConsumerOut = "OUT";
+        }
+        if (ProducerDC_Id == 51) {
+            ProducerOut = "OUT";
+        }
+
+        if (ConsumerIN == "IN" && ProducerIN == "IN") {
+            $("#serviceDetails1_Platform").val('Internal');
+        }
+        else if (ConsumerIN == "IN" && ProducerOut == "OUT") {
+            $("#serviceDetails1_Platform").val('External');
+        }
+        else if (ConsumerOut == "OUT" && ProducerIN == "IN") {
+            $("#serviceDetails1_Platform").val('Internal & External');
+        }
+        else if (ConsumerOut == "OUT" && ProducerOut == "OUT") {
+            $("#serviceDetails1_Platform").val('External ');
+        }
+
+    }
+
+
+
+
+
+
+
+    //------------------------------------------consumer Application auto fill-------------------------------
+    var APPidvalue = null;
+
+    $(function () {
+        debugger;
+        // alert('Test1');
+
+
+        $("#ConsumerApplication").autocomplete(
+            {
+
+                source: function (request, response) {
+                    $("#btnaddupapp").text('Add Application');
+                    $.ajax({
+                        url: '/Home/AutoConsumerAppFilter/',
+                        data: { "prefix": request.term },
+                        type: "POST",
+                        success: function (data) {
+                            //////   debugger;
+                            //alert('Test2')
+
+                            debugger;
+                            //alert('Test2');
+                            response($.map(data, function (item) {
+                                return { label: item.consumerName, val: item.consumerId };
+                            }))
+
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, i) {
+                    debugger;
+                    APPidvalue = i.item.val;
+                    if (APPidvalue == '') {
+                        $("#btnaddupapp").text('Add Application');
+                    }
+                    else {
+                        $("#btnaddupapp").text('Update Spoc');
+                    }
+                    $("#ConsumerApplication").val(i.item.val);
+                    var consId = $("#ConsumerApplication").val();
+                    $.getJSON("/Home/GetConsumerAppId",
+                        {
+                            Id: consId
+                        },
+                        function (data) {
+
+                            debugger;
+                            if ($("#ConsumerApplication") != '') {
+                                $('#serviceDetails1_ConsumerDC').val(data.consumerDC);
+                                var ConsumerDC = $('#serviceDetails1_ConsumerDC').val();
+                                RulesetPlatform();
+
+                            }
+                            else {
+                                $('#serviceDetails1_ConsumerDC').val('');
+                            }
+
+
+                        });
+                },
+                minLength: 1
+
+            });
+
+
+    });
+
+
+
+
+    //------------------------------------------producer Application auto fill-------------------------------
+    $(function () {
+        debugger;
+        //alert('Test1');
+        $("#serviceDetails1_ProducerApplication").autocomplete(
+            {
+
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Home/AutoProducerAppFilter/',
+                        data: { "prefix": request.term },
+                        type: "POST",
+                        success: function (data) {
+                            //////   debugger;
+                            //alert('Test2')
+
+                            debugger;
+                            //alert('Test2');
+                            response($.map(data, function (item) {
+                                return { label: item.producerName, val: item.producerId };
+                            }))
+
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, i) {
+                    debugger;
+
+                    $("#serviceDetails1_ProducerApplication").val(i.item.val);
+                    var consId = $("#serviceDetails1_ProducerApplication").val();
+                    $.getJSON("/Home/GetProducerAppId",
+                        {
+                            Id: consId
+                        },
+                        function (data) {
+                            debugger;
+                            $('#serviceDetails1_ProducerDC').val(data.producerDC);
+                            RulesetPlatform();
+
+                        });
+                },
+                minLength: 1
+
+            });
+
+
+    });
+
+
+
+    $("#ConsumerApplication").keyup(function () {
+        if ($("#ConsumerApplication").val() == '') {
+            $("#btnaddupapp").text('Add Application');
+            $('#serviceDetails1_ConsumerDC').val('');
+
+        }
+
+
+    });
+
+    $("#serviceDetails1_ProducerApplication").keyup(function () {
+        if ($("#serviceDetails1_ProducerApplication").val() == '') {
+            $("#btnaddupapps").text('Add Application');
+            $('#serviceDetails1_ProducerDC').val('');
+
+        }
+    });
+
+    /// ------------------------------------------consumerDc And Producer DC Rule-----------------------------------------------------------
+    //function RulesetPlatform(val) {
+    function RulesetPlatform() {
+        debugger;
+        var ConsumerIN = "";
+        var ConsumerOut = "";
+        var ProducerIN = "";
+        var ProducerOut = "";
+        var ConsumerDC = $("#serviceDetails1_ConsumerDC").val();
+        var ProducerDC = $("#serviceDetails1_ProducerDC").val();
+        //-----------
+        if (ConsumerDC != '' && ProducerDC != '') {
+
+            if (ConsumerDC == 'Bank DC' || ConsumerDC == 'Bank Landing Zone') {
+                ConsumerIN = "IN";
+            }
+            if (ProducerDC == 'Bank DC' || ProducerDC == 'Bank Landing Zone') {
+                ProducerIN = "IN";
+            }
+            if (ConsumerDC == 'External' || ProducerDC == 'Bank Landing Zone') {
+                ConsumerOut = "OUT";
+            }
+            if (ProducerDC == 'External') {
+                ProducerOut = "OUT";
+            }
+
+            if (ConsumerIN == "IN" && ProducerIN == "IN") {
+                $("#serviceDetails1_Platform").val('Internal');
+            }
+            else if (ConsumerIN == "IN" && ProducerOut == "OUT") {
+                //$("#serviceDetails1_Platform").val('External');
+                $("#serviceDetails1_Platform").val('Internal & External');
+            }
+            else if (ConsumerOut == "OUT" && ProducerIN == "IN") {
+                $("#serviceDetails1_Platform").val('Internal & External');
+            }
+            else if (ConsumerOut == "OUT" && ProducerOut == "OUT") {
+                $("#serviceDetails1_Platform").val('External');
+            }
+
+        }
+    }
+
+
+    function Externalservicereadonly() {
+        var ConsumerDC = $('#serviceDetails1_ConsumerDC').val();
+        if (ConsumerDC == 'Bank DC' || ConsumerDC == 'Bank Landing Zone') {
+            $("#serviceDetails1_ExternalServiceName").prop('readonly', true);
+            $("#serviceDetails1_ExternalServiceName").css('background-color', '#e9e9e9');
+            $('#serviceDetails1_ExternalServiceName').css('color', '#333');
+
+        }
+        else {
+            $("#serviceDetails1_ExternalServiceName").prop('readonly', false);
+            $("#serviceDetails1_ExternalServiceName").css('background-color', '#fff');
+            $('#serviceDetails1_ExternalServiceName').css('color', '#212529');
+
+        }
+    }
+
+    function onchangepagerefresh() {
+        window.location.reload();
+    }
+    //function Producserdcfill(txtproducerdc)
+    //    {
+
+    //                  debugger;
+    //                  var APPidvalue = txtproducerdc;
+    //                    if (APPidvalue == '') {
+    //                        $("#btnaddupapps").text('Add Application');
+    //                        producerbuttontext = 'AddApplication';
+    //                    }
+    //                    else {
+    //                        $("#btnaddupapps").text('Update Spoc');
+    //                         producerbuttontext = 'UpdateSpoc';
+    //                    }
+    //                 $("#serviceDetails1_ProducerApplication").val(txtproducerdc);
+    //                   var fullname = $("#serviceDetails1_ProducerApplication").val();
+    //                 $.getJSON("/Home/GetProducerAppfullName",
+    //                 {
+    //                    FullName: fullname
+    //                 },
+    //                function (data) {
+    //                    debugger;
+    //                    if (data.producerDC != null)
+    //                    {
+    //                        $('#serviceDetails1_ProducerDC').val(data.producerDC);
+    //                        RulesetPlatform();
+    //                    }
+
+    //                });
+
+
+    //    }
+    $('#btn_DownloadIntegrationDoc').click(function () {
+        debugger
+        var IntegrationId = getUrlVars()["integrationId"];
+        $.ajax({
+            type: "POST",
+            url: '/Home/DownloadIntegrationFiles',
+            data: {
+                IntegrationId: IntegrationId
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response != null) {
+                    debugger
+                    window.location.href = "/Home/DownloadFileOBP?fileName=" + response;
+                }
+                else {
+                    toastr.error("File has been not donwloaded.");
+                }
+            }
+        });
+    });
+
+    //-----------------------Question detailsBinding on change event-------------------------
+
+    function BindQuestiondetaillist() {
+        debugger;
+        //var userid = $(this).closest("tr").find(".nr").text();
+        var umodel = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        // var inplatform = $('#@Html.IdFor(m => m.IN_Platform)').val();
+        // var apicat = $('#serviceDetails1_APICategory_Id').val();
+
+    @*var umodel = {
+            CustomerId: $('#@Html.IdFor(m=>m.customer.CustomerId)').val(),
+            CustomerName: $('#@Html.IdFor(m=>m.customer.CustomerName)').val(),
+            Address: $('#@Html.IdFor(m=>m.customer.Address)').val()
+            }*@
+
+          //var integration = {
+        //In_platform
+
+
+            debugger;
+        $.ajax({
+            type: "POST",
+            url: '/home/GetQuestonDetail',
+            data: {
+                umodel: umodel
+
+            },
+            dataType: 'json',
+            success: function (response) {
+                debugger
+                if (response != null) {
+                    //alert(1);
+                    /* bind dynamic question start*/
+                    //console.log(response);
+                    $('#newQueTest').empty();
+
+                    var APICategory = $("#serviceDetails1_APICategory_Id option:selected").text();
+                    var Qtype = $("#serviceDetails1_Platform").val();
+
+                    var startDiv = `<div class="row form-group">`;
+                    var endDiv = `</div>`;
+
+                    var filteredQuestions = response.questionList.filter(obj => obj.qType == Qtype && obj.apiCategory == APICategory);
+                    var rowCount = 0;
+
+                    filteredQuestions.forEach(question => {
+                        debugger;
+                        var questionText = `<div class="col-md-6"><label class="label-control"><label>${question.question}</label><span style="font-weight:bold;color:red;font-size: 12px;">    *</span></label>`;
+
+                        var hiddenFields = `<input type="hidden" name="id" value="${question.id}">
+                              <input type="hidden" name="qType" value="${question.qType}">
+                              <input type="hidden" name="apiCategory" value="${question.apiCategory}">
+                              <input type="hidden" name="apiCategoryId" value="${question.apiCategoryId}">
+                              </div>`;
+
+                        var qValueDropList = response.qDropValuesList.filter(qValue => qValue.qid == question.id);
+
+                        var dropdown = qValueDropList.length > 0
+                            ? `<div class="col-md-3"><select class="form-control QdropValue" name="dropdown" id="QuestinonselectedList_${rowCount}__Weightage_1">
+                                ${qValueDropList.map(qValue => `<option value="${qValue.id}">${qValue.val}</option>`).join('')}
+                                </select></div>
+                                <div class="col-md-3"><span id="'QdropValue_' " style="display:none;font-weight:bold;color:red;font-size: 12px;"></span></div>`
+                            : '';
+
+                        $('#newQueTest').append(startDiv + questionText + hiddenFields + dropdown + endDiv);
+                        rowCount++;
+                    });
+                    /* bind dynamic question end*/
+                }
+                else {
+                    toastr.error("no question detail get");
+                }
+            }
+        });
+    };
+
+    $("input[type='file']").on("change", function () {
+        if (this.files[0].size > 5000000) {
+            alert("Please upload file less than 5MB !!");
+            $(this).val('');
+
+        }
+    });
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+
+    $(document).on("change", "#SequenceDiagDocument", function () {
+        // alert("Files changed.");
+        if (this.files[0].size > 5000000) {
+            alert("Please upload file less than 5MB !!");
+
+            $('.SDD .kwt-file__msg').text('');
+            $('.SDD .kwt-file__msg').text('Select Files');
+            $('.SDD .kwt-file__delete').hide();
+            $(this).val('');
+            return false;
+        }
+        $('.SDD .kwt-file__delete').hide();
+        $('.kwt-file__delete').hide();
+    });
+
+    function openFileInPopup(url) {
+        debugger;
+        try {
+            if (url) {
+                var width = 800;
+                var height = 600;
+                var left = (window.screen.width - width) / 2;
+                var top = (window.screen.height - height) / 2;
+
+                fetch(url)
+                    .then(function (response) {
+                        if (!response.ok) {
+                            if (response.status == 404) {
+                                alert("No File Uploaded For This");
+                            }
+                            else {
+                                alert("HTTP Error: " + response.status);
+                            }
+                        } else {
+                            var newWindow = window.open(url, '_blank', 'width=' + width + ', height=' + height + ', left=' + left + ', top=' + top);
+
+                            if (newWindow) {
+                                newWindow.focus();
+                            } else {
+                                alert("Failed to open the file. Please check if the file exists.");
+                            }
+                        }
+                    })
+                    .catch(function (error) {
+                        alert("An error occurred: " + error.message);
+                    });
+            } else {
+                alert("No file uploaded for this.");
+            }
+        } catch (error) {
+            alert("An error occurred: " + error.message);
+        }
+    }
+</script>

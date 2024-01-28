@@ -1,8 +1,97 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@model API_Adda.Models.AddEditExceptionModel
+@{
+    ViewData["Title"] = "ExceptionApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<div class="container mt-10">
+    <div class="card">
+        <div class="card-body">
+            <div class="row form-group">
+                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                    <h4>
+                        Partner Onboarding
+                    </h4>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+                    @*@if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                    {
+                    <a class="btn btn-primary" href="/PartnerOnboarding/AddEditPartnerOnBoarding" id="new" style="font-size: 15px; font-weight: 600;margin-left: 985px;margin-bottom: 8px;">
+                    <i class="bx bx-plus-circle" style="vertical-align: middle;"></i> Add Partner
+                    </a>
+                    }*@
+                </div>
+            </div>
+
+        </div>
+        <div class="row form-group">
+            <div class="row form-group">
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-striped" id="project_detail">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Exception ID</th>
+                                <th>Partner Name</th>
+                                <th>Status</th>
+                                <th>CreatedBy</th>
+                                <th>Date Created</th>
+                                <th>Date Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            @if (Model.lstExceptionDetails != null)
+                            {
+                                @foreach (var item in Model.lstExceptionDetails)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                                            {
+                                                <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
+                                            }
+                                        </td>
+                                        <td class="Appr">@item.CASEID</td>
+                                        <td>@item.PartnerName</td>
+                                        <td>@item.Status</td>
+                                        <td>@item.CreatedBy</td>
+                                        <td>@item.DateCreated</td>
+                                        <td>@item.DateUpdated</td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="~/js/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var IsSuccess = '@TempData["IsSuccess"]';
+        var msg = '@TempData["Result"]';
+        if (IsSuccess != '' && IsSuccess == 'True' && msg != '') {
+            toastr.success(msg);
+        }
+        else if (IsSuccess != '' && IsSuccess == 'False' && msg != '') {
+            toastr.error(msg);
+        }
+
+        var number = parseInt(@ViewBag.Number);
+
+        if (number == 1) {
+            $("#integration").show();
+        }
+    });
+
+
+</script>

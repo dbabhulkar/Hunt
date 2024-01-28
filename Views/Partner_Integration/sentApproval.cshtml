@@ -1,8 +1,134 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Http
+@model API_Adda.Models.PartnerOnboarding
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "sentApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@using (Html.BeginForm("ListofPartnerIntegration", "Partner_Integration", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+{
+    <div class="container mt-10">
+        <div class="card">
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>Add Partner</h4>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div id="msform">
+                        <!-- progressbar -->
+                        <ul id="progressbar">
+                            <li class="active" id="onboarding"><strong>Partner Onboarding</strong></li>
+                            <li id="approval"><strong>Sent For Approval</strong></li>
+
+                        </ul>
+
+
+                        <fieldset>
+                            <div class="row form-group">
+                                <div>
+                                    <label class="label-control" style="font-weight: 600;">Approval Matrix For Case ID - </label> <label>APIGW0000000000</label>
+                                </div>
+                                <div>
+                                    <label class="label-control" style="font-weight: 600;">API Risk - </label> <label>Low</label>
+                                </div>
+                                <div>
+                                    <label class="label-control" style="font-weight: 600;">Partner Risk - </label> <label>Low</label>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of product processor</h5>
+                                <div class="col-md-4">
+                                    <label class="label-control">Funcional Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of Business</h5>
+                                <div class="col-md-4">
+                                    <label class="label-control">Funcional Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="label-control">Vertical Head</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                    <select class="form-control">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                            {
+                                <input type="submit" name="next" class="next action-button" value="Request For Approval" />
+                                <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                            }
+                            else
+                            {
+                                <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                <br />
+
+                            }
+                            @if (Accessor.HttpContext.Session.GetString("Role") != "USER")
+                            {
+                                <div class="row form-group">
+                                    <div class="col-md-10">
+                                        <label class="label-control fw-bold">Feedback/Reviewer Comment</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+
+                                        @Html.TextArea("txt_Feedback", new { @class = "form-control", @cols = "40", @rows = "5", @maxlength = "450" })
+                                        <span id="Feedback_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    @*<div class="col-md-1">
+                            </div>*@
+                                    <div class="col-md-10">
+
+                                        <input type="submit" class="btn btn-info" name="button" id="btnFeedbackV" value="Feedback to User" />
+                                        <input type="submit" class="btn btn-success" name="button" id="btnApprovedV" value="Approved" />
+                                        <input type="submit" class="btn btn-danger" name="button" id="btnRejectV" value="Reject" />
+                                        <input type="submit" class="btn btn-success" name="button" style="background-color:rosybrown" id="btnRejecte" value="Cancel" />
+                                        @*<input type="button" name="previous" class="previous action-button-previous" value="Previous" />*@
+
+                                    </div>
+                                </div>
+                            }
+                        </fieldset>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+}
+<script src="~/js/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.modal-link').click(function () {
+            $('.modal').show();
+            $('.modal-bg').show();
+        });
+        $('.modal .close').click(function () {
+            $('.modal').hide();
+            $('.modal-bg').hide();
+        })
+    })
+</script>

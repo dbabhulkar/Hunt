@@ -1,8 +1,410 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model API_Adda.Models.PartnerOffboarding
+@inject IHttpContextAccessor Accessor
+@using Microsoft.AspNetCore.Http
+@{
+    ViewData["Title"] = "PartnerOffboarding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    .center-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /*height: 100vh; /* Adjust as needed */ */
+    }
+
+    .trAPIname {
+        display: none;
+    }
+
+    .double-width {
+        height: 200%;
+    }
+
+    .inactive-row {
+        color: Red; /* or any other grey color */
+    }
+</style>
+@using (Html.BeginForm("SavePartnerOffboarding", "PartnerOffboarding", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    <div class="container mt-10">
+        <div class="card">
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>Partner Offboarding</h4>
+                        <a href="/PartnerDashboard/PartnerDashboard/" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+                    </div>
+                </div>
+                <div class="row form-group justify-content-center">
+                    <h2 style="color: red; text-align: center;font-size: 24px;">BE AWARE! You are Deleting API's.</h2>
+                    <div id="msform" class="col-md-8">
+                        <div class="row form-group">
+                            <div class="col-md-4">
+                                @Html.LabelFor(a => a.ExitScenario, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.DropDownListFor(a => a.ExitScenario, new List<SelectListItem>
+                                         () {
+                            new SelectListItem { Text="--select--",Value="--select--"},
+                            new SelectListItem { Text="Internal APIs are retired(E1)",Value="Internal APIs are retired(E1)"},
+                            new SelectListItem { Text="Inbound APIs are retired but partnership is continued(E2)",Value="Inbound APIs are retired but partnership is continued(E2)"},
+                            new SelectListItem { Text="Inbound API is continued but Partner is offboarded(E3)", Value="Inbound API is continued but Partner is offboarded(E3)"},
+                            new SelectListItem { Text="Inbound API is retired, and Partner is offboarded(E4)", Value="Inbound API is retired, and Partner is offboarded(E4)"},
+                            new SelectListItem { Text="Outbound API is discontinued(E5)", Value="Outbound API is discontinued(E5)"},
+                            }, new { @class = "form-control", @readonly = "readonly", })
+                                @Html.ValidationMessageFor(a => a.ExitScenario, "", new { @class = "text-danger" })
+                                @*@Html.DropDownListFor(a => a.ExitScenario, new SelectList(Model.lstExitScenarioOptions, "Value", "Text"), "Select", new { @class = "form-control" })*@
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-4">
+                                @Html.LabelFor(a => a.PartnerName, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(a => a.PartnerName, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-4">
+                                @Html.LabelFor(a => a.APIName, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            </div>
+                            <div class="col-md-4">
+                                <select id="ddlApiNames" name="ApiName" class="form-control"></select>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-large btn-success" type="button" style="margin-top: -2%;" id="btnAdd"><i class="bx bx-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8 text-center mx-auto">
+                            <table id="tbladdAPI" name="tbladdAPI" class="TableAddDeleteNew table table-hover table-striped" display:none>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Partner_Name</th>
+                                        <th>API_ID</th>
+                                        <th>API_Name</th>
+                                        @*<th>PARTNETONBOADING_ID</th>*@
+                                    </tr>
+                                </thead>
+                                <tbody id="tblAPIbody"></tbody>
+                            </table>
+                        </div>
+
+
+                        <div class="row form-group">
+                            <div class="col-md-4">
+                                @Html.LabelFor(a => a.Remark, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                            </div>
+                            <div class="col-md-4">
+                                @Html.TextBoxFor(a => a.Remark, new { @class = "form-control double-width" })
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12"></div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-12 d-flex justify-content-center">
+                            <input type="button" class="btn btn-primary" name="button" id="btnvald" value="Submit" /> @*onclick="fnct();" value="Submit" />*@
+                        </div>
+                    </div>
+                    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Confirmation</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <table id="popupTable" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>API Name</th>
+                                                <th>PartnerName</th>
+
+                                            </tr>
+                                        </thead>
+                                        @*<tbody>
+                                    <tr>
+                                    <td>A</td>
+                                    <td>S</td>
+                                    <td>c</td>
+                                    <td>f</td>
+                                    </tr>
+                                    </tbody>*@
+                                        <tbody id="tblpopup"></tbody>
+                                    </table>
+                                    <p style="color:red;">Are you sure you still want to Delete?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" id="btnCancel" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <button id="btnConfirm" type="button" class="btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script src="~/js/jquery.min.js"></script>
+<script>
+
+    function handleFileSelect() {
+        var fileInput = document.getElementById('otheruploadfile');
+        var file = fileInput.files[0];
+        console.log("Selected file: " + file.name);
+    }
+
+
+
+    $("#btnvald").click(function (e) {
+        e.preventDefault();
+        debugger;
+        if ($("#ExitScenario").val() == '' || $("#ExitScenario").val() == '--select--') {
+            alert('Please fill ExitScenario');
+            return false;
+        }
+        if ($("#PartnerName").val() == '') {
+            alert('Please Enter PartnerName!');
+            return false;
+        }
+        //var tblpopup = document.getElementById('tblpopup');
+        debugger;
+        if ($('.trAPIname').length == 0) {
+            alert('Please Enter API!');
+            return false;
+        }
+        if ($("#Remark").val() == '') {
+            alert('Please Add Remark!');
+            return false;
+        }
+        if ($("#uploadfile").val() == '') {
+            alert('Please upload file!');
+            return false;
+        }
+        submitAjaxcall();
+        DeleteApiAjax();
+        // $("form").submit();
+        function showAlertAndRedirect() {
+
+            window.location.href = "https://localhost:44366/PartnerDashboard/PartnerDashboard";
+            alert("Are you sure you want to Delete these API?");// Replace with your desired URL
+        }
+        document.getElementById("btnvald").addEventListener("click", showAlertAndRedirect);
+    });
+
+    function submitAjaxcall() {
+        debugger;
+        var sep = '';
+        var array = {}
+        var lstAPIName = [];
+        var formData = new FormData();
+        $('#tblAPIbody tr').each(function (e) {
+
+            var obj = {};
+            var no = e;
+            var api_name = $(this).find("td:eq(3) input[type='text']").val();
+            obj.APIName = $(this).find("td:eq(3) input[type='text']").val();
+            obj.APIId = '';
+            lstAPIName.push(obj);
+
+        });
+
+        array.ExitScenario = 'test';
+        array.lstAPIName = lstAPIName;
+        formData.append('array', JSON.stringify(array));
+
+        $.ajax({
+            url: '/PartnerOffboarding/addAPIList',
+            data: formData,
+            contentType: false, // Important to prevent jQuery from processing the data
+            processData: false, // Important to prevent jQuery from processing the data
+            dataType: 'json',
+            type: "POST",
+
+            success: function (response) {
+                console.log('Success:', response);
+            },
+            error: function (error) {
+                console.error('Error:', error);
+            }
+        });
+
+    }
+    $(document).ready(function () {
+        $("#PartnerName").autocomplete(
+            {
+
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/PartnerOffboarding/PartnerOffboardingDetails',
+                        data: { "PartnerName": request.term },
+                        type: "POST",
+                        success: function (data) {
+
+                            response($.map(data, function (item) {
+                                return { label: item.partneR_NAME, val: item.partnetonboadinG_ID };
+                            }))
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                minLength: 1
+            });
+        $("#PartnerName").on('change', function () {
+            debugger;
+            // Get the selected partnerName
+            var partnerName = $(this).val();
+            $.ajax({
+                url: '/PartnerOffboarding/PartnerOffboardingapiname',
+                data: { "PartnerName": partnerName },
+                type: "POST",
+                success: function (data) {
+                    debugger;
+                    var transformedData;
+                    if (data == null || data.length === 0) {
+                        alert("API's Not available against this Partner.");
+                        $("#PartnerName").val('');
+                        transformedData = [];
+                    } else {
+                        // Ensure that data is an array of objects with label and val properties
+                        var transformedData = $.map(data, function (item) {
+                            return {
+                                label: item.apiName, value: item.apiId
+
+                            };
+                        });
+                    }
+                    $("#GetapiName").autocomplete("option", "source", transformedData);
+
+                    // Bind apiname values to dropdown list
+                    var ddlApiNames = $("#ddlApiNames");
+
+                    console.log("ddl api names" + ddlApiNames);
+                    ddlApiNames.empty(); // Clear existing options
+
+                    // Iterate through the transformed data and add options to the dropdown
+                    $.each(transformedData, function (index, item) {
+                        ddlApiNames.append($('<option>').text(item.label).val(item.value));
+                    });
+                },
+                error: function (response) {
+                    console.error("Ajax request failed:", response.responseText);
+                    alert(response.responseText);
+                }
+            });
+        });
+
+        $(document).on("click", "#btnAdd", function () {
+            debugger;
+            // $("#tbladdAPI").toggle();
+            AddAPIRow();
+        });
+
+    });
+    var lstAPIName = [];
+
+    function AddAPIRow() {
+        debugger;
+        var APIName = $("#ddlApiNames option:selected").text();
+        var APIID = $("#ddlApiNames").val();
+        var rowCount = $('.trAPIname').length + 1;
+        var partnerName = $("#PartnerName").val();
+        // Check if the API name is not available
+
+        // Check for duplicate entries
+        var isDuplicate = lstAPIName.some(function (apiEntry) {
+            return apiEntry.API_Name === APIName;
+        });
+
+        if (APIName !== "" && !isDuplicate) {
+            // Create a new ApiNameList object
+            var apiNameObj = {
+                RowCount: rowCount,
+                PartnerName: partnerName,
+                APIID: APIID,
+                API_Name: APIName
+            };
+            // Add the new object to the lstAPIName list
+            lstAPIName.push(apiNameObj);
+            // Update your table with the new row
+            var newTR = '<tr class="trAPIname">' +
+                '<td>' + rowCount + '</td>' +
+                '<td>' + partnerName + '</td>' +
+                '<td>' + APIID + '</td>' +
+                '<td><input type="text" name="APIName' + rowCount + '" id="APIName' + rowCount + '" class="form-control APIName" readonly value="' + APIName + '"/></td>' +
+                '<td><button class="close-btn" type="button" onclick="removeAPIRow(this)"><i class="bx bx-x-circle" style="color: red;"></i></button></td>' +
+                '</tr>';
+
+            console.log(newTR);
+            $('.TableAddDeleteNew tbody').append(newTR);
+            $('#ddlApiNames').val('');
+
+            // Show the added row
+            $('.trAPIname:last').show();
+        } else if (isDuplicate) {
+            alert(APIName + "\n API already added to the list!!!");
+        } else {
+            alert("API Name Required!!");
+        }
+    }
+
+    function DeleteApiAjax() {
+        //$("#btnsubmitpo").on("click", function () {
+        debugger;
+        $.ajax({
+            type: 'POST',
+            url: '/PartnerOffboarding/addAPIList', // Replace with the actual endpoint
+            data: JSON.stringify({ lstAPIName: lstAPIName }),
+            contentType: 'application/json',
+            success: function (response) {
+                //alert('API Offboarded successfully');
+                // Mark the rows as inactive in the UI
+                $('.TableAddDeleteNew tbody tr').each(function () {
+                    var apiName = $(this).find('.APIName').val();
+                    if (apiNames.includes(apiName)) {
+                        $(this).addClass('inactive-row');
+                    }
+                });
+            },
+
+        });
+    }
+    function removeAPIRow(button) {
+        var row = $(button).closest('tr');
+        var rowCountToRemove = row.find('td:first').text();
+        var APINameToRemove = row.find('.APIName').val();
+        // Remove the row from the table
+        row.remove();
+        // Remove the corresponding entry from the lstAPIName list
+        lstAPIName = lstAPIName.filter(function (apiEntry) {
+            return !(apiEntry.RowCount === parseInt(rowCountToRemove) && apiEntry.API_Name === APINameToRemove);
+        });
+        // Optionally, you can renumber the rows if needed
+        renumberRows();
+        // Check for duplicates after removing the row
+        var isDuplicate = lstAPIName.some(function (apiEntry) {
+            return apiEntry.API_Name === APINameToRemove;
+        });
+        if (isDuplicate) {
+            alert(APINameToRemove + "\n API already added to the list!!!");
+        }
+    }
+    function renumberRows() {
+        // Renumber the rows after removal
+        $('.TableAddDeleteNew tbody tr').each(function (index) {
+            $(this).find('td:first').text(index + 1);
+        });
+    }
+</script>

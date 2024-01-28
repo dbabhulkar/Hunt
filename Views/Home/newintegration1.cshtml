@@ -1,6 +1,102 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
+﻿@model IEnumerable<API_Adda.Models.NewIntegration>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@{
+    ViewData["Title"] = "newintegration1";
+}
+
+<h2>newintegration1</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectMgrBTG)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectMgrIT)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GoLiveDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BusinesssJustification)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BusinessSponsor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExecutiveSponsor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CostCenterCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MethodFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SpName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserJourneyFiles)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectMgrBTG)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectMgrIT)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GoLiveDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BusinesssJustification)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BusinessSponsor)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExecutiveSponsor)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CostCenterCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MethodFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SpName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserJourneyFiles)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                    @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                    @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

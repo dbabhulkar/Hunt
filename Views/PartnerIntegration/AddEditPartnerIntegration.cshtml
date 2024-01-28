@@ -1,8 +1,1109 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using Microsoft.AspNetCore.Http
+@model API_Adda.Models.PartnerOnboarding
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@inject IHttpContextAccessor Accessor
+@{
+    ViewData["Title"] = "AddEditPartnerIntegration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("SaveAddPartneronBoarding", "PartnerIntegration", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    <form id="uploadForm" action="/PartnerOnboarding/ListofPartner" method="post" enctype="multipart/form-data">
+        <div class="container mt-10">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row form-group">
+                        <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                            <h4>Partner Integration</h4>
+                            <a href="/PartnerIntegration/ListofPartnerIntegration/" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div id="msform">
+                            <!-- progressbar -->
+                            @*<ul id="progressbar">
+                        <li class="active" id="onboarding"><strong>Partner Onboarding</strong></li>
+                        <li id="approval"><strong>Sent For Approval</strong></li>
+                        </ul>*@
+
+                            <fieldset>
+                                <section class="background">
+                                    <b>Partner Details:</b>
+                                    <div class="row form-group">
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.PartnerName, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.TextBoxFor(a => a.PartnerName, new { @class = "form-control", @required = "required" })
+                                            @Html.ValidationMessageFor(a => a.PartnerName, "", new { @class = "text-danger" })
+                                            @Html.HiddenFor(a => a.Action, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.projectDescription, new { @class = "label-control" })&nbsp;&nbsp;@*<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                                            @Html.TextBoxFor(a => a.projectDescription, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(a => a.projectDescription, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.PartnerType, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.DropDownListFor(a => a.PartnerType, (List<SelectListItem>
+                                                     )ViewBag.Listofproducts, "--Select--", new { @class = "form-control ", @id = "ddlPartnerType" })
+                                            @Html.ValidationMessageFor(a => a.PartnerType, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.PartnerSubType, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.DropDownListFor(a => a.PartnerSubType, new List<SelectListItem>
+                                                     () {
+                                        new SelectListItem { Text="-- Select --",Value=""}
+                                        }, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(a => a.PartnerSubType, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.PartnerEntityType, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.DropDownListFor(a => a.PartnerEntityType, new List<SelectListItem>
+                                                     () {
+                                        new SelectListItem { Text="-- Select --",Value=""}
+                                        }, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(a => a.PartnerEntityType, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.PartnerTPRMAssesmetApplicability, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.TextBoxFor(a => a.PartnerTPRMAssesmetApplicability, new { @class = "form-control", @readonly = "readonly", @style = "background-color: lightgray;" })
+                                            @Html.ValidationMessageFor(a => a.PartnerTPRMAssesmetApplicability, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.PartnerRiskScore, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.TextBoxFor(a => a.PartnerRiskScore, new { @class = "form-control", type = "number", min = "0", step = "1" })
+                                            @Html.ValidationMessageFor(a => a.PartnerRiskScore, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.PartnerRisk, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            @Html.DropDownListFor(a => a.PartnerRisk, new List<SelectListItem>
+                                                     () {
+                                        new SelectListItem { Text="High",Value="High"},
+                                        new SelectListItem { Text="Medium",Value="Medium"},
+                                        new SelectListItem { Text="Low", Value="Low"}
+                                        }, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(a => a.PartnerRisk, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.TentativeGoLiveDate, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            <div class="input-group">
+                                                @Html.EditorFor(model => model.TentativeGoLiveDate, new { htmlAttributes = new { @class = "form-control" } })<br />
+                                                <span id="TentativeGoLiveDate_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.CostCentre, new { @class = "label-control" })&nbsp;&nbsp;@*<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                                            @Html.TextBoxFor(a => a.CostCentre, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(a => a.CostCentre, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-4">
+                                            @Html.LabelFor(a => a.Remark, new { @class = "label-control" })&nbsp;&nbsp;@*<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                                            @Html.TextBoxFor(a => a.Remark, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(a => a.Remark, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </section>
+                                <section class="background">
+                                    <div class="row form-group">
+                                        <div class="col-md-3">
+                                            <label class="label-control">API Name</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(a => a.APIName, null, new { @class = "form-control" })
+                                                @Html.HiddenFor(a => a.APIId)
+                                                <div class="input-group-append">
+                                                    @*<button class="search-btn-2">*@
+                                                    <i class="bx bx-search-alt-2"></i>
+                                                    @*</button>*@
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            @Html.LabelFor(a => a.APIRisk, new { @class = "label-control" })
+                                            @Html.TextBoxFor(a => a.APIRisk, new { @class = "form-control", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(a => a.APIRisk, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-3">
+                                            @Html.LabelFor(a => a.APIRiskScore, new { @class = "label-control" })
+                                            @Html.TextBoxFor(a => a.APIRiskScore, new { @class = "form-control", @readonly = "readonly" })
+                                            @Html.ValidationMessageFor(a => a.APIRiskScore, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-large btn-success" type="button" style="margin-top: 7%;" id="btnAdd"><i class="bx bx-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div id="attributes">
+                                        <div class="attr row form-group">
+                                            <table id="tbladdAPI" name="tbladdAPI" class="TableAddDeleteNew table table-hover table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>API Name</th>
+                                                        <th>API Risk</th>
+                                                        <th>API Risk Score</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tblAPIbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                                <div class="col-md-12">
+                                    <section class="background">
+                                        <b>Upload</b>
+                                        <div class="row form-group">
+                                            <div class="col-md-3 file-upload">
+                                                <label class="label-control">Attached Journey Documents</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                                <div class="file-upload-wrapper form-control" data-text="Select your file!">
+                                                    <input name="AttachedJourneyDocuments" id="AttachedJourneyDocuments" type="file" class="file-upload-field" value="" accept=".zip,.7z,.doc,.xls,.xlsx,.pdf">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 file-upload">
+                                                <label class="label-control">Partner Risk Assessment Sheet</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                                <div class="file-upload-wrapper form-control" data-text="Select your file!">
+                                                    <input name="APIRiskAssessment" id="APIRiskAssessment" type="file" class="file-upload-field" value="" accept=".zip,.7z,.doc,.xls,.xlsx,.pdf">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 file-upload">
+                                                <label class="label-control">Other Document</label>&nbsp;&nbsp;@*<span style="font-weight:bold;color:red;font-size: 12px;">*</span>*@
+                                                <div class="file-upload-wrapper form-control" data-text="Select your file!">
+                                                    <input name="OtherDocument" id="OtherDocument" type="file" class="file-upload-field" value="" accept=".zip,.7z,.doc,.xls,.xlsx,.pdf">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                                <input type="button" id="btnSaveAsDraft" name="next" class="action-button btn btn-primary" value="Save As Draft" />
+                                <input type="button" id="redirectbutton" name="next" class="action-button btn btn-primary" value="Next" />
+                            </fieldset>
+                            <fieldset>
+                                <div class="row form-group">
+                                    <div style="display:none;">
+                                        <label class="label-control" style="font-weight: 600;">Approval Matrix For Case ID - </label>
+                                        <label id="CaseID" name="CaseID">APIGW0000000000</label>
+                                    </div>
+                                    <div>
+                                        <label class="label-control" style="font-weight: 600;">API Risk - </label>
+                                        <label name="APIRiskClassification" id="APIRiskClassification">High</label>
+                                    </div>
+                                    <div>
+                                        <label class="label-control" style="font-weight: 600;">Partner Risk - </label>
+                                        <label name="PartnerRiskClassification" id="PartnerRiskClassification">Low</label>
+                                    </div>
+                                </div>
+                                <div class="row form-group" id="HOPP">
+                                    <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of Product Processor</h5>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOPP_FH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOPP_FH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOPP_FH" })
+                                        @Html.ValidationMessageFor(a => a.HOPP_FH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOPP_VH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOPP_VH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOPP_VH" })
+                                        @Html.ValidationMessageFor(a => a.HOPP_VH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOPP_GH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOPP_GH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOPP_GH" })
+                                        @Html.ValidationMessageFor(a => a.HOPP_GH, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="row form-group" id="HOB">
+                                    <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of Business</h5>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOB_FH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOB_FH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOB_FH" })
+                                        @Html.ValidationMessageFor(a => a.HOB_FH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOB_VH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOB_VH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOB_VH" })
+                                        @Html.ValidationMessageFor(a => a.HOB_VH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOB_GH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOB_GH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOB_GH" })
+                                        @Html.ValidationMessageFor(a => a.HOB_GH, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="row form-group" id="HODB">
+                                    <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of Digital Banking</h5>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HODB_FH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HODB_FH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHODB_FH" })
+                                        @Html.ValidationMessageFor(a => a.HODB_FH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HODB_VH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HODB_VH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHODB_VH" })
+                                        @Html.ValidationMessageFor(a => a.HODB_VH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HODB_GH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HODB_GH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHODB_GH" })
+                                        @Html.ValidationMessageFor(a => a.HODB_GH, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="row form-group" id="HOISG">
+                                    <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of ISG</h5>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOISG_FH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOISG_FH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOISG_FH" })
+                                        @Html.ValidationMessageFor(a => a.HOISG_FH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOISG_VH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOISG_VH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOISG_VH" })
+                                        @Html.ValidationMessageFor(a => a.HOISG_VH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOISG_GH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOISG_GH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOISG_GH" })
+                                        @Html.ValidationMessageFor(a => a.HOISG_GH, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="row form-group" id="HOITDRM">
+                                    <h5 style="font-size: 17px;font-weight: 600;color: #20c4c6;">Head of ITDRM</h5>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOITDRM_FH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOITDRM_FH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOITDRM_FH" })
+                                        @Html.ValidationMessageFor(a => a.HOITDRM_FH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOITDRM_VH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOITDRM_VH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOITDRM_VH" })
+                                        @Html.ValidationMessageFor(a => a.HOITDRM_VH, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-md-4">
+                                        @Html.LabelFor(a => a.HOITDRM_GH, new { @class = "label-control" })&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                        @Html.DropDownListFor(a => a.HOITDRM_GH, Enumerable.Empty<SelectListItem>
+                                                 (), "--Select--", new { @class = "form-control DropDownProject", @id = "ddlHOITDRM_GH" })
+                                        @Html.ValidationMessageFor(a => a.HOITDRM_GH, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                                {
+                                    <input type="button" name="next" class="action-button" value="Request For Approval" id="btnSubmit" />
+                                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                }
+                                else
+                                {
+                                    <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                    <br />
+
+                                }
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+}
+<script src="~/js/jquery.min.js"></script>
+<script>
+    var current_fs, next_fs, previous_fs;//fieldsets
+    var opacity;
+    var current = 1;
+    var steps = $("fieldset").length;
+    var lstPartnerEntityType = [];
+    $(document).ready(function () {
+        //$("#PartnerTPRMAssesmetApplicability").val("Partial");
+
+        var currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+
+        $("#TentativeGoLiveDate").on("change", function () {
+            var selectedDate = $(this).val();
+            if (selectedDate) {
+                var selectedDateObject = new Date(selectedDate);
+                selectedDateObject.setHours(0, 0, 0, 0);
+                if (selectedDateObject < currentDate) {
+                    $(this).val("");
+                    $("#TentativeGoLiveDate_Span").text("Past date not allowed.");
+                    $("#TentativeGoLiveDate_Span").show(); // Show the error message span
+                } else {
+                    $("#TentativeGoLiveDate_Span").text("");
+                    $("#TentativeGoLiveDate_Span").hide();
+                }
+            }
+        });
+
+        $("#redirectbutton").click(function () {
+            debugger;
+            if ($("#PartnerName").val() == '') {
+                alert("Please enter Partner Name");
+                return false;
+            }
+            //else if ($("#projectDescription").val() == '') {
+            //    alert("Please enter Project Description");
+            //    return false;
+            //}
+            else if ($("#TentativeGoLiveDate").val() == '') {
+                alert("Please enter Tentative Go Live Date");
+                return false;
+            }
+            else if ($("#ddlPartnerType").val() == '') {
+                alert("Please enter Partner Type");
+                return false;
+            }
+            else if ($("#PartnerEntityType").val() == '') {
+                alert("Please enter Partner Entity Type");
+                return false;
+            }
+            else if ($("#PartnerRiskScore").val() == '') {
+                alert("Please enter Partner Risk Score");
+                return false;
+            }
+            else if ($("#PartnerRisk").val() == '') {
+                alert("Please enter Partner Risk");
+                return false;
+            }
+            else if ($("#AttachedJourneyDocuments").val() == '') {
+                alert("Please Attach Journey Documents");
+                return false;
+            }
+            else if ($("#APIRiskAssessment").val() == '') {
+                alert("Please Attach Partner Risk Assessment Sheet");
+                return false;
+            }
+            else if ($("#tblAPIbody tr").length == 0) {
+                alert("Please Add API !!");
+                return false;
+            }
+            else {
+                debugger;
+                current_fs = $(this).parent();
+                next_fs = $(this).parent().next();
+
+                //Add Class Active
+                $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+
+                //show the next fieldset
+                next_fs.show();
+                //hide the current fieldset with style
+                current_fs.animate({ opacity: 0 }, {
+                    step: function (now) {
+                        // for making fielset appear animation
+                        opacity = 1 - now;
+
+                        current_fs.css({
+                            'display': 'none',
+                            'position': 'relative'
+                        });
+                        next_fs.css({ 'opacity': opacity });
+                    },
+                    duration: 500
+                });
+                setProgressBarNEw(++current);
+                BindPartnerCaseApprovalMetrix();
+                $("#PartnerRiskClassification").text($("#PartnerRisk").val());
+                CalculateAPIRisk();
+            }
+        });
+
+        $("#btnSubmit").click(function (e) {
+            e.preventDefault();
+            debugger;
+            if ($("#ddlHOPP_FH option").length > 1 && $("#ddlHOPP_FH").val() == "") {
+                alert("Please Select Functional Head of Product processor!!");
+                return false;
+            }
+            if ($("#ddlHOPP_VH option").length > 1 && $("#ddlHOPP_VH").val() == "") {
+                alert("Please Select Vertical Head of Product processor!!");
+                return false;
+
+            }
+            if ($("#ddlHOPP_GH option").length > 1 && $("#ddlHOPP_GH").val() == "") {
+                alert("Please Select Group Head of Product processor!!");
+                return false;
+            }
+
+            if ($("#ddlHOB_FH option").length > 1 && $("#ddlHOB_FH").val() == "") {
+                alert("Please Select Business Functional Head !!");
+                return false;
+            }
+            if ($("#ddlHOB_VH option").length > 1 && $("#ddlHOB_VH").val() == "") {
+                alert("Please Select Business Vertical Head !!");
+                return false;
+            }
+            if ($("#ddlHOB_GH option").length > 1 && $("#ddlHOB_GH").val() == "") {
+                alert("Please Select Business Group Head !!");
+                return false;
+            }
+
+            if ($("#ddlHODB_FH option").length > 1 && $("#ddlHODB_FH").val() == "") {
+                alert("Please Select Functional Head of Digital Banking!!");
+                return false;
+            }
+            if ($("#ddlHODB_VH option").length > 1 && $("#ddlHODB_VH").val() == "") {
+                alert("Please Select Vertical Head of Digital Banking!!");
+                return false;
+            }
+            if ($("#ddlHODB_GH option").length > 1 && $("#ddlHODB_GH").val() == "") {
+                alert("Please Select group Head of Digital Banking!!");
+                return false;
+            }
+
+            if ($("#ddlHOISG_FH option").length > 1 && $("#ddlHOISG_FH").val() == "") {
+                alert("Please Select Functional Head of ISG!!");
+                return false;
+            }
+            if ($("#ddlHOISG_VH option").length > 1 && $("#ddlHOISG_VH").val() == "") {
+                alert("Please Select Vertical Head of ISG!!");
+                return false;
+            }
+            if ($("#ddlHOISG_GH option").length > 1 && $("#ddlHOISG_GH").val() == "") {
+                alert("Please Select Group Head of ISG!!");
+                return false;
+            }
+
+            if ($("#ddlHOITDRM_FH option").length > 1 && $("#ddlHOITDRM_FH").val() == "") {
+                alert("Please Select Functional Head of ITDRM!!");
+                return false;
+            }
+            if ($("#ddlHOITDRM_VH option").length > 1 && $("#ddlHOITDRM_VH").val() == "") {
+                alert("Please Select Vertical Head of ITDRM!!");
+                return false;
+            }
+            if ($("#ddlHOITDRM_GH option").length > 1 && $("#ddlHOITDRM_GH").val() == "") {
+                alert("Please Select Business group Head ITDRM!!");
+                return false;
+            }
+
+
+            $("#Action").val("Request For Approval");
+            SaveAddPartneronBoarding("Request");
+        });
+
+        $('#ddlPartnerType').on('change', function () {
+            GetMstPartnerType();
+            PartnerTPRMAssessmentApplicability();
+        });
+
+        $('#PartnerEntityType').on('change', function () {
+            PartnerTPRMAssessmentApplicability();
+        });
+
+        $("input[type='file']").on("change", function () {
+            if (this.files[0].size > 5000000) {
+                alert("Please upload file less than 5MB !!");
+                $(this).val('');
+            }
+        });
+
+        $("#APIName").autocomplete(
+            {
+
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/PartnerOnboarding/GetlstApiDeatil',
+                        data: { "prefix": request.term },
+                        type: "POST",
+                        success: function (data) {
+                            debugger;
+                            response($.map(data, function (item) {
+                                return { label: item.apiName, val: item.apiName };
+                            }))
+
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, i) {
+                    debugger;
+
+                    $("#APIName").val(i.item.val);
+                    var consId = $("#APIName").val();
+                    $.ajax({
+                        type: "POST",
+                        url: '/PartnerOnboarding/GetApiDeatil',
+                        data: {
+                            APIName: consId
+                        },
+                        dataType: 'json',
+                        success: function (response) {
+
+                            debugger;
+                            if (response != null) {
+                                $('#APIId').val(response.apiId);
+                                $('#APIRisk').val(response.apiRisk);
+                                $('#APIRiskScore').val(response.apiRiskScore);
+                            }
+                        }
+                    });
+                },
+                minLength: 1
+            });
+
+        //        $("#APIName").autocomplete({
+        //    debugger;
+        //    source: function (request, response) {
+        //        $.ajax({
+        //            url: '/PartnerOnboarding/GetlstApiDeatil',
+        //            data: { "prefix": request.term },
+        //            type: "POST",
+        //            success: function (data) {
+        //    debugger;
+        //                response($.map(data, function (item) {
+        //                    return { label: item.consumerName, value: item.consumerId };
+        //                }));
+        //            },
+        //            error: function (response) {
+        //                alert(response.responseText);
+        //            },
+        //            failure: function (response) {
+        //                alert(response.responseText);
+        //            }
+        //        });
+        //    },
+        //    select: function (event, ui) {
+        //        APPidvalue = ui.item.value;
+        //        $("#APIId").val(APPidvalue);
+
+        //        if (APPidvalue == '') {
+        //            $("#btnaddupapp").text('Add Application');
+        //            consumerbuttontext = 'AddApplication';
+        //        } else {
+        //            $("#btnaddupapp").text('Update Spoc');
+        //            $("#btnaddupapp").val('UpdateSpoc');
+        //            consumerbuttontext = 'UpdateSpoc';
+        //        }
+
+        //        // Rest of your existing select function code
+
+        //        var consId = $("#APIName").val();
+        //        $.getJSON("/Home/GetConsumerAppId", { Id: consId }, function (data) {
+        //            // Rest of your existing JSON callback function code
+        //        });
+        //    },
+        //    minLength: 1
+        //});
+
+        //$('#APIName').on("change", function () {
+        //    var APIName = $('#APIName').val();
+        //    $.ajax({
+        //        type: "POST",
+        //        url: '/PartnerOnboarding/GetApiDeatil',
+        //        data: { APIName: APIName },
+        //        dataType: 'json',
+        //        success: function (response) {
+        //            if (response != null) {
+        //                $('#APIId').val(response.apiId);
+        //                $('#APIRisk').val(response.apiRisk);
+        //                $('#APIRiskScore').val(response.apiRiskScore);
+        //            }
+        //        }
+        //    });
+        //});
+
+
+        $(document).on("click", "#btnAdd", function () {
+            AddAPIRow();
+        });
+
+        //$(document).on("click", "#btnSubmit", function () {
+        //    SaveAddPartneronBoarding();
+        //});
+        $(document).on("click", "#btnSaveAsDraft", function () {
+            $("#Action").val("Draft");
+            SaveAddPartneronBoarding("Draft");
+        });
+
+        $("#ddlPartnerType").on("change", function () {
+            GetMstPartnerType();
+        });
+        var IsSuccess = '@TempData["IsSuccess"]';
+        var msg = '@TempData["Result"]';
+        if (IsSuccess != '' && IsSuccess == 'True' && msg != '') {
+            toastr.success(msg);
+        }
+        else if (IsSuccess != '' && IsSuccess == 'False' && msg != '') {
+            toastr.error(msg);
+        }
+
+        $("#PartnerRiskScore").change(function () {
+            var score = $(this).val();
+            if (score <= 30) {
+                $("#PartnerRisk").val("Low");
+            } else if (score > 30 && score <= 70) {
+                $("#PartnerRisk").val("Medium");
+            } else {
+                $("#PartnerRisk").val("High");
+            }
+            $("#PartnerRisk").prop("readonly", true).css("background-color", "#f0f0f0");
+            $("#PartnerRisk").css("pointer-events", "none");
+        });
+    });
+
+    //function AddAPIRow() {
+    //    var APIName = $("#APIName").val();
+    //    var APIRisk = $("#APIRisk").val();
+    //    var APIRiskScore = $("#APIRiskScore").val();
+    //    var rowCount = $('.trAPI').length + 1;
+    //    if (APIRisk != "" && APIRiskScore != "") {
+    //        if ($('.trAPI').length > 0) {
+    //            var newTR = '<tr class="trAPI">' +
+    //                '<td><input type="text" name="APIName' + rowCount + '" id="APIName' + rowCount + '" class="form-control APIName" readonly style="background-color: lightgray;" value="' + APIName + '"/></td>' +
+    //                '<td><input type="text" name="APIRisk' + rowCount + '" id="APIRisk' + rowCount + '" class="form-control APIRisk" readonly style="background-color: lightgray;" value="' + APIRisk + '"/></td>' +
+    //                '<td><input type="text" name="APIRiskScore' + rowCount + '" id="APIRiskScore' + rowCount + '" class="form-control APIRiskScore" readonly style="background-color: lightgray;" value="' + APIRiskScore + '"/></td>' +
+    //                "</tr>";
+    //            $('.TableAddDeleteNew tbody').append(newTR);
+    //        }
+    //        else {
+    //            var newTR = '<tr class="trAPI">' +
+    //                '<td><input type="text" name="APIName" id="APIName" class="form-control APIName" readonly style="background-color: lightgray;"  value="' + APIName + '"/></td>' +
+    //                '<td><input type="text" name="APIRisk" id="APIRisk" class="form-control APIRisk" readonly style="background-color: lightgray;"  value="' + APIRisk + '"/></td>' +
+    //                '<td><input type="text" name="APIRiskScore" id="APIRiskScore" class="form-control APIRiskScore" readonly style="background-color: lightgray;"  value="' + APIRiskScore + '"/></td>' +
+    //                "</tr>";
+    //            $('.TableAddDeleteNew tbody').append(newTR);
+    //        }
+    //    }
+    //    else {
+    //        alert("API Risk and API Risk Score Required to Add API !!");
+    //    }
+    //}
+
+    function AddAPIRow() {
+        var APIName = $("#APIName").val();
+        var APIRisk = $("#APIRisk").val();
+        var APIRiskScore = $("#APIRiskScore").val();
+        var rowCount = $('.trAPI').length + 1;
+
+        if (APIRisk != "" && APIRiskScore != "") {
+            var newTR = '<tr class="trAPI">' +
+                '<td><input type="text" name="APIName' + rowCount + '" id="APIName' + rowCount + '" class="form-control APIName" readonly style="background-color: lightgray;" value="' + APIName + '"/></td>' +
+                '<td><input type="text" name="APIRisk' + rowCount + '" id="APIRisk' + rowCount + '" class="form-control APIRisk" readonly style="background-color: lightgray;" value="' + APIRisk + '"/></td>' +
+                '<td><input type="text" name="APIRiskScore' + rowCount + '" id="APIRiskScore' + rowCount + '" class="form-control APIRiskScore" readonly style="background-color: lightgray;" value="' + APIRiskScore + '"/></td>' +
+                '<td><button class="close-btn" type="button" onclick="removeAPIRow(this)"><i class="bx bx-x-circle"style="color: red;"></i></button></td>' +
+                "</tr>";
+            $('.TableAddDeleteNew tbody').append(newTR);
+
+            $("#APIName").val("");
+            $("#APIRisk").val("");
+            $("#APIRiskScore").val("");
+        } else {
+            alert("API Risk and API Risk Score Required to Add API !!");
+        }
+
+        CalculateAPIRisk();
+    }
+
+    function removeAPIRow(button) {
+        $(button).closest('tr').remove();
+
+        CalculateAPIRisk();
+    }
+
+
+    function BindPartnerCaseApprovalMetrix() {
+        debugger;
+        $("#HOPP").show();
+        $("#HOB").show();
+        $("#HODB").show();
+        $("#HOISG").show();
+        $("#HOITDRM").show();
+        $(".DropDownProject option[value!='']").remove();
+        $.ajax({
+            url: "@Url.Action("PartnerCaseApprovalMetrix", "PartnerOnboarding")",
+            data: {
+                PartnerRiskClassification: $("#PartnerRiskClassification").text(),
+                APIRiskClassification: $("#APIRiskClassification").text(),
+                ApproverType: "Product processor",
+                ApproverLevel: "VH"
+            },
+            dataType: "json",
+            type: "GET",
+            error: function () {
+                alert(" An error occurred.");
+            },
+            success: function (data) {
+                objData = $.parseJSON(data);
+
+                /*Bind OPtion ddlProdProcessorFH */
+                var ddlHOPP_FH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Product processor" && obj.ApproverLevel == "FH")
+                if (ddlHOPP_FH.length > 0) {
+                    $.each(ddlHOPP_FH, function (data, value) {
+                        $("#ddlHOPP_FH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOPP_FH").hide();
+                }*/
+
+                /*Bind OPtion ddlProdProcessorVH */
+                var ddlHOPP_VH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Product processor" && obj.ApproverLevel == "VH")
+                if (ddlHOPP_VH.length > 0) {
+                    $.each(ddlHOPP_VH, function (data, value) {
+                        $("#ddlHOPP_VH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOPP_VH").hide();
+                }*/
+
+                /*Bind OPtion ddlProdProcessorGH */
+                var ddlHOPP_GH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Product processor" && obj.ApproverLevel == "GH")
+                if (ddlHOPP_GH.length > 0) {
+                    $.each(ddlHOPP_GH, function (data, value) {
+                        $("#ddlHOPP_GH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOPP_GH").hide();
+                }*/
+
+                /*Bind OPtion ddlBusinessFH */
+                var ddlHOB_FH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Business" && obj.ApproverLevel == "FH")
+                if (ddlHOB_FH.length > 0) {
+                    $.each(ddlHOB_FH, function (data, value) {
+                        $("#ddlHOB_FH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOB_FH").hide();
+                }*/
+
+                /*Bind OPtion ddlBusinessGH */
+                var ddlHOB_GH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Business" && obj.ApproverLevel == "GH")
+                if (ddlHOB_GH.length > 0) {
+                    $.each(ddlHOB_GH, function (data, value) {
+                        $("#ddlHOB_GH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOB_GH").hide();
+                }*/
+
+                /*Bind OPtion ddlBusinessVH */
+                var ddlHOB_VH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Business" && obj.ApproverLevel == "VH")
+                if (ddlHOB_VH.length > 0) {
+                    $.each(ddlHOB_VH, function (data, value) {
+                        $("#ddlHOB_VH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOB_VH").hide();
+                }*/
+
+                /*Bind OPtion ddlDigitalBankingGH */
+                var ddlHODB_FH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Digital Banking" && obj.ApproverLevel == "FH")
+                if (ddlHODB_FH.length > 0) {
+                    $.each(ddlHODB_FH, function (data, value) {
+                        $("#ddlHODB_FH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHODB_FH").hide();
+                }*/
+
+                /*Bind OPtion ddlDigitalBankingFH */
+                var ddlHODB_VH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Digital Banking" && obj.ApproverLevel == "VH")
+                if (ddlHODB_VH.length > 0) {
+                    $.each(ddlHODB_VH, function (data, value) {
+                        $("#ddlHODB_VH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHODB_VH").hide();
+                }*/
+
+                /*Bind OPtion ddlDigitalBankingVH */
+                var ddlHODB_GH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "Digital Banking" && obj.ApproverLevel == "GH")
+                if (ddlHODB_GH.length > 0) {
+                    $.each(ddlHODB_GH, function (data, value) {
+                        $("#ddlHODB_GH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHODB_GH").hide();
+                }*/
+
+                /*Bind OPtion ddlISGGH */
+                var ddlHOISG_FH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ISG" && obj.ApproverLevel == "FH")
+                if (ddlHOISG_FH.length > 0) {
+                    $.each(ddlHOISG_FH, function (data, value) {
+                        $("#ddlHOISG_FH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOISG_FH").hide();
+                }*/
+
+                /*Bind OPtion ddlISGVH */
+                var ddlHOISG_VH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ISG" && obj.ApproverLevel == "VH")
+                if (ddlHOISG_VH.length > 0) {
+                    $.each(ddlHOISG_VH, function (data, value) {
+                        $("#ddlHOISG_VH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOISG_VH").hide();
+                }*/
+
+                /*Bind OPtion ddlISGFH */
+                var ddlHOISG_GH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ISG" && obj.ApproverLevel == "GH")
+                if (ddlHOISG_GH.length > 0) {
+                    $.each(ddlHOISG_GH, function (data, value) {
+                        $("#ddlHOISG_GH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOISG_GH").hide();
+                }*/
+
+                /*Bind OPtion ddlITDRMGH */
+                var ddlHOITDRM_FH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ITDRM" && obj.ApproverLevel == "FH")
+                if (ddlHOITDRM_FH.length > 0) {
+                    $.each(ddlHOITDRM_FH, function (data, value) {
+                        $("#ddlHOITDRM_FH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOITDRM_FH").hide();
+                }*/
+
+                /*Bind OPtion ddlITDRMGH */
+                var ddlHOITDRM_VH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ITDRM" && obj.ApproverLevel == "VH")
+                if (ddlHOITDRM_VH.length > 0) {
+                    $.each(ddlHOITDRM_VH, function (data, value) {
+                        $("#ddlHOITDRM_VH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOITDRM_VH").hide();
+                }*/
+
+                /*Bind OPtion ddlITDRMVH */
+                var ddlHOITDRM_GH = objData.filter(obj => obj.PartnerRiskClassification == $("#PartnerRiskClassification").text() && obj.APIRiskClassification == $("#APIRiskClassification").text() && obj.ApproverType == "ITDRM" && obj.ApproverLevel == "GH")
+                if (ddlHOITDRM_GH.length > 0) {
+                    $.each(ddlHOITDRM_GH, function (data, value) {
+                        $("#ddlHOITDRM_GH").append($("<option></option>").val(value.ApproverUserID).html(value.ApproverUserID + ' - ' + value.ApproverName));
+                    });
+                }
+                /*else {
+                    $("#ddlHOITDRM_GH").hide();
+                }*/
+                debugger;
+                if (ddlHOPP_FH.length == 0 && ddlHOPP_GH.length == 0 && ddlHOPP_VH.length == 0) {
+                    $("#HOPP").hide();
+                }
+                if (ddlHOB_FH.length == 0 && ddlHOB_VH.length == 0 && ddlHOB_GH.length == 0) {
+                    $("#HOB").hide();
+                }
+                if (ddlHODB_FH.length == 0 && ddlHODB_VH.length == 0 && ddlHODB_GH.length == 0) {
+                    $("#HODB").hide();
+                }
+                if (ddlHOISG_FH.length == 0 && ddlHOISG_VH.length == 0 && ddlHOISG_GH.length == 0) {
+                    $("#HOISG").hide();
+                }
+                if (ddlHOITDRM_FH.length == 0 && ddlHOITDRM_VH.length == 0 && ddlHOITDRM_GH.length == 0) {
+                    $("#HOITDRM").hide();
+                }
+
+                if ($('#PartnerRiskClassification').text() == 'Not Applicable') {
+                    $(".DropDownProject").each(function () {
+                        if ($(this).find("option").length === 1) {
+                            $(this).hide();
+                            $(this).closest('.col-md-4').hide();
+                            var labelForDropdown = $(this).closest('.col-md-4').find("label[for='" + $(this).attr("id") + "']");
+                            labelForDropdown.hide();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function SaveAddPartneronBoarding(clickBtn) {
+        var objPartnerOnboarding = {};
+        objPartnerOnboarding.PartnerName = $('#PartnerName').val();
+        objPartnerOnboarding.projectDescription = $('#projectDescription').val();
+        objPartnerOnboarding.TentativeGoLiveDate = $('#TentativeGoLiveDate').val();
+        objPartnerOnboarding.PartnerType = $('#ddlPartnerType').val();
+        objPartnerOnboarding.PartnerEntityType = $('#PartnerEntityType').val();
+        objPartnerOnboarding.PartnerTPRMAssesmetApplicability = $('#PartnerTPRMAssesmetApplicability').val();
+        objPartnerOnboarding.PartnerRiskScore = $('#PartnerRiskScore').val();
+        objPartnerOnboarding.PartnerRisk = $('#PartnerRiskClassification').text();
+        objPartnerOnboarding.APIRisk = $('#APIRiskClassification').text();
+        var lstApiDeatil = [];
+        $('#tblAPIbody tr').each(function (e) {
+            var obj = {};
+            debugger;
+            obj.APIName = $(this).find("td .APIName").val();
+            obj.APIRisk = $(this).find("td .APIRisk").val();
+            obj.APIRiskScore = $(this).find("td .APIRiskScore").val();
+            lstApiDeatil.push(obj);
+        });
+        objPartnerOnboarding.lstApiDeatil = lstApiDeatil;
+        objPartnerOnboarding.HOPP_FH = $("#ddlHOPP_FH").val();
+        objPartnerOnboarding.HOPP_VH = $("#ddlHOPP_VH").val();
+        objPartnerOnboarding.HOPP_GH = $("#ddlHOPP_GH").val();
+        objPartnerOnboarding.HOB_FH = $("#ddlHOB_FH").val();
+        objPartnerOnboarding.HOB_VH = $("#ddlHOB_VH").val();
+        objPartnerOnboarding.HOB_GH = $("#ddlHOB_GH").val();
+        objPartnerOnboarding.HODB_FH = $("#ddlHODB_FH").val();
+        objPartnerOnboarding.HODB_VH = $("#ddlHODB_VH").val();
+        objPartnerOnboarding.HODB_GH = $("#ddlHODB_GH").val();
+        objPartnerOnboarding.HOISG_FH = $("#ddlHOISG_FH").val();
+        objPartnerOnboarding.HOISG_VH = $("#ddlHOISG_VH").val();
+        objPartnerOnboarding.HOISG_GH = $("#ddlHOISG_GH").val();
+        objPartnerOnboarding.HOITDRM_FH = $("#ddlHOITDRM_FH").val();
+        objPartnerOnboarding.HOITDRM_VH = $("#ddlHOITDRM_VH").val();
+        objPartnerOnboarding.HOITDRM_GH = $("#ddlHOITDRM_GH").val();
+        objPartnerOnboarding.Action = $("#Action").val();
+        var formData = new FormData();
+
+        // Append the files to the formData object
+        formData.append("AttachedJourneyDocuments", $("#AttachedJourneyDocuments")[0].files[0]);
+        formData.append("APIRiskAssessment", $("#APIRiskAssessment")[0].files[0]);
+        formData.append("OtherDocument", $("#OtherDocument")[0].files[0]);
+
+        formData.append("objPartnerOnboarding", JSON.stringify(objPartnerOnboarding));
+
+        formData.append("jsonPartnerOnboarding", JSON.stringify(objPartnerOnboarding));
+        formData.append("next", "Request For Approval");
+        debugger;
+        try {
+            $.ajax({
+                type: "POST",
+                url: '/PartnerOnboarding/SaveAddPartneronBoarding',
+                data: formData,
+                contentType: false, // Important to prevent jQuery from processing the data
+                processData: false, // Important to prevent jQuery from processing the data
+                dataType: 'json',
+                success: function (response) {
+                    if (response != null) {
+                        debugger;
+                        if (clickBtn == "Draft") { alert("Partner Detail Saved !!"); }
+                        else { alert("Partner Submitted for Approval !!"); }
+                        window.location.href = '/PartnerOnboarding/ListofPartner';
+                    }
+                    else {
+                        toastr.error("Information not available against this Application.");
+                    }
+                    window.location.href = '/PartnerOnboarding/ListofPartner';
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    //console.error("AJAX Error:", textStatus, errorThrown);
+                    // You can handle the error here, for example, show an alert or log it.
+                },
+                complete: function () {
+                    // This will be called after success or error
+                    window.location.href = '/PartnerOnboarding/ListofPartner';
+                }
+            });
+        } catch (error) {
+            // Handle any unexpected errors
+            alert("An error occurred: " + error.message);
+        }
+    }
+    function PartnerTPRMAssessmentApplicability() {
+        //if ($("#ddlPartnerType").val() == "Distribution Partners" && $("#PartnerEntityType").val() == "Non-Government")
+        //      { $("#PartnerTPRMAssesmetApplicability").val("Partial"); }
+        //else if ($("#ddlPartnerType").val() == "Data Providers" && $("#PartnerEntityType").val() == "Government")
+        //     {$("#PartnerTPRMAssesmetApplicability").val("Partial");}
+        //else if ($("#ddlPartnerType").val() == "Non-Business Partner" && $("#PartnerEntityType").val() == "Government")
+        //{$("#PartnerTPRMAssesmetApplicability").val("Partial");}
+        //else if ($("#ddlPartnerType").val() == "Institutional Consumers : Corporate Clients" && $("#PartnerEntityType").val() == "Non-government")
+        //{ $("#PartnerTPRMAssesmetApplicability").val("Partial"); }
+        //else if ($("#ddlPartnerType").val() == "Institutional Consumers : Sub-member banks" && $("#PartnerEntityType").val() == "Government")
+        //{ $("#PartnerTPRMAssesmetApplicability").val("Partial"); }
+        //else {
+        //    $("#PartnerTPRMAssesmetApplicability").val("Full");
+        //}
+
+        var filteredEntities = lstPartnerEntityType.filter(function (obj) {
+            return obj.PartnerType === $("#ddlPartnerType").val() && obj.PartnerEntityType === $("#PartnerEntityType").val();
+        });
+        if (filteredEntities.length > 0) {
+            var tprmaApplicableValue = filteredEntities[0].TPRMAapplicable;
+            $("#PartnerTPRMAssesmetApplicability").val(tprmaApplicableValue);
+        }
+    }
+    function setProgressBarNEw(curStep) {
+        debugger;
+        var percent = parseFloat(100 / steps) * curStep;
+        percent = percent.toFixed();
+        $(".progress-bar")
+            .css("width", percent + "%")
+    }
+    function CalculateAPIRisk() {
+        var apiRiskCounts = {};
+        $('#tblAPIbody .APIRisk').each(function () {
+            var apiRisk = $(this).val();
+
+            if (apiRisk in apiRiskCounts) {
+                apiRiskCounts[apiRisk]++;
+            } else {
+                apiRiskCounts[apiRisk] = 1;
+            }
+        });
+        var maxApiRisk = null;
+        var maxCount = 0;
+        for (var apiRisk in apiRiskCounts) {
+            if (apiRisk === "High") {
+                maxApiRisk = "High";
+                break;
+            }
+            else if (apiRisk === "Medium") {
+                maxApiRisk = "Medium";
+                break;
+            }
+            else {
+                if (apiRiskCounts[apiRisk] > maxCount) {
+                    maxCount = apiRiskCounts[apiRisk];
+                    maxApiRisk = apiRisk;
+                }
+            }
+        }
+
+        // Set the maxApiRisk value to the PartnerRisk textbox
+        $('#APIRiskClassification').text(maxApiRisk);
+    }
+    function GetMstPartnerType() {
+        debugger;
+        $.ajax({
+            url: "@Url.Action("GetMstPartnerType", "PartnerOnboarding")",
+            data: { PartnerType: $("#ddlPartnerType").val() },
+            dataType: "json",
+            type: "GET",
+            error: function () {
+                alert(" An error occurred.");
+            },
+            success: function (data) {
+                objData = $.parseJSON(data);
+
+                lstPartnerEntityType = objData;
+                var PartnerEntityType = objData.filter(obj => obj.PartnerType == $("#PartnerType").text());
+                $("#PartnerEntityType").empty();
+                $("#PartnerEntityType").append($("<option></option>").val("").html("-- Select --"));
+                if (objData.length > 0) {
+                    $.each(objData, function (data, value) {
+                        $("#PartnerEntityType").append($("<option></option>").val(value.PartnerEntityType).html(value.PartnerEntityType));
+                    });
+                }
+            }
+        });
+    }
+
+</script>
+
+

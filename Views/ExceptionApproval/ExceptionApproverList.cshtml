@@ -1,8 +1,143 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@model API_Adda.Models.AddEditExceptionModel
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@{
+    ViewData["Title"] = "ListofPartner";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("ListOfExceptions", "ExceptionManagement", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    <div class="container mt-10">
+        <div class="card">
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>
+                            Exception Management -Approval
+                        </h4>
+                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                        {
+
+                            <a class="close-btn" href="/ExceptionManagement/AddEditException" id="new" style="font-size: 15px; font-weight: 600;"> <i class="bx bx-plus-circle" style="vertical-align:middle;"></i>Create New Exception</a>
+
+                        }
+                    </div>
+                </div>
+                <div class="row form-group">
+
+
+                    <div class="col-6 col-md-4">
+                        <input type="text" class="form-control" placeholder="Exception Id/User Id" />
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <input type="submit" class="btn btn-primary" name="button" id="BtnSaveDraft" value="Search" />
+                    </div>
+
+                </div>
+                <div class="row form-group">
+                    <div class="col-md-12">
+
+                        <table class="table table-hover table-striped" id="project_detail">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Exception ID</th>
+                                    <th>Partner Name</th>
+                                    <th>Status</th>
+                                    <th>Date Created</th>
+                                    <th>Date Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-border-bottom-0">
+                                @if (Model.lstExceptionDetails != null)
+                                {
+                                    @foreach (var item in Model.lstExceptionDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                                                {
+                                                    <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
+                                                }
+                                            </td>
+                                            <td class="Appr">@item.CASEID</td>
+                                            <td>@item.PartnerName</td>
+                                            <td>@item.Status</td>
+                                            <td>@item.DateCreated</td>
+                                            <td>@item.DateUpdated</td>
+                                        </tr>
+                                    }
+                                }
+                                <tr>
+                                    <td>
+                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                                        {
+                                            <a href="/ExceptionManagement/AddEditException?ID=1234">Edit</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="/ExceptionManagement/AddEditException?ID=1234">View</a>
+                                        }
+                                    </td>
+                                    <td class="Appr">1234</td>
+                                    <td>Swiggy</td>
+                                    <td>Created</td>
+                                    <td>24-07-2023</td>
+                                    <td>24-07-2023</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                                        {
+                                            <a href="/ExceptionManagement/AddEditException?ID=1245">Edit</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="/ExceptionManagement/AddEditException?ID=1245">View</a>
+                                        }
+                                    </td>
+                                    <td class="Appr">1245</td>
+                                    <td>PaisaBazar</td>
+                                    <td>Inprogress</td>
+                                    <td>01-07-2023</td>
+                                    <td>01-07-2023</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                                        {
+                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View/Amend</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="/ExceptionManagement/AddEditException?ID=1256">View</a>
+                                        }
+                                    </td>
+                                    <td class="Appr">1256</td>
+                                    <td>Lentra</td>
+                                    <td>Approved</td>
+                                    <td>11-07-2023</td>
+                                    <td>11-07-2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/Common.js"></script>
+    <script>
+        $(document).ready(function () {
+
+        });
+
+
+    </script>
+}

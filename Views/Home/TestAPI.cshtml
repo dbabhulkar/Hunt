@@ -1,6 +1,182 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+﻿@using API_Adda.Models
+@model API_Adda.Models.SearchAPI;
+@{
+    ViewData["Title"] = "TestAPI";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+
+<style>
+    .ui-widget.ui-widget-content {
+        /*top: 172px !important;
+            left: 216px !important;*/
+        height: 250px;
+        overflow: auto;
+        font-size: 13px;
+    }
+</style>
+
+@using (Html.BeginForm("TestAPI", "Home", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="container mt-10">
+        <div class="card" id="testapi">
+            <div class="card-body">
+                <div class="row form-group">
+                    <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                        <h4>Test API</h4>
+
+                        <a href="/Home" class="close-btn" style="font-size: 15px; font-weight: 600;"><i class="bx bx-left-arrow-circle" style="vertical-align:middle;"></i> Back</a>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-2" style="width: 10.666667%;">
+                        <label class="label-control">ServiceUrl</label><span style="font-weight:bold;color:red;font-size: 11px; padding:8px;">*</span>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="search mt-0">
+
+                            @Html.TextBoxFor(model => model.ServiceUrl, new { htmlAttributes = new { @class = "form-control" } })
+
+                            @Html.HiddenFor(model => model.SearchAPIURL)
+                            @Html.HiddenFor(model => model.APIMainId)
+                            @Html.HiddenFor(model => model.apiCategory)
+                            <input id="path" name="path" style="color:red;display:none" type="text" value="Enter path" />
+                            <input id="ServiceUrlValue" name="ServiceUrlValue" style="color:red;display:none" type="text" value="Enter ServiceUrlValue" />
+                            @*@Html.TextBoxFor(x => x.ServiceUrl, new { placeholder = "Input URL", @class = "form-input" })*@
+                        </div>
+                        <span id="ServiceUrl_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="button" class="btn btn-primary" name="button" id="btntestv" value="Test" onclick="validation('btntest')" />
+                        <input type="submit" class="btn btn-primary d-none" name="button" id="btntest" value="Test" />
+                    </div>
+                </div>
+                <div class="card" style="height:600px">
+                    <div class="card-body" style="height:585px">
+                        <div class="row form-group" style="height:auto">
+                            <div class="col-md-6" style="height:581px">
+                                <label class="label-control">Request</label>&nbsp;&nbsp;<span style="font-weight:bold;color:red;font-size: 12px;">*</span>
+                                @Html.TextAreaFor(x => x.Raw, new { @class = "form-control", @rows = 10, @style = "height:510px;font-size: 14px;line-height: 2;" })
+                                <span id="Raw_Span" style="display:none;font-weight:bold;color:red;font-size: 12px;"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-control">Response</label>
+                                @Html.TextAreaFor(x => x.response, new { @class = "form-control", @rows = 10, @style = "height:510px;font-size: 14px;line-height: 2;" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/Common.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+
+        $('#serviceDetails1_Existing_New_Id').on('change', function () {
+            // debugger;
+            $(".Transformation").hide();
+            $("#serviceDetails1_ServiceName").prop('disabled', false);
+            if (this.value == 2) {
+                $(".Transformation").show();
+                //$("#serviceDetails1_ServiceName").val('');
+            }
+
+
+        });
+    });
+
+    function validation(id) {
+
+        if ($("#ServiceUrl").val() == '') {
+            $("#ServiceUrl_Span").text('Please fill ServiceUrl');
+            $("#ServiceUrl_Span").show();
+            return false;
+        }
+        else { $("#ServiceUrl_Span").hide(); }
+
+        if ($("#Raw").val() == '') {
+            $("#Raw_Span").text('Please fill ProjectMgrIT');
+            $("#Raw_Span").show();
+            return false;
+        }
+        else { $("#Raw_Span").hide(); }
+
+        $("#" + id).click();
+        return true;
+    }
+
+
+
+    $(function () {
+        // debugger;
+        // alert(1);
+        var newValue = "";
+        $("#ServiceUrl").autocomplete(
+            {
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Home/GetAutoTestApi/',
+                        data: { "prefix": request.term },
+                        type: "POST",
+                        success: function (data) {
+                            // debugger;
+                            // alert(data);
+                            response($.map(data, function (item) {
+                                return { label: item.serviceURL, val: item.path, apiCategory: item.apiCategory };
+                            }))
+
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                select: function (e, i) {
+                    debugger;
+
+                    $("#path").val(i.item.val);
+                    $("#ServiceUrlValue").val(i.item.value);
+                    $("#apiCategory").val(i.item.apiCategory);
+                    minLength: 1
+
+                    $("#ServiceNameId").val(i.item.val);
+                    var path = $("#path").val();
+                    var ServiceUrlValue = $("#ServiceUrlValue").val();
+                    var apiCategoryValue = $("#apiCategory").val();
+                    $.getJSON("/Home/GetRequestRecord",
+                        {
+                            path: path, ServiceUrlValue: ServiceUrlValue, apiCategoryValue: apiCategoryValue
+                        },
+                        function (data) {
+                            // debugger;
+                            $('#Raw').val(data.request);
+                            $('#response').val(data.response);
+                            $('#ServiceUrl').val(data.url);
+
+                        });
+
+                }
+            });
+        newValue = $('#ServiceUrl').val().replace('{{obp_url}}/', 'http://10.226.163.7:8002/');
+        $('#ServiceUrl').val(newValue);
+    });
+
+
+</script>
+
+
+
+
+

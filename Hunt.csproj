@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Views\PartnerOnboardingNew\" />
-    <Folder Include="Views\PartnerOnboarding\" />
     <Folder Include="Views\ExceptionManagement\" />
   </ItemGroup>
 

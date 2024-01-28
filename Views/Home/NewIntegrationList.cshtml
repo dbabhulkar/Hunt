@@ -1,0 +1,210 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+@model API_Adda.Models.NewIntegration
+@{
+    ViewData["Title"] = "newintegration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container mt-10">
+    <div class="card">
+        <div class="card-body">
+            <div class="row form-group">
+                <div class="col-md-12 addnew-popup-heading" style="border-bottom: 1px solid #f5eeee;">
+                    <h4>
+                        New Integration
+                        @if (Convert.ToString(ViewBag.statusName) == "True")
+                        {
+
+                            <a href="/Home/NewIntegrationList/" style="font-weight:bold; color:#20C4C6;">&nbsp; Reset Filter</a>
+                        }
+                    </h4>
+
+
+                    @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                    {
+
+                        <a class="close-btn" href="/Home/newintegration" id="new" style="font-size: 15px; font-weight: 600;"> <i class="bx bx-plus-circle" style="vertical-align:middle;"></i> New</a>
+
+                    }
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-2" style="width: 19%;">
+                    <div class="count-card">
+                        <a href="/Home/NewIntegrationList?Status=1">
+                            <div class="count-card-body">
+                                <i class="bx bx-layer-plus"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Pending with BTG User</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.BTGUSER</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-2" style="width: 18%;">
+                    <div class="count-card">
+                        <a href="/Home/NewIntegrationList?Status=3">
+                            <div class="count-card-body">
+                                <i class="bx bx-user"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Pending with IT User</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.ITUSER</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-2" style="width: 18%;">
+                    <div class="count-card">
+                        <a href="/Home/NewIntegrationList?Status=4">
+                            <div class="count-card-body">
+                                <i class="bx bx-cog"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Pending with IT Archt</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.ITARCHITECH</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-2" style="width: 15%;">
+                    <div class="count-card">
+                        <a href="/Home/NewIntegrationList?Status=2">
+                            <div class="count-card-body">
+                                <i class="bx bx-x-circle"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Rejected</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.Rejected</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-2" style="width: 14%;">
+                    <div class="count-card">
+                        <a href="/Home/NewIntegrationList?Status=5">
+                            <div class="count-card-body">
+                                <i class="bx bx-x-circle"></i>
+                                <div class="count-content">
+                                    <p class="text-muted mt-2 mb-0">Closed</p>
+                                    <p class="text-24 line-height-1 mb-2">@ViewBag.Closed</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                @if (ViewBag.Role == "BTGUSER" || ViewBag.Role == "ITUSER" || ViewBag.Role == "ITArchitech")
+                {
+                    <div class="col-md-2" style="width: 16%;">
+                        <div class="count-card">
+                            <a href="/Home/NewIntegrationList?Status=6">
+                                <div class="count-card-body">
+                                    <i class="bx bx-user"></i>
+                                    <div class="count-content">
+                                        <p class="text-muted mt-2 mb-0">Feedback to User</p>
+                                        <p class="text-24 line-height-1 mb-2">@ViewBag.Feedbacktouser</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                }
+
+
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-12">
+
+                    <table class="table table-hover table-striped" id="project_detail">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>API ADDA ID</th>
+                                <th>Project Name</th>
+                                <th>Project ID</th>
+                                <th>Project Manager BTG</th>
+                                <th>Project Manager IT</th>
+                                <th>Status</th>
+                                <th>Platform</th>
+                                <th>JIRA ID</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            @if (Model.integrationLists != null)
+                            {
+
+                                @foreach (var item in Model.integrationLists)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (ViewBag.Role == "USER")
+                                            {
+
+                                                @if (@item.Status == "Draft")
+                                                {
+                                                    <a href="/Home/newintegration?integrationId=@item.integrationId">Edit</a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/Home/newintegration?integrationId=@item.integrationId">View</a>
+                                                }
+
+
+                                            }
+                                            else
+                                            {
+                                                <a href="/Home/Appprovalintegration?integrationId=@item.integrationId">View</a>
+                                            }
+                                        </td>
+                                        <td width="14%">@item.APIADDAID</td>
+                                        <td>@item.ProjectName</td>
+                                        <td>@item.ProjectId</td>
+                                        <td>@item.ProjectManagerBTG</td>
+                                        <td>@item.ProjectManagerIT</td>
+                                        <td>@item.Status</td>
+                                        <td>@item.Platform</td>
+                                        <td>@item.JIRAId</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var IsSuccess = '@TempData["IsSuccess"]';
+        var msg = '@TempData["Result"]';
+        if (IsSuccess != '' && IsSuccess == 'True' && msg != '') {
+            toastr.success(msg);
+        }
+        else if (IsSuccess != '' && IsSuccess == 'False' && msg != '') {
+            toastr.error(msg);
+        }
+
+        var number = parseInt(@ViewBag.Number);
+
+        if (number == 1) {
+            $("#integration").show();
+        }
+
+        $(".new-Integration").on("click", function () {
+            alert('Test');
+        });
+    });
+
+
+</script>
