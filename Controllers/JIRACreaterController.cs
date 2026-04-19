@@ -1,38 +1,3 @@
-using Hunt.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using System.Diagnostics;
-using System.Text;
-
-namespace Hunt.Controllers
-{
-    public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
-}
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -43,26 +8,27 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using API_Adda.Models;
+using API_HUNT.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace API_Adda.Controllers
+namespace API_HUNT.Controllers
 {
     public class JIRACreatorController : Controller
     {
-        SqlConnection sqlCon = new SqlConnection(Startup.connectionstring);
-        SubmitRepository submitRepository = new SubmitRepository();
-        JIRARepository jIRARepository = new JIRARepository();
-        HomeController homeController = new HomeController();
+        private readonly ISubmitRepository submitRepository;
+        private readonly IJiraRepository jIRARepository;
+        private readonly IActivityLogRepository _activityLog;
+        private readonly HomeController _homeController;
         private readonly HttpClient _httpClient;
-        SqlCommand cmd = null;
-        SqlDataAdapter sda = null;
-        public JIRACreatorController(HttpClient httpClient)
+        public JIRACreatorController(HttpClient httpClient, ISubmitRepository submitRepo, IJiraRepository jiraRepo, IActivityLogRepository activityLog, HomeController homeControllerDep)
         {
             _httpClient = httpClient;
+            submitRepository = submitRepo;
+            jIRARepository = jiraRepo;
+            _activityLog = activityLog;
+            _homeController = homeControllerDep;
 
             // Set up Basic Authentication
             var username = "genobpenh";
@@ -74,7 +40,7 @@ namespace API_Adda.Controllers
         public async Task<NewIntegration> CreateJIRA(NewIntegration newIntegration)
         {
             // API endpoint URL
-            var apiUrl = "https://jiraprod.hdfcbank.com/rest/api/2/issue";
+            var apiUrl = "https://jira.hunt.com/rest/api/2/issue";
 
             //newIntegration = submitRepository.GetNewIntegrationById(newIntegration.IntegrationId);
 
@@ -278,8 +244,8 @@ namespace API_Adda.Controllers
         }
         //public async Task UploadZip(string jiraId, string folderName)
         //{
-        //    var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + folderName + "\\");
-        //    string apiUrl = "https://jiraprod.hdfcbank.com/rest/api/2/issue/" + jiraId + "/attachments";
+        //    var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + folderName + "\\");
+        //    string apiUrl = "https://jira.hunt.com/rest/api/2/issue/" + jiraId + "/attachments";
 
         //    // Create a memory stream to hold the zip file
         //    using (MemoryStream memoryStream = new MemoryStream())
@@ -329,12 +295,12 @@ namespace API_Adda.Controllers
             string result = string.Empty;
 
             // API endpoint URL
-            string apiUrl = "https://jiraprod.hdfcbank.com/rest/api/2/issue/" + jiraId + "/attachments";
+            string apiUrl = "https://jira.hunt.com/rest/api/2/issue/" + jiraId + "/attachments";
 
             // folder name
             string folderName = "API" + newIntegration.CreatedAt.ToString("ddMMMyyyy") + newIntegration.IntegrationId;
             // folder path
-            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIAddaDoc\NewIntegrations\" + folderName);
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIHuntDoc\NewIntegrations\" + folderName);
 
             // Check if the folder exists
             if (!Directory.Exists(folderPath))
@@ -344,7 +310,7 @@ namespace API_Adda.Controllers
             // Get OBP document
             DataSet ds = submitRepository.DonwloadIntegrationDoc(newIntegration.IntegrationId);
             string DocName = "OBP_Document_" + newIntegration.IntegrationId + ".xlsx";
-            homeController.Table_Export_IntegratedXL(ds, newIntegration.IntegrationId, DocName);
+            _homeController.Table_Export_IntegratedXL(ds, newIntegration.IntegrationId, DocName);
 
             // Get a list of files in the folder
             var files = Directory.GetFiles(folderPath);

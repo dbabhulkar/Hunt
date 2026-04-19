@@ -1,11 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor Accessor
-@model API_Adda.Models.NewIntegration
+@model API_HUNT.Models.NewIntegration
 @{
     ViewData["Title"] = "newintegration";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container mt-10">
+<div class="container-fluid">
     <div class="card">
         <div class="card-body">
             <div class="row form-group">
@@ -20,7 +20,7 @@
                     </h4>
 
 
-                    @if (Accessor.HttpContext.Session.GetString("Role") == "USER")
+                    @if (Accessor.HttpContext.Session.GetString("Role") == "USER" || Accessor.HttpContext.Session.GetString("Role") == "ADMIN")
                     {
 
                         <a class="close-btn" href="/Home/newintegration" id="new" style="font-size: 15px; font-weight: 600;"> <i class="bx bx-plus-circle" style="vertical-align:middle;"></i> New</a>
@@ -126,7 +126,7 @@
                         <thead>
                             <tr>
                                 <th>Action</th>
-                                <th>API ADDA ID</th>
+                                <th>API HUNT ID</th>
                                 <th>Project Name</th>
                                 <th>Project ID</th>
                                 <th>Project Manager BTG</th>
@@ -163,7 +163,7 @@
                                                 <a href="/Home/Appprovalintegration?integrationId=@item.integrationId">View</a>
                                             }
                                         </td>
-                                        <td width="14%">@item.APIADDAID</td>
+                                        <td width="14%">@item.HUNTID</td>
                                         <td>@item.ProjectName</td>
                                         <td>@item.ProjectId</td>
                                         <td>@item.ProjectManagerBTG</td>

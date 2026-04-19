@@ -4,120 +4,70 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Hunt** is an ASP.NET Core 8.0 MVC web application that manages partner lifecycle workflows. It handles partner onboarding, offboarding, integration approvals, exception management with multi-level approvals, and JIRA integration for issue tracking.
+**Hunt** (namespace: `API_HUNT`) is an internal ASP.NET Core 8.0 MVC web application for API partner lifecycle management — onboarding, integration, approval, offboarding, exception handling, and health diagnostics. It integrates with Active Directory for authentication and JIRA for ticket management.
 
-## Build & Run Commands
+## Build and Run
 
 ```bash
-# Restore dependencies
-dotnet restore
-
-# Build the project
-dotnet build
-
-# Run the application
-dotnet run
-
-# Development with HTTPS on port 7044
-dotnet run --launch-profile https
-
-# Development with HTTP on port 5089
-dotnet run --launch-profile http
+dotnet build Hunt.csproj        # Build
+dotnet run                      # Run (http://localhost:5089)
+dotnet watch run                # Run with hot reload
 ```
 
-The application runs at:
-- HTTP: `http://localhost:5089`
-- HTTPS: `https://localhost:7044`
+The solution (`Hunt.sln`) contains three projects: `Hunt` (main app), `Hunt.Tests`, and `Hunt.UITests` (test projects live one level up at `../Hunt.Tests/` and `../Hunt.UITests/`).
 
 ## Architecture
 
-### High-Level Structure
+### MVC + Repository Pattern
 
-- **Controllers** (15+ controllers): Handle different workflows and user roles
-  - Partner workflows: Onboarding, Offboarding, Approval, Integration, Dashboard
-  - Exception Management: Multiple approval levels (Level 1-3)
-  - Admin & Login: User and system management
-  - JIRA integration: Create and track issues
+- **Controllers/** — Handle HTTP requests, delegate to repositories. `CustomFilter` attribute enforces session-based auth.
+- **Models/** — Contains domain models, view models, AND repository implementations (most repositories live here, not in `Repositories/`).
+- **Repositories/** — Only `IAdminRepository`/`AdminRepository` use the formal Interfaces/Implementations folder structure. All other repository interfaces and implementations are in `Models/`.
+- **Views/** — Razor views organized by controller. Shared layout in `Views/Shared/_Layout.cshtml`.
 
-- **Models**: Business logic and data access
-  - Repository pattern: `*Repository.cs` classes handle database operations
-  - Domain models: `Partner*`, `Exception*`, `*Model.cs` classes represent domain entities
-  - Utilities: `AESEncrytDecry`, `SendEmail`, `GetConnectionString` for cross-cutting concerns
+### Data Access
 
-- **Views**: Razor templates organized by controller
-  - Multiple versions of views (e.g., `PartnerOnboarding` and `PartnerOnboardingNew`) suggest active refactoring
-  - `_Layout.cshtml` provides main layout structure
-  - Partial views like `_FeedbackPartial.cshtml` reused across workflows
+Uses **raw ADO.NET** (not EF Core). Database is **MySQL** via MySqlConnector, but code uses `SqlCommand`/`SqlDataAdapter` patterns.
 
-### Key Technical Patterns
+- Connection string built in `Program.cs` via `ConnectionDB.getConString()` (defined in `Models/DataBaseConnection.cs`) with encrypted credentials.
+- Connection factory: `IDbConnectionFactory` / `DbConnectionFactory` — injected into repositories.
+- Data pattern: `SqlDataAdapter` → `DataSet` → iterate `DataTable.Rows`. Parameters use `@p_` prefix convention.
 
-1. **Database Access**: Direct SqlConnection/SqlCommand usage (not EF Core)
-   - Connection strings managed via `Startup.connectionstring` configuration
-   - Models use repository pattern for data access
-   - SQL Server required
+### Authentication Flow
 
-2. **Authentication & Authorization**: Session-based
-   - User role checked via `HttpContext.Session.GetString("Role")`
-   - Roles include: USER, APPROVER, ADMIN
-   - Custom `[CustomFilter]` attribute used for role-based filtering
+1. Active Directory/LDAP validation (`LDAP://ldap.hunt.com`)
+2. `UserMaster` table status check (Active/Locked/Dormant/Disabled)
+3. Session variables set: `EmpId`, `UserName`, `UserRole`, `Role`, `LoginTime`, `Logid`
+4. `CustomFilter` action filter (in `Models/CustomFilter.cs`) checks session on protected controllers
+5. Session timeout: 30 minutes idle
 
-3. **File Uploads**: Partners can upload documents
-   - Upload folder: `wwwroot/UploadPO/` (created at runtime if missing)
-   - Handled in constructors of controllers managing uploads
+### Dependency Injection
 
-4. **Data Export**: EPPlus used for Excel generation
-   - Supports exporting partner lists and approval data
+All repositories registered as `AddScoped` in `Program.cs`. `HomeController` is registered as `AddTransient` because `JIRACreatorController` depends on it directly.
 
-5. **External Integrations**:
-   - JIRA API: `JIRARepository` handles issue creation and sync
-   - Email: `SendEmail` utility for workflow notifications
-   - HttpClient for API calls
+### Key Modules
 
-### Code Organization Observations
+| Controller | Purpose |
+|---|---|
+| `LoginController` | Auth, session management |
+| `HomeController` | Main dashboard, health diagnostics (Diagnose), Excel export |
+| `AdminController` | User/app master CRUD |
+| `PartnerOnboardingController` | Partner onboarding workflow |
+| `PartnerIntegrationController` | API integration management |
+| `PartnerApprovalController` | Approval workflows |
+| `PartnerOffboardingController` | Partner offboarding |
+| `ExceptionManagementController` | Exception CRUD |
+| `ExceptionApprovalController` | Exception approval workflow |
+| `JIRACreaterController` | JIRA ticket creation/export |
+| `PartnerDashboardController` | Partner analytics dashboard |
 
-- Some legacy code remnants from an older `API_HUNT` project (visible in HomeController and some controller usings)
-- Multiple controller variants suggest incremental refactoring (e.g., `PartnerIntegration` + `PartnerIntegrationNew`)
-- Empty placeholder classes (`DBClass`, `GetConnectionString`, `PartnerRepository`) suggest ongoing development
+### Key Libraries
 
-## Configuration
+- **EPPlus** — Excel file generation/export
+- **Newtonsoft.Json** — JSON serialization
+- **System.DirectoryServices** — Active Directory/LDAP auth
+- **MySqlConnector** — MySQL database driver
 
-- **appsettings.json**: Minimal config (logging, allowed hosts)
-- **appsettings.Development.json**: Development-specific overrides (not included in repo)
-- **launchSettings.json**: Three profiles - HTTP, HTTPS, and IIS Express
+### Default Route
 
-## Common Development Tasks
-
-### Adding a New Workflow
-
-1. Create a new Controller in `Controllers/` directory
-2. Add corresponding Model/Repository in `Models/` for data access
-3. Create views under `Views/{ControllerName}/`
-4. Implement role-based access checks using Session.GetString("Role")
-5. Use existing Repository classes as template for database patterns
-
-### Modifying Database Operations
-
-- Repository classes handle all data access using SqlConnection
-- Avoid mixing data access logic in controllers
-- Follow existing pattern: Repository methods return lists or single objects
-- Consider using parameterized queries to prevent SQL injection (check existing patterns)
-
-### Working with Views
-
-- Use `_Layout.cshtml` as base for shared UI elements
-- Leverage existing partial views (`_FeedbackPartial.cshtml`, etc.)
-- Check both versioned and new view folders for latest patterns
-
-## Database
-
-- **Type**: SQL Server
-- **Connection**: Configured via `Startup.connectionstring` (implementation not visible in current codebase)
-- **Scripts**: DBScripts folder (currently empty; likely migrated elsewhere)
-
-## Notes for Future Development
-
-1. **Code Cleanup**: Several empty model classes and redundant view versions indicate ongoing refactoring—consolidate when possible
-2. **Legacy Code**: Mix of Hunt and API_HUNT namespaces; align namespaces during refactoring
-3. **Direct SQL**: Consider evaluating migration to Entity Framework for new features
-4. **Error Handling**: HomeController references a `Startup` class not visible in project structure—verify configuration is properly set up
-5. **Testing**: No test projects detected; consider adding unit/integration tests for critical workflows
+`{controller=Login}/{action=Index}/{id?}` — app starts at the login page.

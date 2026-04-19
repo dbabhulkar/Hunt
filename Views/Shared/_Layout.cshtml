@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor Accessor
 <!DOCTYPE html>
 
@@ -6,85 +6,172 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - API_Adda</title>
+    <title>@ViewData["Title"] - API HUNT</title>
 
-    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker3.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
     <link href="~/css/style.css" rel="stylesheet" />
-    <link href="~/fonts/boxicons/css/boxicons.css" rel="stylesheet" />
-    <link href="~/css/aos.css" rel="stylesheet" />
-    <link href="~/css/datepicker3.css" rel="stylesheet" />
-    <link href="~/css/datatables.css" rel="stylesheet" />
-    <link href="~/css/Toaster.css" rel="stylesheet" />
-    @*<link href="~/css/smoothness.css" rel="stylesheet" />*@
-    <link href="~/css/jquery-ui.css" rel="stylesheet" />
-
-    @*<link href="~/css/1jquery-ui.css" rel="stylesheet" />*@ @*--------new----------*@
 </head>
 <body>
-    <div class="top-header fixed-top">
-        <div class="container">
-            <div class="logo">
-                <img src="~/images/HDFC_logo.png" />
+    @{
+        var userRole = Accessor.HttpContext?.Session.GetString("Role") ?? "";
+        var userName = Accessor.HttpContext?.Session.GetString("UserName") ?? "";
+    }
+
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <nav class="ovi-sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-name">API HUNT</div>
+                <div class="app-name">Partner Integration</div>
             </div>
 
-            <div class="user-logout">
-                @*@using (Html.BeginForm("LogoutUser", "Login", FormMethod.Post,
-                new { enctype = "multipart/form-data" }))
-                {*@
-                <a href="/Login/LogoutUser" class="btn-border">
-                    <i class="bx bx-power-off"></i>
-                </a>
-                @*   }*@
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/home/index/" class="@(ViewData["Title"]?.ToString() == "DiagnoseIssue" ? "active" : "")">
+                        <img src="~/images/icons/dashboard.svg" class="nav-icon" alt="" />
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/home/search/" class="@(ViewData["Title"]?.ToString() == "Search" ? "active" : "")">
+                        <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                        <span>Search API</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/home/TestAPI/" class="@(ViewData["Title"]?.ToString() == "TestAPI" ? "active" : "")">
+                        <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                        <span>Test API</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/home/NewIntegrationList/" class="@(ViewData["Title"]?.ToString() == "NewIntegration" ? "active" : "")">
+                        <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                        <span>New Integration</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/home/faq/" class="@(ViewData["Title"]?.ToString() == "FAQ" ? "active" : "")">
+                        <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                        <span>FAQ</span>
+                    </a>
+                </li>
 
+                @if (userRole == "USER" || userRole == "ADMIN")
+                {
+                    <li>
+                        <a href="/PartnerOnboarding/ListofPartner/" class="@(ViewData["Title"]?.ToString()?.Contains("Onboarding") == true ? "active" : "")">
+                            <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                            <span>Partner Onboarding</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/PartnerIntegration/ListofPartner/" class="@(ViewData["Title"]?.ToString()?.Contains("Integration") == true ? "active" : "")">
+                            <img src="~/images/icons/commercials.svg" class="nav-icon" alt="" />
+                            <span>Partner Integration</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ExceptionManagement/Index/" class="@(ViewData["Title"]?.ToString()?.Contains("Exception") == true ? "active" : "")">
+                            <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                            <span>Exception Mgmt</span>
+                        </a>
+                    </li>
+                }
+
+                @if (userRole == "APPROVER" || userRole == "ADMIN")
+                {
+                    <li>
+                        <a href="/PartnerApproval/ListofPartner/" class="@(ViewData["Title"]?.ToString()?.Contains("Approval") == true && !ViewData["Title"].ToString().Contains("Exception") ? "active" : "")">
+                            <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                            <span>Partner Approval</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ExceptionApproval/Index/" class="@(ViewData["Title"]?.ToString()?.Contains("ExceptionApproval") == true ? "active" : "")">
+                            <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                            <span>Exception Approval</span>
+                        </a>
+                    </li>
+                }
+
+                <li>
+                    <a href="/PartnerDashboard/PartnerDashboardNew/">
+                        <img src="~/images/icons/dashboard.svg" class="nav-icon" alt="" />
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/PartnerOffboarding/Index/">
+                        <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                        <span>Partner Offboarding</span>
+                    </a>
+                </li>
+
+                @if (userRole == "ADMIN")
+                {
+                    <li>
+                        <a href="/Admin/Admins/">
+                            <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
+                            <span>Admin</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            <div class="sidebar-footer">
+                Logged in as <strong>@userRole</strong>
             </div>
-            <div class="user-logout">
-                <label class="NameLabel">@Accessor.HttpContext.Session.GetString("UserName") - <span style="font-size:13px">@Accessor.HttpContext.Session.GetString("Role")</span></label>
+        </nav>
+
+        <!-- Main content -->
+        <div class="app-main">
+            <!-- Top Header -->
+            <div class="ovi-top-header">
+                <div class="app-chip">API Hunt</div>
+                <div class="page-title">@ViewData["Title"]</div>
+                <div class="header-spacer"></div>
+
+                <div class="header-search">
+                    <i class="fa fa-search"></i>
+                    <input type="text" placeholder="Search..." />
+                </div>
+
+                <div class="header-actions">
+                    <div class="user-info">
+                        <strong>@userName</strong>
+                        <span>@userRole</span>
+                    </div>
+                    <a href="/Login/LogoutUser" class="icon-btn" title="Logout">
+                        <img src="~/images/icons/logout.svg" alt="Logout" />
+                    </a>
+                </div>
+            </div>
+
+            <!-- Page content -->
+            <div class="app-content">
+                @RenderBody()
             </div>
         </div>
     </div>
-    <header id="header" class="fixed-top  header-transparent " style="top: 30px;" data-aos="fade-down">
-        <div class="container d-flex align-items-center justify-content-between">
 
-            <nav id="navbar" class="navbar">
-                <ul id="nav">
-                    <li style="padding-left:0;"><a class="nav-link scrollto" href="/home/index/" style="border-bottom:0 !important;"><i class="bx bx-desktop"></i></a></li>
-
-                    <li><a class="nav-link scrollto" href="/home/search/">Search API</a></li>
-                    @*
-                    <li><a class="nav-link scrollto" href="#">Log Project</a></li>*@
-                    <li><a class="nav-link scrollto" href="/home/TestAPI/">Test API</a></li>
-                    @*
-                    <li><a class="nav-link scrollto" href="#">Diagnose UAT Integration</a></li>
-                    <li><a class="nav-link scrollto" href="#">Diagnose Production Issues</a></li>*@
-                    <li><a class="nav-link scrollto" href="/home/faq/">FAQ</a></li>
-
-                </ul>
-
-                <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-
-        </div>
-    </header>
-
-    @RenderBody()
-
-
-
-
-    <script src="~/js/jquery.min.js"></script>
-    <script src="~/js/aos.js"></script>
-    <script src="~/js/bootstrap.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
     <script src="~/js/main.js"></script>
-    <script src="~/js/carbon-components.min.js"></script>
-    <script src="~/js/prism.js"></script>
-    <script src="~/js/bootstrap-datepicker.js"></script>
-    <script src="~/js/dataTable.min.js"></script>
-    <script src="~/js/Toaster.js"></script>
-    <script src="~/js/jquery-ui.js"></script>
-    @*<script src="~/js/1jquery-ui.min.js"></script>*@
     <script>
         $(document).ready(function () {
-
             toastr.options = {
                 "closeButton": true,
                 "newestOnTop": false,
@@ -101,10 +188,7 @@
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
             }
-
-
         });
-        AOS.init();
 
         /////// Datepicker ////////
         $(".date").datepicker({
@@ -114,12 +198,8 @@
             autoclose: true,
         });
 
-
         /////// File Uploader ///////
         (function ($) {
-            /**
-             * Create drag and drop element.
-             */
             var customDragandDrop = function (element) {
                 $(element).addClass("kwt-file__input");
                 var element = $(element).wrap(
@@ -138,60 +218,34 @@
                 );
                 var element = element.parents(".kwt-file");
 
-                // Add class on focus and drage enter event.
                 element.on("dragenter focus click", ".kwt-file__input", function (e) {
                     $(this).parents(".kwt-file__drop-area").addClass("is-active");
                 });
 
-                // Remove class on blur and drage leave event.
                 element.on("dragleave blur drop", ".kwt-file__input", function (e) {
                     $(this).parents(".kwt-file__drop-area").removeClass("is-active");
                 });
 
-                // Show filename when change file.
                 element.on("change", ".kwt-file__input", function (e) {
                     let filesCount = $(this)[0].files.length;
                     let textContainer = $(this).next(".kwt-file__msg");
                     if (1 === filesCount) {
                         let fileName = $(this).val().split("\\").pop();
-                        textContainer
-                            .text(fileName)
-                            .next(".kwt-file__delete")
-                            .css("display", "block");
+                        textContainer.text(fileName).next(".kwt-file__delete").css("display", "block");
                     } else if (filesCount > 1) {
-                        textContainer
-                            .text(filesCount + " files selected")
-                            .next(".kwt-file__delete")
-                            .css("display", "inline-block");
+                        textContainer.text(filesCount + " files selected").next(".kwt-file__delete").css("display", "inline-block");
                     } else {
-                        textContainer.text(
-                            `${"" === this[0].placeholder
-                                ? "or drop files here"
-                                : `${this[0].placeholder}`
-                            }`
-                        );
-                        $(this)
-                            .parents(".kwt-file")
-                            .find(".kwt-file__delete")
-                            .css("display", "none");
+                        textContainer.text(`${"" === this[0].placeholder ? "or drop files here" : `${this[0].placeholder}`}`);
+                        $(this).parents(".kwt-file").find(".kwt-file__delete").css("display", "none");
                     }
                 });
 
-                // Delete selected file.
                 element.on("click", ".kwt-file__delete", function (e) {
                     let deleteElement = $(this);
                     deleteElement.parents(".kwt-file").find(`.kwt-file__input`).val(null);
-                    deleteElement
-                        .css("display", "none")
-                        .prev(`.kwt-file__msg`)
-                        .text(
-                            `${"" ===
-                                $(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder
-                                ? "or drop files here"
-                                : `${$(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder
-                                }`
-                            }`
-                        );
+                    deleteElement.css("display", "none").prev(`.kwt-file__msg`).text(
+                        `${"" === $(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder ? "or drop files here" : `${$(this).parents(".kwt-file").find(".kwt-file__input")[0].placeholder}`}`
+                    );
                 });
             };
 
@@ -204,48 +258,32 @@
             };
         })(jQuery);
 
-        // Plugin initialize
         jQuery(document).ready(function ($) {
-            //  debugger;
             $(".demo1").kwtFileUpload();
         });
 
-
-
-        ////////// New Intergration ///////////
-
         $("#new").click(function () {
             $("#integration").show();
-
         });
 
         //////////// Datatable //////////
-
         $("#new_api").DataTable();
-
         $("#project_detail").DataTable();
         $("#api_details").DataTable();
         $("#field_detail").DataTable();
         $("#new_api_detail").DataTable();
-        //$("#new_api").DataTable();
-
 
         /////// Dynamic Table ///////
-
         function create_tr(table_id) {
-            debugger;
             let table_body = document.getElementById(table_id),
                 first_tr = table_body.firstElementChild
             tr_clone = first_tr.cloneNode(true);
-
             table_body.append(tr_clone);
-
             clean_first_tr(table_body.firstElementChild);
         }
 
         function clean_first_tr(firstTr) {
             let children = firstTr.children;
-
             children = Array.isArray(children) ? children : Object.values(children);
             children.forEach(x => {
                 if (x !== firstTr.lastElementChild) {
@@ -254,150 +292,29 @@
             });
         }
 
-
-
         function remove_tr(This) {
-
             This.closest('tr').remove();
-        @*if (This.closest('tbody').childElementCount == 1) {
-                //'@TempData["Editbydb"]'= "NewIntegration";
-                alert("You Don't have Permission to Delete This ?");
-                @{
-                TempData["Editbydb"] = "NewIntegration";
-                window.location.href = "/Home/NewIntegration";
-                //}
-                } else {
-                This.closest('tr').remove();
-                }*@
-                                                }
+        }
 
-        //////// Active nav link /////////
-
+        //////// Active sidebar link /////////
         $(function () {
-
-            var current = location.pathname;
-            $('#nav li a').each(function () {
-
-                var $this = $(this);
-                // if the current path is like this link, make it active
-                if ($this.attr('href').indexOf(current) !== -1) {
-
-                    $this.addClass('active');
+            var current = location.pathname.toLowerCase();
+            $('.ovi-sidebar .sidebar-nav li a').each(function () {
+                var href = $(this).attr('href').toLowerCase();
+                if (current.indexOf(href) !== -1 && href !== '/') {
+                    $(this).addClass('active');
                 }
-            })
-        })
-        /////////////// Responsive tabs ///////////////////////
-
-        $('.nav-tabs-dropdown').on("click", "li:not('.active') a", function (event) {
-            // debugger;
-            $(this).closest('ul').removeClass("open");
-        })
-            .on("click", "li.active a", function (event) {
-                // debugger;
-                $(this).closest('ul').toggleClass("open");
             });
+        });
 
-        //////////////////////////////////
-
-        function fnRedirct() {
-
-            Response.redirect("/home/TestAPI/");
-
-        };
-
-
-
-        //$(function () {
-        //    $("#ServiceUrl").autocomplete({
-        //        source: function (request, response) {
-        //            $.ajax({
-        //                url: '/Home/Index/',
-        //                data: { "prefix": request.term },
-        //                type: "POST",
-        //                success: function (data) {
-        //                    response($.map(data, function (item) {
-        //                        return item;
-        //                    }))
-        //                },
-        //                error: function (response) {
-        //                    alert(response.responseText);
-        //                },
-        //                failure: function (response) {
-        //                    alert(response.responseText);
-        //                }
-        //            });
-        //        },
-        //        select: function (e, i) {
-        //            $("#hfCustomer").val(i.item.val);
-        //        },
-        //        minLength: 1
-        //    });
-        //});
-        //serviceDetails1_ServiceName
-
-        ///---------------------------------------------------Autocomplete Box --------------------------------------------------------
-        //    $(function () {
-        //       // debugger;
-        //        $("#serviceDetails1_ServiceName").autocomplete(
-        //            {
-
-        //            source: function (request, response) {
-        //                $.ajax({
-        //                    url: '/Home/AutoFilterExistingServiceName/',
-        //                    data: { "prefix": request.term },
-        //                    type: "POST",
-        //                    success: function (data) {
-        //                       // debugger;
-        //                        if ($("#serviceDetails1_Existing_New_Id").val() == "1") {
-        //                            response($.map(data, function (item) {
-        //                                return { label: item.exServiceName, val: item.exServiceId};
-        //                            }))
-        //                        }
-        //                    },
-        //                    error: function (response) {
-        //                        alert(response.responseText);
-        //                    },
-        //                    failure: function (response) {
-        //                        alert(response.responseText);
-        //                    }
-        //                });
-        //            },
-        //           select: function (e, i) {
-        //                   // debugger;
-
-        //             $("#ServiceNameId").val(i.item.val);
-        //               var recordId = $("#ServiceNameId").val();
-        //             $.getJSON("/Home/GetExistingServiceRecordById",
-        //             {
-        //                id: recordId
-        //             },
-        //            function (data) {
-        //               // debugger;
-        //                $('#serviceDetails1_ConsumerApplication').val(data.consumerApplication);
-        //                $('#serviceDetails1_APIType_Id').val(data.apiTypeId);
-        //                $('#serviceDetails1_DomainName_Id').val(data.domainId);
-        //                $('#serviceDetails1_Rest_SOAP_Id').val(data.restSoapId);
-        //                $('#serviceDetails1_APICategory_Id').val(data.apiCatId);
-        //                // $('RecordType').val(data.Type);
-        //            });
-        //            },
-        //            minLength: 1
-
-        //    });
-
-
-        //});
-
-
-
-
-
-
-
+        /////////////// Responsive tabs ///////////////////////
+        $('.nav-tabs-dropdown').on("click", "li:not('.active') a", function (event) {
+            $(this).closest('ul').removeClass("open");
+        }).on("click", "li.active a", function (event) {
+            $(this).closest('ul').toggleClass("open");
+        });
 
         ////////  Add Multiple divs /////
-
-        /* Variables */
         var row = $(".attr");
 
         function addRow() {
@@ -410,45 +327,31 @@
 
         $('#attributes .attr:first-child').find('.remove').hide();
 
-        /* Doc ready */
         $(".add").on('click', function () {
-            //debugger
-            // alert('test1');
-            // $("#adddrow").html("Add");
             addRow();
             if ($("#attributes .attr").length > 1) {
-                //alert("Can't remove row.");
                 $(".remove").show();
             }
         });
         $(".remove").on('click', function () {
-            debugger;
             if ($("#attributes .attr").size() == 1) {
-                //alert("Can't remove row.");
                 $(".remove").hide();
             } else {
                 removeRow($(this));
-
                 if ($("#attributes .attr").size() == 1) {
                     $(".remove").hide();
                 }
-
             }
         });
 
         ///////// File Uploader ////////
-
-
         $(".file-upload").on("change", ".file-upload-field", function () {
-            debugger;
             $(this).parent(".file-upload-wrapper").attr("data-text", $(this).val().replace(/.*(\/|\\)/, ''));
         });
 
         /////////////////// Wizard /////////
-
         $(document).ready(function () {
-
-            var current_fs, next_fs, previous_fs; //fieldsets
+            var current_fs, next_fs, previous_fs;
             var opacity;
             var current = 1;
             var steps = $("fieldset").length;
@@ -456,25 +359,14 @@
             setProgressBar(current);
 
             $(".next").click(function () {
-
                 current_fs = $(this).parent();
                 next_fs = $(this).parent().next();
-
-                //Add Class Active
                 $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
-
-                //show the next fieldset
                 next_fs.show();
-                //hide the current fieldset with style
                 current_fs.animate({ opacity: 0 }, {
                     step: function (now) {
-                        // for making fielset appear animation
                         opacity = 1 - now;
-
-                        current_fs.css({
-                            'display': 'none',
-                            'position': 'relative'
-                        });
+                        current_fs.css({ 'display': 'none', 'position': 'relative' });
                         next_fs.css({ 'opacity': opacity });
                     },
                     duration: 500
@@ -483,26 +375,14 @@
             });
 
             $(".previous").click(function () {
-
                 current_fs = $(this).parent();
                 previous_fs = $(this).parent().prev();
-
-                //Remove class active
                 $("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
-
-                //show the previous fieldset
                 previous_fs.show();
-
-                //hide the current fieldset with style
                 current_fs.animate({ opacity: 0 }, {
                     step: function (now) {
-                        // for making fielset appear animation
                         opacity = 1 - now;
-
-                        current_fs.css({
-                            'display': 'none',
-                            'position': 'relative'
-                        });
+                        current_fs.css({ 'display': 'none', 'position': 'relative' });
                         previous_fs.css({ 'opacity': opacity });
                     },
                     duration: 500
@@ -513,14 +393,12 @@
             function setProgressBar(curStep) {
                 var percent = parseFloat(100 / steps) * curStep;
                 percent = percent.toFixed();
-                $(".progress-bar")
-                    .css("width", percent + "%")
+                $(".progress-bar").css("width", percent + "%");
             }
 
             $(".submit").click(function () {
                 return false;
-            })
-
+            });
         });
     </script>
 </body>

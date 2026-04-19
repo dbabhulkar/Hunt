@@ -1,289 +1,176 @@
-using Hunt.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
-namespace Hunt.Controllers
-{
-    public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
-}
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using API_Adda.Models;
+using API_HUNT.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API_Adda.Controllers
+namespace API_HUNT.Controllers
 {
     public class ExceptionManagementController : Controller
     {
-        ExceptionRepository exceptionRepository = new ExceptionRepository();
+        private readonly IExceptionRepository _exceptionRepo;
+
+        public ExceptionManagementController(IExceptionRepository exceptionRepo)
+        {
+            _exceptionRepo = exceptionRepo;
+        }
+
         public IActionResult Index()
         {
-            return View();
+            AddEditExceptionModel model = new AddEditExceptionModel();
+            model.lstExceptionDetails = _exceptionRepo.ExceptionList();
+            return View(model);
         }
+
         public IActionResult ListOfExceptions()
         {
-            if (HttpContext.Session.GetString("Role").ToString() == "USER")
+            if (HttpContext.Session.GetString("Role") == "USER")
             {
-                AddEditExceptionModel addEditExceptionModel = new AddEditExceptionModel();
-                addEditExceptionModel.lstExceptionDetails = exceptionRepository.ExceptionList();
-                return View(addEditExceptionModel);
+                AddEditExceptionModel model = new AddEditExceptionModel();
+                model.lstExceptionDetails = _exceptionRepo.ExceptionList();
+                return View(model);
             }
-            else
-            {
-                return RedirectToAction("Index", "ExceptionApproval");
-            }
+            return RedirectToAction("Index", "ExceptionApproval");
         }
+
         [HttpPost]
-        public IActionResult ListOfExceptions(string data)
-        {
-            return View();
-        }
+        public IActionResult ListOfExceptions(string data) => View();
+
         public IActionResult AddEditException(string CaseId)
         {
-            AddEditExceptionModel addeditexceptionModel = new AddEditExceptionModel();
-            if (CaseId != null && CaseId != "" && CaseId.Contains("APIGW") == true)
+            AddEditExceptionModel model = new AddEditExceptionModel();
+            if (!string.IsNullOrEmpty(CaseId) && CaseId.Contains("APIGW"))
             {
-                addeditexceptionModel = exceptionRepository.GetExceptionDeatil(CaseId);
-                addeditexceptionModel.CaseId = CaseId;
+                model = _exceptionRepo.GetExceptionDetail(CaseId);
+                model.CaseId = CaseId;
             }
-            return View(addeditexceptionModel);
+            return View(model);
         }
+
         [HttpPost]
         public IActionResult SaveaddeditException(AddEditExceptionModel addeditexceptionModel)
         {
-            var actionName = "";
-            if (addeditexceptionModel.ExceptionLevel == "Level 1")
+            string actionName = addeditexceptionModel.ExceptionLevel switch
             {
-                actionName = "ExceptionLevel1";
-            }
-            else if (addeditexceptionModel.ExceptionLevel == "Level 2")
-            {
-                actionName = "ExceptionLevel2";
-            }
-            else if (addeditexceptionModel.ExceptionLevel == "Level 3")
-            {
-                actionName = "ExceptionLevel3";
-            }
-            addeditexceptionModel.currentUser = HttpContext.Session.GetString("EmpId").ToString();
-            ExceptionRepository exceptionRepository = new ExceptionRepository();
-            addeditexceptionModel = exceptionRepository.SaveAddEditException(addeditexceptionModel);
-            //exceptionRepository.SaveAddEditException(addeditexceptionModel);
-
-            return RedirectToAction(actionName: actionName, addeditexceptionModel);
-
+                "Level 1" => "ExceptionLevel1",
+                "Level 2" => "ExceptionLevel2",
+                "Level 3" => "ExceptionLevel3",
+                _ => ""
+            };
+            addeditexceptionModel.currentUser = HttpContext.Session.GetString("EmpId");
+            addeditexceptionModel = _exceptionRepo.SaveAddEditException(addeditexceptionModel);
+            return RedirectToAction(actionName, addeditexceptionModel);
         }
+
         public IActionResult ExceptionLevel1(AddEditExceptionModel addeditexceptionModel)
         {
-            ExceptionLevels exceptionLevels = new ExceptionLevels();
-            exceptionLevels.CaseID = addeditexceptionModel.OriginalOnboardingGASID;
+            ExceptionLevels exceptionLevels = new ExceptionLevels { CaseID = addeditexceptionModel.OriginalOnboardingGASID };
+            var level1 = _exceptionRepo.BindExcpLevel1();
 
-            var BusinessVerticalHeadList = (from product in exceptionRepository.BindExcpLevel1().BusinessVerticalHeadList
-                                            select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                            { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.BusinessVerticalHeadList = BusinessVerticalHeadList;
-
-            var BusinessGroupHeadList = (from product in exceptionRepository.BindExcpLevel1().BusinessGroupHeadList
-                                         select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                         { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.BusinessGroupHeadList = BusinessGroupHeadList;
-
-            var CIOGroupList = (from product in exceptionRepository.BindExcpLevel1().CIOGroupList
-                                select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.CIOGroupList = CIOGroupList;
+            ViewBag.BusinessVerticalHeadList = level1.BusinessVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.BusinessGroupHeadList = level1.BusinessGroupHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.CIOGroupList = level1.CIOGroupList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
 
             return View(exceptionLevels);
-            //return RedirectToPage("/ExceptionLevels");
         }
+
         public IActionResult ExceptionLevel2(AddEditExceptionModel addeditexceptionModel)
         {
-            ExceptionLevels exceptionLevels = new ExceptionLevels();
-            exceptionLevels.CaseID = addeditexceptionModel.OriginalOnboardingGASID;
+            ExceptionLevels exceptionLevels = new ExceptionLevels { CaseID = addeditexceptionModel.OriginalOnboardingGASID };
+            var level2 = _exceptionRepo.BindExcpLevel2();
 
-            var BusinessVerticalHeadList = (from product in exceptionRepository.BindExcpLevel2().BusinessVerticalHeadList
-                                            select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                            { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.BusinessVerticalHeadList = BusinessVerticalHeadList;
-
-            var ITDRMVerticalHeadList = (from product in exceptionRepository.BindExcpLevel2().ITDRMVerticalHeadList
-                                         select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                         { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.ITDRMVerticalHeadList = ITDRMVerticalHeadList;
-
-            var BusinessGroupHeadList = (from product in exceptionRepository.BindExcpLevel2().BusinessGroupHeadList
-                                         select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                         { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.BusinessGroupHeadList = BusinessGroupHeadList;
-
-            var CIOGroupList = (from product in exceptionRepository.BindExcpLevel2().CIOGroupList
-                                select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.CIOGroupList = CIOGroupList;
-
-            var ITDRMGroupHeadList = (from product in exceptionRepository.BindExcpLevel2().ITDRMGroupHeadList
-                                      select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                      { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.ITDRMGroupHeadList = ITDRMGroupHeadList;
-
-            var CISOGroupList = (from product in exceptionRepository.BindExcpLevel2().CISOGroupList
-                                 select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                 { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.CISOGroupList = CISOGroupList;
+            ViewBag.BusinessVerticalHeadList = level2.BusinessVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.ITDRMVerticalHeadList = level2.ITDRMVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.BusinessGroupHeadList = level2.BusinessGroupHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.CIOGroupList = level2.CIOGroupList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.ITDRMGroupHeadList = level2.ITDRMGroupHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.CISOGroupList = level2.CISOGroupList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
 
             return View(exceptionLevels);
-            //return RedirectToPage("/ExceptionLevels");
         }
+
         public IActionResult ExceptionLevel3(AddEditExceptionModel addeditexceptionModel)
         {
-            ExceptionLevels exceptionLevels = new ExceptionLevels();
-            exceptionLevels.CaseID = addeditexceptionModel.OriginalOnboardingGASID;
+            ExceptionLevels exceptionLevels = new ExceptionLevels { CaseID = addeditexceptionModel.OriginalOnboardingGASID };
+            var level3 = _exceptionRepo.BindExcpLevel3();
 
-            var ITVerticalHeadList = (from product in exceptionRepository.BindExcpLevel3().ITVerticalHeadList
-                                      select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                      { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.ITVerticalHeadList = ITVerticalHeadList;
-
-            var BSGVerticalHeadList = (from product in exceptionRepository.BindExcpLevel3().BSGVerticalHeadList
-                                       select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                       { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.BSGVerticalHeadList = BSGVerticalHeadList;
-
-            var BusinessVerticalHeadList = (from product in exceptionRepository.BindExcpLevel3().BusinessVerticalHeadList
-                                            select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                            { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.BusinessVerticalHeadList = BusinessVerticalHeadList;
-
-            var ComplianceVerticalHeadList = (from product in exceptionRepository.BindExcpLevel3().ComplianceVerticalHeadList
-                                              select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                              { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.ComplianceVerticalHeadList = ComplianceVerticalHeadList;
-
-            var ITDRMVerticalHeadList = (from product in exceptionRepository.BindExcpLevel3().ITDRMVerticalHeadList
-                                         select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                         { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.ITDRMVerticalHeadList = ITDRMVerticalHeadList;
-
-            var ISGVerticalHeadList = (from product in exceptionRepository.BindExcpLevel3().ISGVerticalHeadList
-                                       select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                       { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.ISGVerticalHeadList = ISGVerticalHeadList;
-
-            var APEXSteeringCommitteeList = (from product in exceptionRepository.BindExcpLevel3().APEXSteeringCommitteeList
-                                             select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
-                                             { Text = product.Val, Value = product.ID }).ToList();
-            ViewBag.APEXSteeringCommitteeList = APEXSteeringCommitteeList;
+            ViewBag.ITVerticalHeadList = level3.ITVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.BSGVerticalHeadList = level3.BSGVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.BusinessVerticalHeadList = level3.BusinessVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.ComplianceVerticalHeadList = level3.ComplianceVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.ITDRMVerticalHeadList = level3.ITDRMVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.ISGVerticalHeadList = level3.ISGVerticalHeadList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
+            ViewBag.APEXSteeringCommitteeList = level3.APEXSteeringCommitteeList.Select(p => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem { Text = p.Val, Value = p.ID?.ToString() }).ToList();
 
             return View(exceptionLevels);
-            //return RedirectToPage("/ExceptionLevels");
         }
+
         [HttpPost]
         public JsonResult GetExceptionLevel(string ImpactOnBank)
         {
-            AddEditExceptionModel getexceptionlevel = new AddEditExceptionModel();
-            ExceptionRepository exceptionrepository = new ExceptionRepository();
+            AddEditExceptionModel result = new AddEditExceptionModel();
             try
             {
-                getexceptionlevel = exceptionrepository.GetExceptionLevel(ImpactOnBank);
+                result = _exceptionRepo.GetExceptionLevel(ImpactOnBank);
             }
             catch (Exception e)
             {
                 e.ToString();
             }
-            return new JsonResult(getexceptionlevel);
+            return new JsonResult(result);
         }
+
         [HttpPost]
         public IActionResult SaveExceptionLevel1(ExceptionLevels exception)
         {
-            try
+            string createdBy = HttpContext.Session.GetString("EmpId") ?? string.Empty;
+            exception.lstAddExceptionlevelDetails = new List<AddExceptionlevelDetails>
             {
-                var CreatedBy = HttpContext.Session.GetString("EmpId").ToString();
-                exception.lstAddExceptionlevelDetails = new List<AddExceptionlevelDetails>();
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessVerticalHead, Status = "Created", ApproverType = "Business", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level1" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessGroupHead, Status = "Created", ApproverType = "Business", ApproverLevel = "GH", CreatedBy = CreatedBy, ExceptionLevel = "Level1" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.CIOGroup, Status = "Created", ApproverType = "CIO", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level1" });
-
-                exception.lstAddExceptionlevelDetails = exception.lstAddExceptionlevelDetails.Where(X => X.ApproverUserID != null && X.ApproverUserID != "").ToList();
-                var objPartnerOnboarding = exceptionRepository.SaveExceptionLevel(exception);
-                return RedirectToAction("ListOfExceptions");
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessVerticalHead, Status = "Created", ApproverType = "Business", ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level1" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessGroupHead,    Status = "Created", ApproverType = "Business", ApproverLevel = "GH", CreatedBy = createdBy, ExceptionLevel = "Level1" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.CIOGroup,             Status = "Created", ApproverType = "CIO",      ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level1" },
+            };
+            exception.lstAddExceptionlevelDetails = exception.lstAddExceptionlevelDetails.Where(x => !string.IsNullOrEmpty(x.ApproverUserID)).ToList();
+            _exceptionRepo.SaveExceptionLevel(exception);
+            return RedirectToAction("ListOfExceptions");
         }
+
         [HttpPost]
         public IActionResult SaveExceptionLevel2(ExceptionLevels exception)
         {
-            try
+            string createdBy = HttpContext.Session.GetString("EmpId") ?? string.Empty;
+            exception.lstAddExceptionlevelDetails = new List<AddExceptionlevelDetails>
             {
-                var CreatedBy = HttpContext.Session.GetString("EmpId").ToString();
-                exception.lstAddExceptionlevelDetails = new List<AddExceptionlevelDetails>();
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessVerticalHead, Status = "Created", ApproverType = "Business", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level2" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITDRMVerticalHead, Status = "Created", ApproverType = "ITDRM", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level2" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessGroupHead, Status = "Created", ApproverType = "Business", ApproverLevel = "GH", CreatedBy = CreatedBy, ExceptionLevel = "Level2" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.CIOGroup, Status = "Created", ApproverType = "CIO", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level2" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITDRMGroupHead, Status = "Created", ApproverType = "ITDRM", ApproverLevel = "GH", CreatedBy = CreatedBy, ExceptionLevel = "Level2" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.CISOGroupHead, Status = "Created", ApproverType = "CISO", ApproverLevel = "GH", CreatedBy = CreatedBy, ExceptionLevel = "Level2" });
-
-                exception.lstAddExceptionlevelDetails = exception.lstAddExceptionlevelDetails.Where(X => X.ApproverUserID != null && X.ApproverUserID != "").ToList();
-                var objPartnerOnboarding = exceptionRepository.SaveExceptionLevel(exception);
-                return RedirectToAction("ListOfExceptions");
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessVerticalHead, Status = "Created", ApproverType = "Business", ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level2" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITDRMVerticalHead,    Status = "Created", ApproverType = "ITDRM",    ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level2" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessGroupHead,    Status = "Created", ApproverType = "Business", ApproverLevel = "GH", CreatedBy = createdBy, ExceptionLevel = "Level2" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.CIOGroup,             Status = "Created", ApproverType = "CIO",      ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level2" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITDRMGroupHead,       Status = "Created", ApproverType = "ITDRM",    ApproverLevel = "GH", CreatedBy = createdBy, ExceptionLevel = "Level2" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.CISOGroupHead,        Status = "Created", ApproverType = "CISO",     ApproverLevel = "GH", CreatedBy = createdBy, ExceptionLevel = "Level2" },
+            };
+            exception.lstAddExceptionlevelDetails = exception.lstAddExceptionlevelDetails.Where(x => !string.IsNullOrEmpty(x.ApproverUserID)).ToList();
+            _exceptionRepo.SaveExceptionLevel(exception);
+            return RedirectToAction("ListOfExceptions");
         }
+
         [HttpPost]
         public IActionResult SaveExceptionLevel3(ExceptionLevels exception)
         {
-            try
+            string createdBy = HttpContext.Session.GetString("EmpId") ?? string.Empty;
+            exception.lstAddExceptionlevelDetails = new List<AddExceptionlevelDetails>
             {
-                var CreatedBy = HttpContext.Session.GetString("EmpId").ToString();
-                exception.lstAddExceptionlevelDetails = new List<AddExceptionlevelDetails>();
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITVerticalHead, Status = "Created", ApproverType = "IT", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level3" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BSGVerticalHead, Status = "Created", ApproverType = "BSG", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level3" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessVerticalHead, Status = "Created", ApproverType = "Business", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level3" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ComplianceVerticalHead, Status = "Created", ApproverType = "Compliance", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level3" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITDRMVerticalHead, Status = "Created", ApproverType = "ITDRM", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level3" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ISGVerticalHead, Status = "Created", ApproverType = "ISG", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level3" });
-                exception.lstAddExceptionlevelDetails.Add(new AddExceptionlevelDetails() { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ApexSteeringCommittee, Status = "Created", ApproverType = "ApexSteeringCommittee", ApproverLevel = "VH", CreatedBy = CreatedBy, ExceptionLevel = "Level3" });
-
-                exception.lstAddExceptionlevelDetails = exception.lstAddExceptionlevelDetails.Where(X => X.ApproverUserID != null && X.ApproverUserID != "").ToList();
-                var objPartnerOnboarding = exceptionRepository.SaveExceptionLevel(exception);
-                return RedirectToAction("ListOfExceptions");
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITVerticalHead,         Status = "Created", ApproverType = "IT",                   ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level3" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BSGVerticalHead,        Status = "Created", ApproverType = "BSG",                  ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level3" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.BusinessVerticalHead,   Status = "Created", ApproverType = "Business",             ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level3" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ComplianceVerticalHead, Status = "Created", ApproverType = "Compliance",           ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level3" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ITDRMVerticalHead,      Status = "Created", ApproverType = "ITDRM",                ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level3" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ISGVerticalHead,        Status = "Created", ApproverType = "ISG",                  ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level3" },
+                new AddExceptionlevelDetails { ExceptionCaseID = exception.CaseID, ApproverUserID = exception.ApexSteeringCommittee,  Status = "Created", ApproverType = "ApexSteeringCommittee", ApproverLevel = "VH", CreatedBy = createdBy, ExceptionLevel = "Level3" },
+            };
+            exception.lstAddExceptionlevelDetails = exception.lstAddExceptionlevelDetails.Where(x => !string.IsNullOrEmpty(x.ApproverUserID)).ToList();
+            _exceptionRepo.SaveExceptionLevel(exception);
+            return RedirectToAction("ListOfExceptions");
         }
     }
 }

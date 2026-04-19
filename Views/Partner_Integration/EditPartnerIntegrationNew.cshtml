@@ -1,4 +1,4 @@
-﻿@model API_Adda.Models.PartnerOnboarding
+﻿@model API_HUNT.Models.PartnerOnboarding
 @inject IHttpContextAccessor Accessor
 @using Microsoft.AspNetCore.Http
 @using Newtonsoft.Json
@@ -9,7 +9,7 @@
 
 @using (Html.BeginForm("SaveEditPartner", "Partner_Integration", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-    <div class="container mt-10">
+    <div class="container-fluid">
         <div class="card">
             <div class="card-body">
                 <div class="row form-group">
@@ -244,22 +244,22 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="tblAPIbody">
-                                                @for (int i = 0; i < Model.lstApiDeatil.Count; i++)
+                                                @for (int i = 0; i < Model.lstApiDetail.Count; i++)
                                                 {
                                                     <tr>
                                                         <td>
-                                                            <input type="text" name="APIName_@i" id="APIName_@i" class="form-control APIName" readonly style="background-color: lightgray;" value="@Model.lstApiDeatil[i].APIName" />
+                                                            <input type="text" name="APIName_@i" id="APIName_@i" class="form-control APIName" readonly style="background-color: lightgray;" value="@Model.lstApiDetail[i].APIName" />
                                                         </td>
                                                         <td class="APIRisktd">
-                                                            <input type="text" name="APIRisk_@i" id="APIRisk_@i" class="form-control APIRisk" readonly style="background-color: lightgray;" value="@Model.lstApiDeatil[i].APIRisk" />
+                                                            <input type="text" name="APIRisk_@i" id="APIRisk_@i" class="form-control APIRisk" readonly style="background-color: lightgray;" value="@Model.lstApiDetail[i].APIRisk" />
                                                         </td>
                                                         <td>
-                                                            <input type="text" name="APIRiskScore_@i" id="APIRiskScore_@i" class="form-control APIRiskScore" readonly style="background-color: lightgray;" value="@Model.lstApiDeatil[i].APIRiskScore" />
+                                                            <input type="text" name="APIRiskScore_@i" id="APIRiskScore_@i" class="form-control APIRiskScore" readonly style="background-color: lightgray;" value="@Model.lstApiDetail[i].APIRiskScore" />
                                                         </td>
                                                         <td class="d-none">
                                                             <button class="close-btn" type="button" onclick="removeAPIRow(this)"><i class="bx bx-x-circle" style="color: red;"></i></button>
                                                         </td>
-                                                        @if (i == Model.lstApiDeatil.Count - 1)
+                                                        @if (i == Model.lstApiDetail.Count - 1)
                                                         {
                                                             <td style="width: 170px; text-align: center;">
                                                                 <!-- Button only in the last iteration -->
@@ -838,7 +838,7 @@
 
         //            source: function (request, response) {
         //                $.ajax({
-        //                    url: '/Partner_Integration/GetlstApiDeatil',
+        //                    url: '/Partner_Integration/GetlstApiDetail',
         //                    data: { "prefix": request.term },
         //                    type: "POST",
         //                    success: function (data) {
@@ -863,7 +863,7 @@
         //               var consId = $("#APIName").val();
         //                 $.ajax({
         //            type: "POST",
-        //            url: '/Partner_Integration/GetApiDeatil',
+        //            url: '/Partner_Integration/GetApiDetail',
         //            data: {
         //                APIName: consId
         //            },
@@ -885,7 +885,7 @@
         $("#APIName").autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: '/Partner_Integration/GetlstApiDeatil',
+                    url: '/Partner_Integration/GetlstApiDetail',
                     data: { "prefix": request.term },
                     type: "POST",
                     success: function (data) {
@@ -914,7 +914,7 @@
                 var consId = $("#APIName").val();
                 $.ajax({
                     type: "POST",
-                    url: '/Partner_Integration/GetApiDeatil',
+                    url: '/Partner_Integration/GetApiDetail',
                     data: {
                         APIName: consId
                     },
@@ -1763,16 +1763,16 @@
         objPartnerOnboarding.PartnerRiskScore = $('#PartnerRiskScore').val();
         objPartnerOnboarding.PartnerRisk = $('#PartnerRiskClassification').text();
         objPartnerOnboarding.APIRisk = $('#APIRiskClassification').text();
-        var lstApiDeatil = [];
+        var lstApiDetail = [];
         $('#tblAPIbody tr').each(function (e) {
             var obj = {};
             debugger;
             obj.APIName = $(this).find("td .APIName").val();
             obj.APIRisk = $(this).find("td .APIRisk").val();
             obj.APIRiskScore = $(this).find("td .APIRiskScore").val();
-            lstApiDeatil.push(obj);
+            lstApiDetail.push(obj);
         });
-        objPartnerOnboarding.lstApiDeatil = lstApiDeatil;
+        objPartnerOnboarding.lstApiDetail = lstApiDetail;
         objPartnerOnboarding.HOPP_FH = $("#ddlHOPP_FH").val();
         objPartnerOnboarding.HOPP_VH = $("#ddlHOPP_VH").val();
         objPartnerOnboarding.HOPP_GH = $("#ddlHOPP_GH").val();

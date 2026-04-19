@@ -1,42 +1,10 @@
-using Hunt.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
-namespace Hunt.Controllers
-{
-    public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
-}
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using API_Adda.Models;
+using API_HUNT.Models;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using System.Data;
@@ -56,21 +24,26 @@ using System.Net.Http;
 //using MvcContrib.Filters;
 
 
-namespace API_Adda.Controllers
+namespace API_HUNT.Controllers
 {
     [CustomFilter]
 
     // [PassParametersDuringRedirect]
     public class HomeController : Controller
     {
-        SqlConnection sqlCon = new SqlConnection(Startup.connectionstring);
-
-        SubmitRepository submitRepository = new SubmitRepository();
+        private readonly ISubmitRepository submitRepository;
+        private readonly IActivityLogRepository _activityLog;
+        private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IJiraRepository _jiraRepository;
         int workflowstatus = 0;
-        SqlCommand cmd = null;
-        SqlDataAdapter sda = null;
 
-        private readonly HttpClient _httpClient;
+        public HomeController(ISubmitRepository submitRepo, IActivityLogRepository activityLog, IDbConnectionFactory connectionFactory, IJiraRepository jiraRepository)
+        {
+            submitRepository = submitRepo;
+            _activityLog = activityLog;
+            _connectionFactory = connectionFactory;
+            _jiraRepository = jiraRepository;
+        }
 
         public IActionResult Index()
         {
@@ -196,7 +169,7 @@ namespace API_Adda.Controllers
                 SearchAPI searchModel = new SearchAPI();
                 searchModel = submitRepository.searchAPIList(searchModel);
                 string UserId = HttpContext.Session.GetString("EmpId");
-                CaptureProductivityDetails(sqlCon, UserId, "Search", "API ADDA", 1, "Search ", " Test API In for EmpCode - " + UserId.Trim());
+                CaptureProductivityDetails(null!, UserId, "Search", "API HUNT", 1, "Search ", " Test API In for EmpCode - " + UserId.Trim());
                 ModelState.Clear();
                 return View(searchModel);
                 //var ActionName = TempData["SearchAction"];
@@ -504,10 +477,10 @@ namespace API_Adda.Controllers
                     newIntegration = submitRepository.GetNewIntegrationById(newIntegration.IntegrationId);
                     createdDate = newIntegration.CreatedAt.ToString("ddMMMyyyy");
 
-                    //TempData["APIAddaId"] = "API" + createdDate + newIntegration.ParentIntegrationId;
+                    //TempData["APIHuntId"] = "API" + createdDate + newIntegration.ParentIntegrationId;
                     var FolderName = "API" + createdDate + (newIntegration.ParentIntegrationId == null || newIntegration.ParentIntegrationId == 0 ? newIntegration.IntegrationId : newIntegration.ParentIntegrationId) + @"\";
-                    TempData["APIAddaId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIAddaDoc\NewIntegrations\") + FolderName;
-                    //TempData["APIAddaId"] = "API" + createdDate + (newIntegration.ParentIntegrationId == null || newIntegration.ParentIntegrationId == 0 ? newIntegration.IntegrationId : newIntegration.ParentIntegrationId);
+                    TempData["APIHuntId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIHuntDoc\NewIntegrations\") + FolderName;
+                    //TempData["APIHuntId"] = "API" + createdDate + (newIntegration.ParentIntegrationId == null || newIntegration.ParentIntegrationId == 0 ? newIntegration.IntegrationId : newIntegration.ParentIntegrationId);
                     if (newIntegration.ParentIntegrationId == 0)
                     {
                         HttpContext.Session.SetString("folderName", "API" + createdDate + newIntegration.IntegrationId);
@@ -622,17 +595,15 @@ namespace API_Adda.Controllers
                 }
                 string date;
                 DataTable dataSet = new DataTable();
-                cmd = new SqlCommand("sp_APIA_NewAPIIntegration", sqlCon);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@IdentFlag", "GetDate");
-                cmd.Parameters.AddWithValue("@IntegrationId", umodel.IntegrationId);
-                if (sqlCon.State == ConnectionState.Closed)
+                using (var sqlCon1 = _connectionFactory.CreateConnection())
                 {
-                    sqlCon.Open();
+                    var cmd1 = new SqlCommand("SELECT CreatedAt FROM TBL_API_HUNT_Integration WHERE IntegrationId = @IntegrationId", sqlCon1);
+                    cmd1.CommandType = CommandType.Text;
+                    cmd1.Parameters.AddWithValue("@IntegrationId", umodel.IntegrationId);
+                    sqlCon1.Open();
+                    var sda1 = new SqlDataAdapter(cmd1);
+                    sda1.Fill(dataSet);
                 }
-                sda = new SqlDataAdapter(cmd);
-                sda.Fill(dataSet);
-                sqlCon.Close();
                 if (dataSet.Rows.Count > 0)
                 {
                     foreach (DataRow row in dataSet.Rows)
@@ -647,17 +618,15 @@ namespace API_Adda.Controllers
                 }
                 NewIntegration newIntegration = new NewIntegration();
 
-
-                cmd = new SqlCommand("sp_APIA_NewAPIIntegration", sqlCon);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@IdentFlag", "GetId");
-                if (sqlCon.State == ConnectionState.Closed)
+                dataSet = new DataTable();
+                using (var sqlCon2 = _connectionFactory.CreateConnection())
                 {
-                    sqlCon.Open();
+                    var cmd2 = new SqlCommand("SELECT IntegrationId FROM TBL_API_HUNT_Integration ORDER BY IntegrationId DESC", sqlCon2);
+                    cmd2.CommandType = CommandType.Text;
+                    sqlCon2.Open();
+                    var sda2 = new SqlDataAdapter(cmd2);
+                    sda2.Fill(dataSet);
                 }
-                sda = new SqlDataAdapter(cmd);
-                sda.Fill(dataSet);
-                sqlCon.Close();
 
                 for (int i = 0; i < dataSet.Rows.Count; i++)
                 {
@@ -670,7 +639,7 @@ namespace API_Adda.Controllers
                 //{
                 //    if (umodel.serviceDetails1.ExpAPISPCFDocument != null)
                 //    {
-                //        var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + date + "" + umodel.IntegrationId + "\\");
+                //        var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + date + "" + umodel.IntegrationId + "\\");
                 //        basePathdoc = basePathdoc + "\\" + umodel.serviceDetails1.modifyExpectedAPISpecificationFileName;
                 //        FileInfo file = new FileInfo(basePathdoc);
                 //        if (file.Exists)//check file exsit or not  
@@ -687,7 +656,7 @@ namespace API_Adda.Controllers
                     if (umodel.UserJourneyDocument != null || umodel.modifyFileName != null)
                     {
 
-                        var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                        var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                         basePathdoc = basePathdoc + umodel.modifyFileName;
                         FileInfo file = new FileInfo(basePathdoc);
                         try
@@ -719,7 +688,7 @@ namespace API_Adda.Controllers
 
                     if (umodel.RDConceptNoteDocument != null || umodel.modifyRDConceptNoteFileName != null)
                     {
-                        var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                        var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                         basePathdoc = basePathdoc + umodel.modifyRDConceptNoteFileName;
                         FileInfo file = new FileInfo(basePathdoc);
                         if (file.Exists) //check file exsit or not  
@@ -800,7 +769,7 @@ namespace API_Adda.Controllers
                                 //    string extension = Path.GetExtension(umodel.serviceDetails1.SfileName);
                                 //   // foreach (var file in umodel.serviceDetails1.ExpAPISPCFDocument)
                                 //    //{
-                                //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                                //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                                 //        bool basePathExists = System.IO.Directory.Exists(basePath);
                                 //        if (!basePathExists) Directory.CreateDirectory(basePath);
                                 //        umodel.serviceDetails1.modifyExpectedAPISpecificationFileName = "ExpAPISPCFDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + "_" + newIntegration.IntegrationId + extension;
@@ -912,7 +881,7 @@ namespace API_Adda.Controllers
                             //    string extension = Path.GetExtension(umodel.serviceDetails1.SfileName);
                             //   // foreach (var file in umodel.serviceDetails1.ExpAPISPCFDocument)
                             //    //{
-                            //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             //        bool basePathExists = System.IO.Directory.Exists(basePath);
                             //        if (!basePathExists) Directory.CreateDirectory(basePath);
                             //        umodel.serviceDetails1.modifyExpectedAPISpecificationFileName = "ExpAPISPCFDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + "_" + newIntegration.IntegrationId + extension;
@@ -972,7 +941,7 @@ namespace API_Adda.Controllers
                             //    string extension = Path.GetExtension(umodel.serviceDetails1.SfileName);
                             //   // foreach (var file in umodel.serviceDetails1.ExpAPISPCFDocument)
                             //   // {
-                            //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             //        bool basePathExists = System.IO.Directory.Exists(basePath);
                             //        if (!basePathExists) Directory.CreateDirectory(basePath);
                             //        umodel.serviceDetails1.modifyExpectedAPISpecificationFileName = "ExpAPISPCFDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + "_" + newIntegration.IntegrationId + extension;
@@ -1032,7 +1001,7 @@ namespace API_Adda.Controllers
                             string extension = Path.GetExtension(umodel.fileName);
                             // foreach (var file in umodel.UserJourneyDocument)
                             // {
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.modifyFileName = "JourneyDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + newIntegration.IntegrationId + extension;
@@ -1059,7 +1028,7 @@ namespace API_Adda.Controllers
                             string extension = Path.GetExtension(umodel.RfileName);
                             // foreach (var file in umodel.RDConceptNoteDocument)
                             // {
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.modifyRDConceptNoteFileName = "RDDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + newIntegration.IntegrationId + extension;
@@ -1160,7 +1129,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.fileName);
                         // foreach (var file in umodel.UserJourneyDocument)
                         // {
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifyFileName = "JourneyDoc" + "_API_" + date + "_" + umodel.IntegrationId + extension;
@@ -1186,7 +1155,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.RfileName);
                         //foreach (var file in umodel.RDConceptNoteDocument)
                         // {
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifyRDConceptNoteFileName = "RDDoc" + "_API_" + date + "_" + umodel.IntegrationId + extension;
@@ -1211,7 +1180,7 @@ namespace API_Adda.Controllers
                     //    string extension = Path.GetExtension(umodel.serviceDetails1.SfileName);
                     //    //foreach (var file in umodel.serviceDetails1.ExpAPISPCFDocument)
                     //   // {
-                    //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
+                    //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
                     //        bool basePathExists = System.IO.Directory.Exists(basePath);
                     //        if (!basePathExists) Directory.CreateDirectory(basePath);
                     //        umodel.serviceDetails1.modifyExpectedAPISpecificationFileName = "ExpAPISPCFDoc" + "_API_" + date + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + "_" + umodel.IntegrationId + extension;
@@ -1296,7 +1265,7 @@ namespace API_Adda.Controllers
                                 string extension = Path.GetExtension(umodel.fileName);
                                 //foreach (var file in umodel.UserJourneyDocument)
                                 // {
-                                var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                                var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                                 bool basePathExists = System.IO.Directory.Exists(basePath);
                                 if (!basePathExists) Directory.CreateDirectory(basePath);
                                 umodel.modifyFileName = "JourneyDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + newIntegration.IntegrationId + extension;
@@ -1318,7 +1287,7 @@ namespace API_Adda.Controllers
                                 string extension = Path.GetExtension(umodel.RfileName);
                                 //  foreach (var file in umodel.RDConceptNoteDocument)
                                 //{
-                                var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                                var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                                 bool basePathExists = System.IO.Directory.Exists(basePath);
                                 if (!basePathExists) Directory.CreateDirectory(basePath);
                                 umodel.modifyRDConceptNoteFileName = "RDDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + newIntegration.IntegrationId + extension;
@@ -1346,7 +1315,7 @@ namespace API_Adda.Controllers
                                 return RedirectToAction("newintegration", umodel);
                             }
 
-                            umodel.SpName = "sp_APIA_NewAPIIntegration";
+                            umodel.SpName = "sp_HUNT_NewAPIIntegration";
                             umodel.MethodFlag = "AddNewIntegration";
                             umodel.UserJourneyFiles = umodel.modifyFileName;
                             umodel.UserJourneyFiles = umodel.UserJourneyFiles;
@@ -1373,7 +1342,7 @@ namespace API_Adda.Controllers
                                 umodel = new NewIntegration();
                                 ViewBag.Number = "0";
                                 string UserId = HttpContext.Session.GetString("EmpId");
-                                CaptureProductivityDetails(sqlCon, UserId, "New Intergration", "API ADDA", 1, "NewIntegration save ", " Save NewIntegration for EmpCode - " + UserId.ToString().Trim());
+                                CaptureProductivityDetails(null!, UserId, "New Intergration", "API HUNT", 1, "NewIntegration save ", " Save NewIntegration for EmpCode - " + UserId.ToString().Trim());
                             }
                             else
                             {
@@ -1403,7 +1372,7 @@ namespace API_Adda.Controllers
                             string extension = Path.GetExtension(umodel.fileName);
                             //foreach (var file in umodel.UserJourneyDocument)
                             // {
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.UserJourneyFiles = "JourneyDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + newIntegration.IntegrationId + extension;
@@ -1426,7 +1395,7 @@ namespace API_Adda.Controllers
                             umodel.RfileName = umodel.RDConceptNoteDocument.FileName;
                             HttpContext.Session.SetString("RFileName", umodel.RfileName);
                             string extension = Path.GetExtension(umodel.RfileName);
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.RDConceptNoteFiles = "RDDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + newIntegration.IntegrationId + extension;
@@ -1453,7 +1422,7 @@ namespace API_Adda.Controllers
                             }
                             return RedirectToAction("newintegration", umodel);
                         }
-                        umodel.SpName = "sp_APIA_NewAPIIntegration";
+                        umodel.SpName = "sp_HUNT_NewAPIIntegration";
                         umodel.MethodFlag = "UpdateIntegrationDetails";
                         umodel.UserId = HttpContext.Session.GetString("EmpId");
 
@@ -1479,7 +1448,7 @@ namespace API_Adda.Controllers
                             ModelState.Clear();
                             TempData["Result"] = "Data Submit Successfully";
                             TempData["IsSuccess"] = "True";
-                            CaptureProductivityDetails(sqlCon, umodel.UserId, "New Intergration", "API ADDA", 1, "NewIntegration  update ", " Update NewIntegration for EmpCode - " + umodel.UserId.ToString().Trim());
+                            CaptureProductivityDetails(null!, umodel.UserId, "New Intergration", "API HUNT", 1, "NewIntegration  update ", " Update NewIntegration for EmpCode - " + umodel.UserId.ToString().Trim());
                             umodel = new NewIntegration();
                             ViewBag.Number = "0";
                         }
@@ -1524,7 +1493,7 @@ namespace API_Adda.Controllers
                         // {
                         umodel.fileName = umodel.UserJourneyDocument.FileName;
                         string extension = Path.GetExtension(umodel.fileName);
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.UserJourneyFiles = "JourneyDoc" + "_API_" + date + "_" + umodel.IntegrationId + extension;
@@ -1554,7 +1523,7 @@ namespace API_Adda.Controllers
                             umodel.RfileName = umodel.RDConceptNoteDocument.FileName;
                             string extension = Path.GetExtension(umodel.RfileName);
 
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + date + "" + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.RDConceptNoteFiles = "RDDoc" + "_API_" + date + "_" + umodel.IntegrationId + extension;
@@ -1626,7 +1595,7 @@ namespace API_Adda.Controllers
                     //}
                     #endregion
 
-                    umodel.SpName = "sp_APIA_NewAPIIntegration";
+                    umodel.SpName = "sp_HUNT_NewAPIIntegration";
                     umodel.MethodFlag = "UpdateIntegrationDetails";
                     umodel.UserId = HttpContext.Session.GetString("EmpId");
 
@@ -1671,7 +1640,7 @@ namespace API_Adda.Controllers
                         ModelState.Clear();
                         TempData["Result"] = "Data Updated Successfully";
                         TempData["IsSuccess"] = "True";
-                        CaptureProductivityDetails(sqlCon, umodel.UserId, "New Intergration", "API ADDA", 1, "NewIntegration update ", " Update NewIntegration for EmpCode - " + umodel.UserId.ToString().Trim());
+                        CaptureProductivityDetails(null!, umodel.UserId, "New Intergration", "API HUNT", 1, "NewIntegration update ", " Update NewIntegration for EmpCode - " + umodel.UserId.ToString().Trim());
                         umodel = new NewIntegration();
                         ViewBag.Number = "0";
                     }
@@ -1702,7 +1671,7 @@ namespace API_Adda.Controllers
                             string extension = Path.GetExtension(umodel.fileName);
                             //foreach (var file in umodel.UserJourneyDocument)
                             //{
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.modifyFileName = "JourneyDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.ProjectId + extension;
@@ -1724,7 +1693,7 @@ namespace API_Adda.Controllers
                             string extension = Path.GetExtension(umodel.RfileName);
                             //foreach (var file in umodel.RDConceptNoteDocument)
                             // {
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + newIntegration.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.modifyRDConceptNoteFileName = "RDDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.ProjectId + extension;
@@ -1752,7 +1721,7 @@ namespace API_Adda.Controllers
                             }
                             return RedirectToAction("newintegration", umodel);
                         }
-                        umodel.SpName = "sp_APIA_NewAPIIntegration";
+                        umodel.SpName = "sp_HUNT_NewAPIIntegration";
                         umodel.MethodFlag = "DraftAddNewIntegration";
                         umodel.UserJourneyFiles = umodel.modifyFileName;
                         umodel.RDConceptNoteFiles = umodel.modifyRDConceptNoteFileName;
@@ -1772,7 +1741,7 @@ namespace API_Adda.Controllers
                             umodel = new NewIntegration();
                             ViewBag.Number = "0";
                             string UserId = HttpContext.Session.GetString("EmpId");
-                            CaptureProductivityDetails(sqlCon, UserId, "New Intergration", "API ADDA", 1, "NewIntegration save ", " Daft NewIntegration for EmpCode - " + UserId.ToString().Trim());
+                            CaptureProductivityDetails(null!, UserId, "New Intergration", "API HUNT", 1, "NewIntegration save ", " Daft NewIntegration for EmpCode - " + UserId.ToString().Trim());
 
                         }
                         else
@@ -1804,7 +1773,7 @@ namespace API_Adda.Controllers
                             //{
                             umodel.fileName = umodel.UserJourneyDocument.FileName;
                             string extension = Path.GetExtension(umodel.fileName);
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.UserJourneyFiles = "JourneyDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.ProjectId + extension;
@@ -1822,7 +1791,7 @@ namespace API_Adda.Controllers
                             {
                                 umodel.RfileName = umodel.RDConceptNoteDocument.FileName;
                                 string extension = Path.GetExtension(umodel.RfileName);
-                                var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
+                                var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
                                 basePathdoc = basePathdoc + "\\" + umodel.UserJourneyFiles;
                                 FileInfo file = new FileInfo(basePathdoc);
                                 if (file.Exists)//check file exsit or not  
@@ -1841,7 +1810,7 @@ namespace API_Adda.Controllers
                             // {
                             umodel.RfileName = umodel.RDConceptNoteDocument.FileName;
                             string extension = Path.GetExtension(umodel.RfileName);
-                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
+                            var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
                             bool basePathExists = System.IO.Directory.Exists(basePath);
                             if (!basePathExists) Directory.CreateDirectory(basePath);
                             umodel.RDConceptNoteFiles = "RDDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.ProjectId + extension;
@@ -1856,7 +1825,7 @@ namespace API_Adda.Controllers
                         {
                             if (HttpContext.Session.GetString("Role") == "USER")
                             {
-                                var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
+                                var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
                                 basePathdoc = basePathdoc + "\\" + umodel.RDConceptNoteFiles;
                                 FileInfo file = new FileInfo(basePathdoc);
                                 if (file.Exists)//check file exsit or not  
@@ -1867,7 +1836,7 @@ namespace API_Adda.Controllers
                             umodel.RDConceptNoteFiles = umodel.modifyRDConceptNoteFileName;
                         }
 
-                        umodel.SpName = "sp_APIA_NewAPIIntegration";
+                        umodel.SpName = "sp_HUNT_NewAPIIntegration";
                         umodel.MethodFlag = "UpdateIntegrationDetails";
                         umodel.UserId = HttpContext.Session.GetString("EmpId");
 
@@ -1888,7 +1857,7 @@ namespace API_Adda.Controllers
                                 ModelState.Clear();
                                 TempData["Result"] = "Data Draft Successfully";
                                 TempData["IsSuccess"] = "True";
-                                CaptureProductivityDetails(sqlCon, umodel.UserId, "New Intergration", "API ADDA", 1, "NewIntegration update darft", " Update NewIntegration for EmpCode - " + umodel.UserId.ToString().Trim());
+                                CaptureProductivityDetails(null!, umodel.UserId, "New Intergration", "API HUNT", 1, "NewIntegration update darft", " Update NewIntegration for EmpCode - " + umodel.UserId.ToString().Trim());
                                 umodel = new NewIntegration();
                                 ViewBag.Number = "0";
                             }
@@ -1919,11 +1888,6 @@ namespace API_Adda.Controllers
             //return View(umodel);
             return RedirectToAction("NewIntegrationList", "Home");
             //return RedirectToAction("newintegration",);
-        }
-
-        private void CaptureProductivityDetails(object sqlCon, object userId, string v1, string v2, int v3, string v4, string v5)
-        {
-            throw new NotImplementedException();
         }
 
         [HttpPost]
@@ -1988,7 +1952,7 @@ namespace API_Adda.Controllers
                         searchModel.strProvider = searchModel.lstServiceProviders.Where(x => x.IsCheck == true)
                             .Select(x => x.ServiceProviderId).Aggregate((a, x) => a + "," + x);
                     }
-                    searchModel.SpName = "sp_APIA_Search_API";
+                    searchModel.SpName = "sp_HUNT_Search_API";
                     searchModel.IdentFlag = "GetFilterData";
                     searchModel.MethodFlag = "GetFilterData";
                 }
@@ -2002,7 +1966,7 @@ namespace API_Adda.Controllers
                         return View(searchModel);
                     }
 
-                    searchModel.SpName = "sp_APIA_Search_API";
+                    searchModel.SpName = "sp_HUNT_Search_API";
                     searchModel.IdentFlag = "getAll";
                     searchModel.MethodFlag = "GetAllAPIs";
                 }
@@ -2016,7 +1980,7 @@ namespace API_Adda.Controllers
             ModelState.Clear();
             searchModel = submitRepository.searchAPIList(searchModel);
             string UserId = HttpContext.Session.GetString("EmpId");
-            CaptureProductivityDetails(sqlCon, UserId, "Search", "API ADDA", 1, "Search ", " Test API In for EmpCode - " + UserId.Trim());
+            CaptureProductivityDetails(null!, UserId, "Search", "API HUNT", 1, "Search ", " Test API In for EmpCode - " + UserId.Trim());
             return View(searchModel);
 
             // TempData["SearchAction"] = "submitForm";
@@ -2036,12 +2000,12 @@ namespace API_Adda.Controllers
             {
                 if (button != null)
                 {
-                    // searchAPI.ServiceUrl = "https://hbentbpuatap.hdfcbankuat.com:9550" + searchAPI.ServiceUrl;
+                    // searchAPI.ServiceUrl = "https://hbentbpuatap.huntuat.com:9550" + searchAPI.ServiceUrl;
                     searchAPI.ServiceUrl = searchAPI.ServiceUrl;
                     if (button.ToLower() == "test")
                     {
                         string UserId = HttpContext.Session.GetString("EmpId");
-                        CaptureProductivityDetails(sqlCon, UserId, "Test API", "API ADDA", 1, "Test API ", " Test API In for EmpCode - " + UserId.Trim());
+                        CaptureProductivityDetails(null!, UserId, "Test API", "API HUNT", 1, "Test API ", " Test API In for EmpCode - " + UserId.Trim());
                         ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(delegate { return true; });
                         if (System.Net.ServicePointManager.SecurityProtocol == (SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls))
                             System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -2073,10 +2037,13 @@ namespace API_Adda.Controllers
                         byte[] byte1 = encoding.GetBytes(searchAPI.Raw); //output
                         request.ContentLength = byte1.Length;
                         string[] SoapList = Convert.ToString(searchAPI.Raw).Split('<');
-                        string[] SoapList1 = SoapList[1].Split(':');
-                        if (SoapList1[0].ToString() == "soapenv")
+                        if (SoapList.Length > 1)
                         {
-                            request.ContentType = "text/xml";
+                            string[] SoapList1 = SoapList[1].Split(':');
+                            if (SoapList1[0].ToString() == "soapenv")
+                            {
+                                request.ContentType = "text/xml";
+                            }
                         }
                         Stream requestStream = request.GetRequestStream();
                         requestStream.Write(byte1, 0, byte1.Length);
@@ -2108,12 +2075,12 @@ namespace API_Adda.Controllers
             {
                 if (button != null)
                 {
-                    // searchAPI.ServiceUrl = "https://hbentbpuatap.hdfcbankuat.com:9550" + searchAPI.ServiceUrl;
+                    // searchAPI.ServiceUrl = "https://hbentbpuatap.huntuat.com:9550" + searchAPI.ServiceUrl;
                     searchAPI.ServiceUrl = searchAPI.ServiceUrl;
                     if (button.ToLower() == "Test API")
                     {
                         string UserId = HttpContext.Session.GetString("EmpId");
-                        CaptureProductivityDetails(sqlCon, UserId, "Test API", "API ADDA", 1, "Test API ", "Test API In for EmpCode - " + UserId.Trim());
+                        CaptureProductivityDetails(null!, UserId, "Test API", "API HUNT", 1, "Test API ", "Test API In for EmpCode - " + UserId.Trim());
 
                         TempData["ActionName"] = "submitForm";
                         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(searchAPI.ServiceUrl);
@@ -2189,7 +2156,7 @@ namespace API_Adda.Controllers
                     if (button == "Test API")
                     {
                         string UserId = HttpContext.Session.GetString("EmpId");
-                        CaptureProductivityDetails(sqlCon, UserId, "Test API", "API ADDA", 1, "Test API ", " Test API In for EmpCode - " + UserId.Trim());
+                        CaptureProductivityDetails(null!, UserId, "Test API", "API HUNT", 1, "Test API ", " Test API In for EmpCode - " + UserId.Trim());
                         //ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(delegate { return true; });
                         //if (System.Net.ServicePointManager.SecurityProtocol == (SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls))
                         //    System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -2219,11 +2186,12 @@ namespace API_Adda.Controllers
                         byte[] byte1 = encoding.GetBytes(search_api.Raw); //output
                         request.ContentLength = byte1.Length;
                         string[] SoapList = Convert.ToString(search_api.Raw).Split('<');
-                        string[] SoapList1 = SoapList[1].Split(':');
-                        if (SoapList1[0].ToString() == "soapenv")
-                            // request.ContentType = "application/soap";
-                            request.ContentType = "text/xml";
-                        //request.ContentType = "application/soap+xml";
+                        if (SoapList.Length > 1)
+                        {
+                            string[] SoapList1 = SoapList[1].Split(':');
+                            if (SoapList1[0].ToString() == "soapenv")
+                                request.ContentType = "text/xml";
+                        }
                         Stream requestStream = request.GetRequestStream();
                         requestStream.Write(byte1, 0, byte1.Length);
                         requestStream.Close();
@@ -2240,11 +2208,11 @@ namespace API_Adda.Controllers
                 else
                 {
                     string UserId = HttpContext.Session.GetString("EmpId");
-                    CaptureProductivityDetails(sqlCon, UserId, "API Details", "API ADDA", 1, "API Details ", " API Details In for EmpCode - " + UserId.Trim());
+                    CaptureProductivityDetails(null!, UserId, "API Details", "API HUNT", 1, "API Details ", " API Details In for EmpCode - " + UserId.Trim());
 
 
-                    search_api.APIMainId = id;
-                    search_api.SpName = "sp_APIA_Search_API";
+                    search_api.APIMainId = id.ToString();
+                    search_api.SpName = "sp_HUNT_Search_API";
                     search_api.IdentFlag = "GetDetailsById";
                     search_api.MethodFlag = "GetDetailsOfAPIById";
                     dt = submitRepository.GetAPIDetails(search_api);
@@ -2524,7 +2492,7 @@ namespace API_Adda.Controllers
 
                     //    }
 
-                    // search_api.ServiceUrl = "https://hbentbpuatap.hdfcbankuat.com:9550"+dt.Rows[0]["ServiceURL"].ToString();
+                    // search_api.ServiceUrl = "https://hbentbpuatap.huntuat.com:9550"+dt.Rows[0]["ServiceURL"].ToString();
                     #endregion
 
                     // 
@@ -2600,7 +2568,7 @@ namespace API_Adda.Controllers
                     }
                     var createdDate = newIntegration.CreatedAt.ToString("ddMMMyyyy");
                     var FolderName = "API" + createdDate + (newIntegration.ParentIntegrationId == null || newIntegration.ParentIntegrationId == 0 ? newIntegration.IntegrationId : newIntegration.ParentIntegrationId) + @"\";
-                    TempData["APIAddaId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIAddaDoc\NewIntegrations\") + FolderName;
+                    TempData["APIHuntId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIHuntDoc\NewIntegrations\") + FolderName;
                     TempData["Editbydb"] = "Appprovalintegration?integrationId=" + integrationId;
 
 
@@ -2647,7 +2615,7 @@ namespace API_Adda.Controllers
         public IActionResult Appprovalintegration(NewIntegration umodel, string button = null)
         {
             var httpClient = new HttpClient();
-            var jiraApiService = new JIRACreatorController(httpClient);
+            var jiraApiService = new JIRACreatorController(httpClient, submitRepository, _jiraRepository, _activityLog, this);
             try
             {
                 // var serviceDetails1 = umodel.serviceDetails1;
@@ -2676,8 +2644,8 @@ namespace API_Adda.Controllers
                 //    string extension = Path.GetExtension(umodel.SqfileName);
                 //    foreach (var file in umodel.SequenceDiagDocument)
                 //    {
-                //        //var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
-                //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + "API" + HttpContext.Session.GetString("folderName") + "" + umodel.IntegrationId + "\\");
+                //        //var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + DateTime.Now.ToString("ddMMMyyyy") + "" + umodel.IntegrationId + "\\");
+                //        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + "API" + HttpContext.Session.GetString("folderName") + "" + umodel.IntegrationId + "\\");
                 //        bool basePathExists = System.IO.Directory.Exists(basePath);
                 //        if (!basePathExists) Directory.CreateDirectory(basePath);
                 //        umodel.modifySequenceDiagFileName = "SQDiagram" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -2758,7 +2726,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.SqfileName);
                         //foreach (var file in umodel.SequenceDiagDocument)
                         //{
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifySequenceDiagFileName = "SequenceDiagDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -2920,7 +2888,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.SqfileName);
                         //foreach (var file in umodel.SequenceDiagDocument)
                         //{
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifySequenceDiagFileName = "SequenceDiagDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -3037,7 +3005,7 @@ namespace API_Adda.Controllers
                     ModelState.Clear();
                     var createdDate = umodel.CreatedAt.ToString("ddMMMyyyy");
                     var FolderName = "API" + createdDate + (umodel.ParentIntegrationId == null || umodel.ParentIntegrationId == 0 ? umodel.IntegrationId : umodel.ParentIntegrationId) + @"\";
-                    TempData["APIAddaId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIAddaDoc\NewIntegrations\") + HttpContext.Session.GetString("folderName") + @"\";
+                    TempData["APIHuntId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIHuntDoc\NewIntegrations\") + HttpContext.Session.GetString("folderName") + @"\";
                     // ViewBag.SubmitValue = "Save";
                     TempData["Editbydb"] = "Appprovalintegration?integrationId=" + umodel.IntegrationId;
                     TempData["PopupEdit"] = "EditMode";
@@ -3058,7 +3026,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.SqfileName);
                         // foreach (var file in umodel.SequenceDiagDocument)
                         // {
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifySequenceDiagFileName = "SequenceDiagDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -3136,14 +3104,14 @@ namespace API_Adda.Controllers
                         SendEmail obj = new SendEmail();
                         obj.SendMailAlert(umodel, LogUserid, "Feedback to User", 0, ConsumerApplicationId); // Uncomment on prod
 
-                        umodel.SpName = "SP_APIA_WorkFlowApprovalProcess";
+                        umodel.SpName = "SP_HUNT_WorkFlowApprovalProcess";
                         umodel.MethodFlag = "FeedbackCount";
                         umodel.UserId = HttpContext.Session.GetString("EmpId");
                         umodel.workflowstatus = workflowstatus;
                         umodel = submitRepository.AddFeedback(umodel);
 
 
-                        //umodel.SpName = "SP_APIA_WorkFlowApprovalProcess";
+                        //umodel.SpName = "SP_HUNT_WorkFlowApprovalProcess";
                         //umodel.MethodFlag = "AddFeedback";
                         // umodel = submitRepository.AddFeedback(umodel);
 
@@ -3157,7 +3125,7 @@ namespace API_Adda.Controllers
                             umodel = new NewIntegration();
                             ViewBag.Number = "0";
                             string UserId = HttpContext.Session.GetString("EmpId");
-                            CaptureProductivityDetails(sqlCon, UserId, "Appprovalintegration", "API ADDA", 1, "Feedback sent to user successfully ", "Feedback for EmpCode - " + UserId.ToString().Trim());
+                            CaptureProductivityDetails(null!, UserId, "Appprovalintegration", "API HUNT", 1, "Feedback sent to user successfully ", "Feedback for EmpCode - " + UserId.ToString().Trim());
                         }
                         else
                         {
@@ -3180,7 +3148,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.SqfileName);
                         // foreach (var file in umodel.SequenceDiagDocument)
                         // {
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifySequenceDiagFileName = "SequenceDiagDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -3215,7 +3183,7 @@ namespace API_Adda.Controllers
                     SendEmail obj = new SendEmail();
                     obj.SendMailAlert(umodel, LogUserid, "Reviewed by BTG User", 0, ConsumerApplicationId); // Uncomment on prod
 
-                    //umodel.SpName = "SP_APIA_WorkFlowApprovalProcess";
+                    //umodel.SpName = "SP_HUNT_WorkFlowApprovalProcess";
                     //umodel.MethodFlag = "AddFeedback";
                     //
                     //umodel = submitRepository.AddFeedback(umodel);
@@ -3227,7 +3195,7 @@ namespace API_Adda.Controllers
                         umodel = new NewIntegration();
                         ViewBag.Number = "0";
                         string UserId = HttpContext.Session.GetString("EmpId");
-                        CaptureProductivityDetails(sqlCon, UserId, "Appprovalintegration", "API ADDA", 1, "Request sent to IT User for review successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
+                        CaptureProductivityDetails(null!, UserId, "Appprovalintegration", "API HUNT", 1, "Request sent to IT User for review successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
                     }
                     else
                     {
@@ -3251,7 +3219,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.SqfileName);
                         // foreach (var file in umodel.SequenceDiagDocument)
                         // {
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifySequenceDiagFileName = "SequenceDiagDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -3293,7 +3261,7 @@ namespace API_Adda.Controllers
                         umodel = new NewIntegration();
                         ViewBag.Number = "0";
                         string UserId = HttpContext.Session.GetString("EmpId");
-                        CaptureProductivityDetails(sqlCon, UserId, "Appprovalintegration", "API ADDA", 1, "Request sent to IT Architech for review successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
+                        CaptureProductivityDetails(null!, UserId, "Appprovalintegration", "API HUNT", 1, "Request sent to IT Architech for review successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
                     }
                     else
                     {
@@ -3315,7 +3283,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.SqfileName);
                         //foreach (var file in umodel.SequenceDiagDocument)
                         // {
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifySequenceDiagFileName = "SequenceDiagDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -3359,7 +3327,7 @@ namespace API_Adda.Controllers
                         umodel = new NewIntegration();
                         ViewBag.Number = "0";
                         string UserId = HttpContext.Session.GetString("EmpId");
-                        CaptureProductivityDetails(sqlCon, UserId, "Appprovalintegration", "API ADDA", 1, "Request rejected successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
+                        CaptureProductivityDetails(null!, UserId, "Appprovalintegration", "API HUNT", 1, "Request rejected successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
                     }
                     else
                     {
@@ -3379,7 +3347,7 @@ namespace API_Adda.Controllers
                         string extension = Path.GetExtension(umodel.SqfileName);
                         //foreach (var file in umodel.SequenceDiagDocument)
                         //{
-                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIAddaDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
+                        var basePath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\APIHuntDoc\\NewIntegrations\\" + HttpContext.Session.GetString("folderName") + "\\");
                         bool basePathExists = System.IO.Directory.Exists(basePath);
                         if (!basePathExists) Directory.CreateDirectory(basePath);
                         umodel.modifySequenceDiagFileName = "SequenceDiagDoc" + "_API_" + DateTime.Now.ToString("ddMMMyyyy") + "_" + umodel.IntegrationId + extension;
@@ -3422,7 +3390,7 @@ namespace API_Adda.Controllers
                     obj.SendMailAlert(umodel, LogUserid, "Approved", 0, ConsumerApplicationId); // Uncomment on prod
                     // End
 
-                    //umodel.SpName = "SP_APIA_WorkFlowApprovalProcess";
+                    //umodel.SpName = "SP_HUNT_WorkFlowApprovalProcess";
                     //umodel.MethodFlag = "AddFeedback";
                     //umodel = submitRepository.AddFeedback(umodel);
                     if (umodel.FeedbackId > 0)
@@ -3433,7 +3401,7 @@ namespace API_Adda.Controllers
                         umodel = new NewIntegration();
                         ViewBag.Number = "0";
                         string UserId = HttpContext.Session.GetString("EmpId");
-                        CaptureProductivityDetails(sqlCon, UserId, "Appprovalintegration", "API ADDA", 1, "Request approved successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
+                        CaptureProductivityDetails(null!, UserId, "Appprovalintegration", "API HUNT", 1, "Request approved successfully", "Request sent for EmpCode - " + UserId.ToString().Trim());
                     }
                     else
                     {
@@ -3462,10 +3430,9 @@ namespace API_Adda.Controllers
             {
                 int Id = Convert.ToInt32(TempData["integrationId"]);
                 string UserId = HttpContext.Session.GetString("EmpId");
-                SqlConnection sqlCon = new SqlConnection(Startup.connectionstring);
-                string path = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIAddaDoc\NewIntegrations\") + HttpContext.Session.GetString("folderName") + "\\" + fileName;
+                string path = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIHuntDoc\NewIntegrations\") + HttpContext.Session.GetString("folderName") + "\\" + fileName;
                 byte[] bytes = System.IO.File.ReadAllBytes(path);
-                CaptureProductivityDetails(sqlCon, UserId, "DownloadFile", "API ADDA", 1, "Download File ", " DownloadFile In for EmpCode - " + UserId.Trim());
+                CaptureProductivityDetails(null!, UserId, "DownloadFile", "API HUNT", 1, "Download File ", " DownloadFile In for EmpCode - " + UserId.Trim());
                 return File(bytes, "application/octet-stream", fileName);
             }
             catch (Exception Ex)
@@ -3483,11 +3450,10 @@ namespace API_Adda.Controllers
             {
                 int Id = Convert.ToInt32(TempData["integrationId"]);
                 string UserId = HttpContext.Session.GetString("EmpId");
-                SqlConnection sqlCon = new SqlConnection(Startup.connectionstring);
-                filePath = Path.Combine(Directory.GetCurrentDirectory() + @"\wwwroot\APIAddaDoc\NewIntegrations\" + HttpContext.Session.GetString("folderName") + "\\");
+                filePath = Path.Combine(Directory.GetCurrentDirectory() + @"\wwwroot\APIHuntDoc\NewIntegrations\" + HttpContext.Session.GetString("folderName") + "\\");
                 filePath = filePath + fileName;
                 byte[] bytes = System.IO.File.ReadAllBytes(filePath);
-                CaptureProductivityDetails(sqlCon, UserId, "DownloadFile", "API ADDA", 1, "Download File ", " DownloadFile In for EmpCode - " + UserId.Trim());
+                CaptureProductivityDetails(null!, UserId, "DownloadFile", "API HUNT", 1, "Download File ", " DownloadFile In for EmpCode - " + UserId.Trim());
                 return File(bytes, "application/octet-stream", fileName);
             }
 
@@ -3539,7 +3505,7 @@ namespace API_Adda.Controllers
 
                 string ObpJeeraID = ds.Tables[0].Rows[0]["OBP_JIRA_ID"].ToString();
 
-                string ApiaddaProjectid = ds.Tables[0].Rows[0]["APIAddaProjectID"].ToString();
+                string ApiaddaProjectid = ds.Tables[0].Rows[0]["APIHuntProjectID"].ToString();
 
                 DateTime CreatedDate = Convert.ToDateTime(ds.Tables[0].Rows[0]["CreatedDate"]);
 
@@ -3634,7 +3600,7 @@ namespace API_Adda.Controllers
                 //TempData["FolderName"] = "API" + CreatedDate.ToString("ddMMMyyyy") + "" + Id + "";
                 //HttpContext.Session.SetString("FolderName", "API" + CreatedDate.ToString("ddMMMyyyy") + "" + Id + "");
 
-                FolderfilePath = Path.Combine(Directory.GetCurrentDirectory() + @"\wwwroot\APIAddaDoc\NewIntegrations\" + "API" + CreatedDate.ToString("ddMMMyyyy") + "" + Id + "" + "\\");
+                FolderfilePath = Path.Combine(Directory.GetCurrentDirectory() + @"\wwwroot\APIHuntDoc\NewIntegrations\" + "API" + CreatedDate.ToString("ddMMMyyyy") + "" + Id + "" + "\\");
 
                 filePath = FolderfilePath + DocName;
 
@@ -3782,7 +3748,7 @@ namespace API_Adda.Controllers
 
                     ws.Cells[12, 2, 12, 15].Merge = true;
 
-                    ws.Cells[13, 1].Value = "API Adda Project ID";
+                    ws.Cells[13, 1].Value = "API Hunt Project ID";
 
                     ws.Cells[13, 1].Style.Font.Bold = true;
 
@@ -3996,8 +3962,8 @@ namespace API_Adda.Controllers
         public IActionResult faq()
         {
             string UserId = HttpContext.Session.GetString("EmpId");
-            CaptureProductivityDetails(sqlCon, UserId, "FAQ", "API ADDA", 1, "FAQ ", "Faq view  for EmpCode - " + UserId.ToString().Trim());
-            return View();
+            CaptureProductivityDetails(null!, UserId, "FAQ", "API HUNT", 1, "FAQ ", "Faq view  for EmpCode - " + UserId.ToString().Trim());
+            return View(NewIntegration.CreateEmpty());
         }
         //[HttpPost]
         //public JsonResult Index(string prefix)
@@ -4047,7 +4013,7 @@ namespace API_Adda.Controllers
             {
 
                 //umodel.workflowstatus = workflowstatus;
-                umodel.SpName = "sp_APIA_NewAPIIntegration";
+                umodel.SpName = "sp_HUNT_NewAPIIntegration";
                 umodel.MethodFlag = "UpdateIntegrationDetails";
                 // umodel.UserId = HttpContext.Session.GetString("EmpId");
 
@@ -4301,7 +4267,7 @@ namespace API_Adda.Controllers
                     search_api.Raw = "No Data Available";
                     if (path != null && path != "")
                     {
-                        // search_api.ServiceUrl = @"https://hbentbpuatap.hdfcbankuat.com:9550/OBPMultiFTWebServices/OnlineTransactionInquiryRestWrapper/doTransactionInquiry";
+                        // search_api.ServiceUrl = @"https://hbentbpuatap.huntuat.com:9550/OBPMultiFTWebServices/OnlineTransactionInquiryRestWrapper/doTransactionInquiry";
                         var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\Collections");
                         basePathdoc = basePathdoc + "\\" + path + ".json";
                         FileInfo file = new FileInfo(basePathdoc);
@@ -4372,7 +4338,7 @@ namespace API_Adda.Controllers
                     search_api.Raw = "No Data Available";
                     if (path != null && path != "")
                     {
-                        // search_api.ServiceUrl = @"https://hbentbpuatap.hdfcbankuat.com:9550/OBPMultiFTWebServices/OnlineTransactionInquiryRestWrapper/doTransactionInquiry";
+                        // search_api.ServiceUrl = @"https://hbentbpuatap.huntuat.com:9550/OBPMultiFTWebServices/OnlineTransactionInquiryRestWrapper/doTransactionInquiry";
                         var basePathdoc = Path.Combine(Directory.GetCurrentDirectory() + "\\Collections");
                         basePathdoc = basePathdoc + "\\" + path + ".json";
                         FileInfo file = new FileInfo(basePathdoc);
@@ -4447,39 +4413,7 @@ namespace API_Adda.Controllers
         }
         public void CaptureProductivityDetails(SqlConnection Con, string Empcode, string Form_Name, string Module_Name, int Total_Count, string Activity, string Activity_Details)
         {
-            SqlCommand cmd = null;
-            try
-            {
-                if (Con.State == ConnectionState.Closed) { Con.Open(); }
-
-                cmd = new SqlCommand("USP_Insert_Data_In_Activity_Log_Tracker_API_Adda", Con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@Emp_Code", SqlDbType.Text).Value = Empcode;
-                cmd.Parameters.Add("@Form_Name", SqlDbType.Text).Value = Form_Name;
-                cmd.Parameters.Add("@Module_Name", SqlDbType.Text).Value = Module_Name;
-                cmd.Parameters.Add("@Total_Count", SqlDbType.Int).Value = Total_Count;
-                cmd.Parameters.Add("@Activity", SqlDbType.Text).Value = Activity;
-                cmd.Parameters.Add("@Activity_Details", SqlDbType.Text).Value = Activity_Details;
-
-
-                cmd.CommandTimeout = 0;
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-
-
-
-                if (Con.State == ConnectionState.Open) { Con.Close(); }
-            }
-            catch (Exception)
-            { throw; }
-            finally
-            {
-                if (Con.State == ConnectionState.Open) { Con.Close(); }
-                if (cmd != null)
-                {
-                    cmd.Dispose();
-                }
-            }
+            _activityLog.LogActivity(Empcode, Form_Name, Module_Name, Total_Count, Activity, Activity_Details);
         }
 
         public void DeletePriviousdocinupdate(NewIntegration umodel)
@@ -4901,7 +4835,7 @@ namespace API_Adda.Controllers
         public void SetFilePath(NewIntegration newIntegration)
         {
             var FolderName = "API" + newIntegration.CreatedAt.ToString("ddMMMyyyy") + (newIntegration.ParentIntegrationId == null || newIntegration.ParentIntegrationId == 0 ? newIntegration.IntegrationId : newIntegration.ParentIntegrationId) + @"\";
-            TempData["APIAddaId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIAddaDoc\NewIntegrations\") + FolderName;
+            TempData["APIHuntId"] = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIHuntDoc\NewIntegrations\") + FolderName;
         }
 
         [HttpPost]

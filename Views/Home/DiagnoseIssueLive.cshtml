@@ -1,5 +1,5 @@
-﻿@using API_Adda.Models
-@model API_Adda.Models.SearchAPI;
+﻿@using API_HUNT.Models
+@model API_HUNT.Models.SearchAPI;
 @{
     ViewData["Title"] = "apiDetails";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -7,7 +7,7 @@
 
 @using (Html.BeginForm("apiDetails", "Home", FormMethod.Post))
 {
-    <div class="container mt-10">
+    <div class="container-fluid">
         <div class="card">
             <div class="card-body">
                 <div class="row form-group">

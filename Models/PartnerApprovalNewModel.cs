@@ -1,4 +1,4 @@
-﻿namespace Hunt.Models
+﻿namespace API_HUNT.Models
 {
     public class PartnerApprovalNewModel
     {

@@ -1,0 +1,1408 @@
+/* =============================================================
+   API HUNT — OVI Dashboard Design System
+   Based on the OVI Dashboard Design System tokens
+   ============================================================= */
+
+/* ---- Fonts ---- */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable.ttf') format('truetype-variations'),
+       url('/fonts/InterVariable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/InterVariable-Italic.ttf') format('truetype-variations'),
+       url('/fonts/InterVariable-Italic.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ==========================================================
+     COLORS — CORE PALETTE
+     ========================================================== */
+  --ovi-primary:          #593bdb;
+  --ovi-primary-hover:    #4125ab;
+  --ovi-primary-link-hover:#391faa;
+  --ovi-secondary:        #673BB7;
+  --ovi-blue:             #5e72e4;
+  --ovi-white:            #ffffff;
+  --ovi-black:            #000000;
+
+  /* ==========================================================
+     COLORS — SEMANTIC / STATUS
+     ========================================================== */
+  --ovi-success:   #7ED321;
+  --ovi-info:      #50E3C2;
+  --ovi-warning:   #FFAA16;
+  --ovi-danger:    #FF1616;
+  --ovi-red:       #EE3232;
+  --ovi-green:     #297F00;
+
+  --ovi-overdue:   #E92D2D;
+  --ovi-due-soon:  #CAC325;
+  --ovi-due-later: #25CA5D;
+
+  /* ==========================================================
+     COLORS — BRAND
+     ========================================================== */
+  --ovi-brand-blue:       #10498B;
+  --ovi-link-blue:        #1D86FF;
+  --ovi-logout-blue:      #001F81;
+  --ovi-icon-tint:        #CFD3E9;
+
+  /* ==========================================================
+     COLORS — NEUTRAL / TEXT
+     ========================================================== */
+  --ovi-text-dark:         #171921;
+  --ovi-text-modal:        #1F2937;
+  --ovi-text-card-header:  #374151;
+  --ovi-text-body:         #555555;
+  --ovi-text-label:        #6B7280;
+  --ovi-text-muted:        #BBBBBB;
+  --ovi-text-placeholder:  #222222;
+
+  /* ==========================================================
+     COLORS — BACKGROUNDS & SURFACES
+     ========================================================== */
+  --ovi-bg-page:       #F7F7F7;
+  --ovi-bg-hover:      #f1f1f1;
+  --ovi-bg-row-odd:    #F9FAFB;
+  --ovi-bg-notif:      rgba(196, 196, 196, 0.08);
+  --ovi-bg-overdue:    rgba(255, 0, 0, 0.13);
+  --ovi-bg-overlay:    rgba(0, 0, 0, 0.3);
+
+  /* ==========================================================
+     COLORS — BORDERS
+     ========================================================== */
+  --ovi-border-card:          #E5E7EB;
+  --ovi-border-table:         #F3F3F3;
+  --ovi-border-table-divider: #EBEBEB;
+  --ovi-border-custom-hdr:    #C3D1E2;
+  --ovi-border-portfolio:     rgba(16, 73, 139, 0.36);
+  --ovi-border-input:         #BBBBBB;
+
+  /* ==========================================================
+     COLORS — NOTIFICATION ACCENTS
+     ========================================================== */
+  --ovi-accent-1: #8C54FF;
+  --ovi-accent-2: #603DA8;
+  --ovi-accent-3: #4F62B1;
+  --ovi-accent-4: #1B3D70;
+
+  /* ==========================================================
+     COLORS — GRADIENTS (stat cards)
+     ========================================================== */
+  --ovi-gradient-1:  linear-gradient(to bottom, #f0a907 0%, #f53c79 100%);
+  --ovi-gradient-2:  linear-gradient(to bottom, #4dedf5 0%, #480ceb 100%);
+  --ovi-gradient-3:  linear-gradient(to bottom, #51f5ae 0%, #3fbcda 100%);
+  --ovi-gradient-4:  linear-gradient(to right,  #f25521 0%, #f9c70a 100%);
+  --ovi-gradient-7:  linear-gradient(to right,  #4400eb 0%, #44e7f5 100%);
+  --ovi-gradient-11: linear-gradient(to right,  #3398fb 0%, #8553ee 100%);
+  --ovi-gradient-14: linear-gradient(135deg,    #23bdb8 0%, #43e794 100%);
+  --ovi-gradient-15: linear-gradient(135deg,    #9a56ff 0%, #e36cd9 100%);
+  --ovi-gradient-16: linear-gradient(135deg,    #f48665 0%, #fda23f 100%);
+  --ovi-gradient-18: linear-gradient(to right,  #a15cff 0%, #ce82fd 100%);
+
+  /* ==========================================================
+     TYPOGRAPHY
+     ========================================================== */
+  --ovi-font-primary:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ovi-fs-xs:   10px;
+  --ovi-fs-sm:   12px;
+  --ovi-fs-base: 14px;
+  --ovi-fs-md:   16px;
+  --ovi-fs-lg:   18px;
+  --ovi-fs-xl:   20px;
+  --ovi-fs-2xl:  22px;
+  --ovi-fs-hero: 32px;
+  --ovi-fw-regular:   400;
+  --ovi-fw-medium:    500;
+  --ovi-fw-semibold:  600;
+  --ovi-fw-bold:      700;
+  --ovi-fw-extrabold: 800;
+
+  /* ==========================================================
+     SPACING, RADII, SHADOWS
+     ========================================================== */
+  --ovi-r-sm:   4px;
+  --ovi-r-md:   6px;
+  --ovi-r-lg:   8px;
+  --ovi-r-xl:   12px;
+  --ovi-r-2xl:  15px;
+  --ovi-r-full: 50px;
+  --ovi-shadow-table:     0px 4px 4px rgba(0, 0, 0, 0.05);
+  --ovi-shadow-portfolio: 0px 0.14px 7.49px rgba(0, 0, 0, 0.11);
+  --ovi-shadow-panel:     10px 3px 29px rgba(0, 0, 0, 0.20);
+  --ovi-shadow-tab-hover: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--ovi-font-primary);
+  font-size: var(--ovi-fs-base);
+  line-height: 1.5;
+  background: var(--ovi-bg-page);
+  color: var(--ovi-text-body);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--ovi-link-blue); text-decoration: none; transition: color .15s ease; }
+a:hover { color: var(--ovi-primary-link-hover); }
+
+/* =============================================================
+   APP SHELL — Sidebar + Top Header layout
+   ============================================================= */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+.ovi-sidebar {
+  width: 230px;
+  background: var(--ovi-brand-blue);
+  min-height: 100vh;
+  padding: 18px 0;
+  flex: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.ovi-sidebar .sidebar-brand {
+  color: #fff;
+  padding: 0 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.ovi-sidebar .sidebar-brand .brand-name {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .03em;
+}
+
+.ovi-sidebar .sidebar-brand .app-name {
+  font-size: 10px;
+  color: var(--ovi-icon-tint);
+  letter-spacing: .15em;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.ovi-sidebar .sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+}
+
+.ovi-sidebar .sidebar-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+  color: var(--ovi-icon-tint);
+  font-size: 13px;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background .2s, color .2s;
+}
+
+.ovi-sidebar .sidebar-nav li a:hover {
+  color: #fff;
+}
+
+.ovi-sidebar .sidebar-nav li a.active {
+  color: #fff;
+  background: rgba(255,255,255,.08);
+  border-left-color: #fff;
+  padding-left: 17px;
+}
+
+.ovi-sidebar .sidebar-nav li a img.nav-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.ovi-sidebar .sidebar-nav li a i {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+.ovi-sidebar .sidebar-footer {
+  padding: 16px 20px;
+  color: var(--ovi-icon-tint);
+  font-size: 10px;
+  letter-spacing: .05em;
+}
+
+.ovi-sidebar .sidebar-footer strong {
+  color: #fff;
+}
+
+/* --- Main content area --- */
+.app-main {
+  flex: 1;
+  margin-left: 230px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* --- Top Header --- */
+.ovi-top-header {
+  background: #fff;
+  border-bottom: 1px solid var(--ovi-border-card);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 22px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0px 4px 4px rgba(0,0,0,0.03);
+}
+
+.ovi-top-header .app-chip {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--ovi-brand-blue);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  border: 1px solid var(--ovi-border-portfolio);
+  border-radius: var(--ovi-r-sm);
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+
+.ovi-top-header .page-title {
+  font-size: var(--ovi-fs-lg);
+  font-weight: var(--ovi-fw-semibold);
+  color: var(--ovi-text-card-header);
+}
+
+.ovi-top-header .header-spacer {
+  flex: 1;
+}
+
+.ovi-top-header .header-search {
+  background: var(--ovi-bg-page);
+  border: 1px solid var(--ovi-border-card);
+  border-radius: var(--ovi-r-md);
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ovi-text-label);
+  width: 220px;
+}
+
+.ovi-top-header .header-search input {
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 13px;
+  flex: 1;
+  color: var(--ovi-text-dark);
+  font-family: inherit;
+}
+
+.ovi-top-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ovi-r-md);
+  border: 1px solid var(--ovi-border-card);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  background: #fff;
+  transition: background .15s;
+}
+
+.icon-btn:hover {
+  background: var(--ovi-bg-hover);
+}
+
+.icon-btn img {
+  width: 18px;
+  height: 18px;
+}
+
+.icon-btn .badge-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--ovi-overdue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 5px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.ovi-top-header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ovi-text-label);
+}
+
+.ovi-top-header .user-info strong {
+  color: var(--ovi-brand-blue);
+  font-weight: var(--ovi-fw-semibold);
+}
+
+/* --- Content area --- */
+.app-content {
+  padding: 22px 28px;
+  flex: 1;
+}
+
+/* =============================================================
+   CARDS
+   ============================================================= */
+.card,
+.ovi-card {
+  background: #fff;
+  border: 1px solid var(--ovi-border-card);
+  border-radius: var(--ovi-r-2xl);
+  box-shadow: var(--ovi-shadow-table);
+  padding: 15px;
+  overflow: visible;
+}
+
+.card:hover {
+  box-shadow: var(--ovi-shadow-table);
+}
+
+.ovi-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ovi-border-custom-hdr);
+  margin-bottom: 12px;
+}
+
+.ovi-card-header .card-title {
+  font-size: var(--ovi-fs-lg);
+  font-weight: var(--ovi-fw-semibold);
+  color: var(--ovi-brand-blue);
+  margin: 0;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Card heading (used in existing views) */
+.addnew-popup-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px !important;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--ovi-border-custom-hdr) !important;
+}
+
+.addnew-popup-heading h4,
+.card-body h4 {
+  font-size: var(--ovi-fs-lg);
+  font-weight: var(--ovi-fw-semibold);
+  color: var(--ovi-brand-blue);
+  margin: 0;
+}
+
+.close-btn {
+  color: var(--ovi-primary);
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(89,59,219,.06);
+  transition: background .15s;
+  text-decoration: none;
+}
+
+.close-btn:hover {
+  background: rgba(89,59,219,.12);
+  color: var(--ovi-primary-hover);
+}
+
+/* Portfolio card */
+.portfolio-card {
+  background: #fff;
+  border: 1px solid var(--ovi-border-portfolio);
+  border-radius: var(--ovi-r-2xl);
+  box-shadow: var(--ovi-shadow-portfolio);
+  padding: 10px 19px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Stat tiles (gradient cards) */
+.stat-tile {
+  border-radius: var(--ovi-r-lg);
+  padding: 16px;
+  color: #fff;
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stat-tile .stat-label {
+  font-size: var(--ovi-fs-sm);
+  opacity: 0.9;
+}
+
+.stat-tile .stat-value {
+  font-size: 26px;
+  font-weight: var(--ovi-fw-bold);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-tile .stat-sub {
+  font-size: 11px;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+/* =============================================================
+   BUTTONS
+   ============================================================= */
+.btn {
+  font-family: var(--ovi-font-primary);
+  font-size: var(--ovi-fs-base);
+  font-weight: var(--ovi-fw-semibold);
+  border-radius: var(--ovi-r-sm);
+  padding: 8px 22px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color .15s ease;
+}
+
+.btn-primary {
+  background: var(--ovi-primary);
+  color: #fff;
+  border-color: var(--ovi-primary);
+}
+
+.btn-primary:hover {
+  background: var(--ovi-primary-hover);
+  border-color: var(--ovi-primary-hover);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: #fff;
+  border-color: #6c757d;
+}
+
+.btn-success {
+  background: var(--ovi-green);
+  color: #fff;
+}
+
+.btn-danger {
+  background: var(--ovi-danger);
+  color: #fff;
+  border-color: var(--ovi-danger);
+}
+
+.btn-outline {
+  background: #fff;
+  color: var(--ovi-primary);
+  border-color: var(--ovi-primary);
+}
+
+.btn-border {
+  background: #fff;
+  color: var(--ovi-brand-blue);
+  border: 1px solid var(--ovi-border-card);
+  border-radius: var(--ovi-r-md);
+  padding: 6px 10px;
+  font-weight: var(--ovi-fw-medium);
+  font-size: 13px;
+}
+
+.btn-border:hover {
+  background: var(--ovi-bg-hover);
+  color: var(--ovi-brand-blue);
+}
+
+.btn-link {
+  background: transparent;
+  color: var(--ovi-link-blue);
+  border: 0;
+  font-weight: var(--ovi-fw-medium);
+  font-size: 13px;
+  padding: 4px 6px;
+}
+
+.btn-link:hover {
+  color: var(--ovi-primary-link-hover);
+}
+
+/* =============================================================
+   FORMS
+   ============================================================= */
+.form-control {
+  border: 0;
+  border-bottom: 1px solid var(--ovi-border-input);
+  border-radius: 0;
+  background: transparent;
+  height: 30px;
+  font-size: var(--ovi-fs-base);
+  font-family: inherit;
+  color: var(--ovi-text-dark);
+  outline: none;
+  padding: 0;
+  transition: border-color .2s;
+}
+
+.form-control:focus {
+  border-color: var(--ovi-primary);
+  box-shadow: none;
+  background: transparent;
+  outline: none;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.label-control {
+  font-size: var(--ovi-fs-sm);
+  font-weight: var(--ovi-fw-regular);
+  color: var(--ovi-text-label);
+  margin-bottom: 4px;
+  display: block;
+}
+
+select.form-control {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #6B7280 50%), linear-gradient(-45deg, transparent 50%, #6B7280 50%);
+  background-position: calc(100% - 12px) 14px, calc(100% - 7px) 14px;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 18px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group .form-control {
+  padding-right: 36px;
+}
+
+.input-group-addon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ovi-text-label);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+  border: 1px solid var(--ovi-border-card);
+  border-radius: var(--ovi-r-sm);
+  padding: 10px;
+}
+
+.field-validation-error {
+  color: var(--ovi-danger);
+  font-size: 11px;
+  margin-top: 4px;
+  display: block;
+}
+
+/* =============================================================
+   TABS
+   ============================================================= */
+.ovi-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--ovi-border-card);
+}
+
+.ovi-tabs .tab-item {
+  padding: 10px 22px;
+  font-size: var(--ovi-fs-base);
+  font-weight: var(--ovi-fw-medium);
+  color: var(--ovi-text-body);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  user-select: none;
+  transition: color .15s;
+}
+
+.ovi-tabs .tab-item:hover {
+  color: var(--ovi-brand-blue);
+}
+
+.ovi-tabs .tab-item.active {
+  font-weight: var(--ovi-fw-semibold);
+  color: var(--ovi-brand-blue);
+  border-bottom-color: var(--ovi-brand-blue);
+}
+
+/* Bootstrap nav-tabs override to match OVI */
+.nav-tabs {
+  border-bottom: 1px solid var(--ovi-border-card);
+}
+
+.nav-tabs .nav-link {
+  font-size: var(--ovi-fs-base);
+  font-weight: var(--ovi-fw-medium);
+  color: var(--ovi-text-body);
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  padding: 10px 22px;
+  margin-bottom: -1px;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--ovi-brand-blue);
+  border-color: transparent;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--ovi-brand-blue);
+  font-weight: var(--ovi-fw-semibold);
+  border-color: transparent;
+  border-bottom-color: var(--ovi-brand-blue);
+  background: transparent;
+}
+
+/* =============================================================
+   TABLES
+   ============================================================= */
+table.dataTable,
+.table {
+  width: 100% !important;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table.dataTable thead th,
+.table thead th {
+  font-size: var(--ovi-fs-sm);
+  text-transform: uppercase;
+  color: var(--ovi-text-muted);
+  font-weight: var(--ovi-fw-regular);
+  padding: 12px 14px;
+  text-align: left;
+  letter-spacing: .03em;
+  border-bottom: 1px solid var(--ovi-border-table);
+  background: transparent;
+}
+
+table.dataTable tbody td,
+.table tbody td {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--ovi-text-body);
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--ovi-border-table-divider);
+  vertical-align: middle;
+}
+
+table.dataTable tbody tr:hover,
+.table tbody tr:hover {
+  background: var(--ovi-bg-row-odd);
+}
+
+.table-wrapper {
+  background: #fff;
+  border-radius: var(--ovi-r-xl);
+  overflow: hidden;
+  border: 1px solid var(--ovi-border-table);
+}
+
+/* DataTables overrides */
+.dataTables_wrapper .dataTables_filter input {
+  border: 0;
+  border-bottom: 1px solid var(--ovi-border-input);
+  border-radius: 0;
+  padding: 6px 0;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+  background: transparent;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: var(--ovi-primary);
+  box-shadow: none;
+}
+
+.dataTables_wrapper .dataTables_length select {
+  border: 0;
+  border-bottom: 1px solid var(--ovi-border-input);
+  border-radius: 0;
+  padding: 4px 0;
+  font-size: 13px;
+  background: transparent;
+}
+
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_length {
+  font-size: 12px;
+  color: var(--ovi-text-label);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 4px 12px;
+  border-radius: var(--ovi-r-sm);
+  font-size: 12px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: var(--ovi-primary) !important;
+  color: white !important;
+  border: none !important;
+}
+
+/* Dashboard table */
+.dash {
+  text-align: center;
+  max-height: 220px;
+  overflow: auto;
+  border-radius: var(--ovi-r-md);
+  border: 1px solid var(--ovi-border-card);
+}
+
+.dash-tbl th {
+  background: rgba(16,73,139,0.07) !important;
+  color: var(--ovi-text-card-header) !important;
+  font-size: 12px;
+  font-weight: var(--ovi-fw-semibold);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* =============================================================
+   STATUS DOTS
+   ============================================================= */
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.status-dot.overdue { background: var(--ovi-overdue); }
+.status-dot.soon { background: var(--ovi-due-soon); }
+.status-dot.ok { background: var(--ovi-due-later); }
+
+/* =============================================================
+   NOTIFICATION LIST
+   ============================================================= */
+.notif-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notif-list li {
+  background: var(--ovi-bg-notif);
+  border-radius: var(--ovi-r-sm);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notif-list li:nth-child(4n+1) { border-left: 4px solid var(--ovi-accent-1); }
+.notif-list li:nth-child(4n+2) { border-left: 4px solid var(--ovi-accent-2); }
+.notif-list li:nth-child(4n+3) { border-left: 4px solid var(--ovi-accent-3); }
+.notif-list li:nth-child(4n+4) { border-left: 4px solid var(--ovi-accent-4); }
+
+.notif-count {
+  font-weight: var(--ovi-fw-bold);
+  font-size: 22px;
+  color: var(--ovi-text-body);
+  min-width: 36px;
+  font-variant-numeric: tabular-nums;
+}
+
+.notif-title {
+  font-size: 13px;
+  color: var(--ovi-text-dark);
+  font-weight: var(--ovi-fw-medium);
+}
+
+.notif-meta {
+  font-size: 11px;
+  color: var(--ovi-text-label);
+  margin-top: 1px;
+}
+
+/* =============================================================
+   LOGIN PAGE — Split screen
+   ============================================================= */
+.login-wrapper {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.login-brand {
+  background: var(--ovi-brand-blue);
+  color: #fff;
+  padding: 48px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.login-brand .brand-name {
+  font-size: 28px;
+  font-weight: var(--ovi-fw-extrabold);
+  letter-spacing: .03em;
+}
+
+.login-brand .app-chip {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,.5);
+  padding: 5px 10px;
+  border-radius: var(--ovi-r-sm);
+  white-space: nowrap;
+}
+
+.login-brand .tagline {
+  font-size: var(--ovi-fs-hero);
+  font-weight: var(--ovi-fw-regular);
+  line-height: 1.25;
+  max-width: 420px;
+}
+
+.login-brand .tagline-sub {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--ovi-icon-tint);
+  max-width: 420px;
+}
+
+.login-brand .version-info {
+  font-size: 11px;
+  color: var(--ovi-icon-tint);
+  letter-spacing: .05em;
+}
+
+.login-form-panel {
+  display: grid;
+  place-items: center;
+  padding: 40px;
+  background: #fff;
+}
+
+.login-form {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-form .login-heading {
+  font-size: var(--ovi-fs-2xl);
+  font-weight: var(--ovi-fw-semibold);
+  color: var(--ovi-text-modal);
+  margin: 0;
+}
+
+.login-form .login-sub {
+  font-size: var(--ovi-fs-sm);
+  color: var(--ovi-text-label);
+  margin-top: 4px;
+}
+
+.login-form .form-control {
+  border: 0;
+  border-bottom: 1px solid var(--ovi-border-input);
+  background: transparent;
+  height: 30px;
+  font-size: var(--ovi-fs-base);
+  color: var(--ovi-text-dark);
+  padding: 0;
+  border-radius: 0;
+}
+
+.login-form .form-control:focus {
+  border-color: var(--ovi-primary);
+  box-shadow: none;
+}
+
+.login-form .btn-primary {
+  justify-content: center;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.login-form .login-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--ovi-fs-sm);
+}
+
+.login-form .login-actions label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ovi-text-body);
+  cursor: pointer;
+}
+
+.login-form .login-actions a {
+  color: var(--ovi-link-blue);
+  text-decoration: none;
+}
+
+/* Error message on login */
+.login-error {
+  color: var(--ovi-danger);
+  font-weight: var(--ovi-fw-medium);
+  font-size: 13px;
+  text-align: center;
+  background: var(--ovi-bg-overdue);
+  padding: 8px 14px;
+  border-radius: var(--ovi-r-sm);
+}
+
+/* Old login-form styles for backward compat */
+.login-form img {
+  height: 50px;
+  margin-bottom: 12px;
+}
+
+.login-form .form-group .label-control {
+  color: var(--ovi-danger);
+  font-weight: var(--ovi-fw-medium);
+  font-size: 13px;
+  text-align: center;
+  background: var(--ovi-bg-overdue);
+  padding: 8px 14px;
+  border-radius: var(--ovi-r-sm);
+  border: none;
+}
+
+/* =============================================================
+   DRAWER / SIDE PANEL
+   ============================================================= */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ovi-bg-overlay);
+  z-index: 200;
+  display: none;
+}
+
+.drawer-overlay.open { display: block; }
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 360px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: var(--ovi-shadow-panel);
+  z-index: 210;
+  padding: 18px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: right .3s ease;
+}
+
+.drawer.open { right: 0; }
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-header h3 {
+  font-size: 16px;
+  font-weight: var(--ovi-fw-bold);
+  color: var(--ovi-text-dark);
+  margin: 0;
+}
+
+.drawer-close {
+  cursor: pointer;
+  color: var(--ovi-text-label);
+  font-size: 16px;
+  background: none;
+  border: none;
+}
+
+/* =============================================================
+   FILTER BAR
+   ============================================================= */
+.filter-bar {
+  background: #fff;
+  border: 1px solid var(--ovi-border-card);
+  border-radius: var(--ovi-r-xl);
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  box-shadow: 0px 4px 4px rgba(0,0,0,0.03);
+}
+
+/* =============================================================
+   DIAGNOSE SECTION
+   ============================================================= */
+.diagnosepoints ul {
+  padding-left: 0;
+  margin: 10px 0;
+}
+
+.diagnosepoints ul li {
+  list-style: none;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--ovi-text-label);
+  border-bottom: 1px dashed var(--ovi-border-card);
+}
+
+.diagnosepoints ul li:last-child { border-bottom: none; }
+
+/* =============================================================
+   ERROR MESSAGES
+   ============================================================= */
+.error {
+  color: var(--ovi-danger);
+  font-size: 13px;
+  font-weight: var(--ovi-fw-medium);
+}
+
+/* =============================================================
+   FILE UPLOAD
+   ============================================================= */
+.kwt-file__drop-area {
+  border: 2px dashed var(--ovi-border-card);
+  border-radius: var(--ovi-r-xl);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  background: var(--ovi-bg-page);
+}
+
+.kwt-file__drop-area.is-active,
+.kwt-file__drop-area:hover {
+  border-color: var(--ovi-primary);
+  background: rgba(89,59,219,.03);
+}
+
+.kwt-file__msg {
+  color: var(--ovi-text-label);
+  font-size: 13px;
+  display: block;
+  margin-top: 8px;
+}
+
+.kwt-file__choose-file { color: var(--ovi-primary); }
+
+.kwt-file__delete {
+  display: none;
+  color: var(--ovi-danger);
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* =============================================================
+   PROGRESS BAR / WIZARD
+   ============================================================= */
+#progressbar {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin: 0 0 30px;
+  gap: 0;
+  counter-reset: step;
+}
+
+#progressbar li {
+  position: relative;
+  text-align: center;
+  flex: 1;
+  font-size: 12px;
+  font-weight: var(--ovi-fw-semibold);
+  color: var(--ovi-text-label);
+}
+
+#progressbar li::before {
+  content: counter(step);
+  counter-increment: step;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  display: block;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: var(--ovi-border-card);
+  color: var(--ovi-text-label);
+  font-size: 14px;
+  font-weight: var(--ovi-fw-bold);
+}
+
+#progressbar li.active::before {
+  background: var(--ovi-primary);
+  color: #fff;
+}
+
+#progressbar li.active {
+  color: var(--ovi-primary);
+}
+
+.progress-bar {
+  background: var(--ovi-primary) !important;
+  border-radius: var(--ovi-r-full);
+}
+
+/* =============================================================
+   FILTER SIDEBAR (Search/categories)
+   ============================================================= */
+.tabs {
+  border: 1px solid var(--ovi-border-card);
+  border-radius: var(--ovi-r-md);
+  overflow: hidden;
+  background: var(--ovi-bg-page);
+}
+
+.tab {
+  border-bottom: 1px solid var(--ovi-border-card);
+}
+
+.tab:last-child { border-bottom: none; }
+
+.tab-label {
+  display: block;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: var(--ovi-fw-semibold);
+  color: var(--ovi-text-card-header);
+  cursor: pointer;
+  background: #fff;
+  transition: background .15s;
+  margin: 0;
+}
+
+.tab-label:hover {
+  background: rgba(89,59,219,.04);
+}
+
+.tab-content {
+  padding: 8px 14px 14px;
+  background: #fff;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #fff;
+}
+
+.filterHeading {
+  font-size: 15px !important;
+  font-weight: var(--ovi-fw-bold) !important;
+  color: var(--ovi-text-card-header);
+  margin: 0 !important;
+}
+
+.filter {
+  background: var(--ovi-primary);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: var(--ovi-fw-semibold);
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.filter:hover {
+  background: var(--ovi-primary-hover);
+}
+
+/* Category lists */
+.categories { list-style: none; padding: 0; margin: 0; }
+.categories li { list-style: none; }
+.categories ul { list-style: none; padding: 0; margin: 0; }
+
+.subcat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 12px;
+  color: var(--ovi-text-card-header);
+}
+
+.subcat input[type="checkbox"] {
+  accent-color: var(--ovi-primary);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.subcat .count {
+  margin-left: auto;
+  background: var(--ovi-border-card);
+  color: var(--ovi-text-label);
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: var(--ovi-fw-semibold);
+}
+
+/* =============================================================
+   TOASTR
+   ============================================================= */
+.toast-top-right { top: 70px; }
+
+/* =============================================================
+   SCROLLBAR
+   ============================================================= */
+::-webkit-scrollbar { width: 5px; height: 7px; }
+::-webkit-scrollbar-track { background: #eeeeee; }
+::-webkit-scrollbar-thumb { background: #1074C2; border-radius: var(--ovi-r-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--ovi-brand-blue); }
+
+/* =============================================================
+   CONTENT SPACING
+   ============================================================= */
+.mt-10 {
+  padding: 22px 28px;
+  padding-top: 22px;
+  margin-top: 0;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* =============================================================
+   DROPDOWN MENUS — Bootstrap overrides
+   ============================================================= */
+.dropdown-menu {
+  border-radius: var(--ovi-r-lg);
+  box-shadow: var(--ovi-shadow-panel);
+  border: 1px solid var(--ovi-border-card);
+  padding: 6px 0;
+}
+
+.dropdown-item {
+  font-size: 13px;
+  padding: 8px 18px;
+  font-weight: var(--ovi-fw-medium);
+  color: var(--ovi-text-body);
+}
+
+.dropdown-item:hover {
+  color: var(--ovi-primary);
+  background: rgba(89,59,219,.05);
+}
+
+/* =============================================================
+   RESPONSIVE
+   ============================================================= */
+@media (max-width: 992px) {
+  .ovi-sidebar {
+    width: 60px;
+    overflow: hidden;
+  }
+  .ovi-sidebar .sidebar-brand .brand-name,
+  .ovi-sidebar .sidebar-brand .app-name,
+  .ovi-sidebar .sidebar-nav li a span,
+  .ovi-sidebar .sidebar-footer {
+    display: none;
+  }
+  .ovi-sidebar .sidebar-nav li a {
+    justify-content: center;
+    padding: 12px 0;
+  }
+  .app-main {
+    margin-left: 60px;
+  }
+  .login-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .login-brand {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    margin-left: 0;
+  }
+  .ovi-sidebar {
+    display: none;
+  }
+  .ovi-top-header .header-search {
+    display: none;
+  }
+}

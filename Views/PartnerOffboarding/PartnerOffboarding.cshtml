@@ -1,4 +1,4 @@
-﻿@model API_Adda.Models.PartnerOffboarding
+﻿@model API_HUNT.Models.PartnerOffboarding
 @inject IHttpContextAccessor Accessor
 @using Microsoft.AspNetCore.Http
 @{
@@ -28,7 +28,7 @@
 </style>
 @using (Html.BeginForm("SavePartnerOffboarding", "PartnerOffboarding", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-    <div class="container mt-10">
+    <div class="container-fluid">
         <div class="card">
             <div class="card-body">
                 <div class="row form-group">

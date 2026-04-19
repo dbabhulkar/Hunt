@@ -1,5 +1,5 @@
-﻿@using API_Adda.Models
-@model API_Adda.Models.SearchAPI;
+﻿@using API_HUNT.Models
+@model API_HUNT.Models.SearchAPI;
 @{
     ViewData["Title"] = "TestAPI";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -19,7 +19,7 @@
 @using (Html.BeginForm("TestAPI", "Home", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
-    <div class="container mt-10">
+    <div class="container-fluid">
         <div class="card" id="testapi">
             <div class="card-body">
                 <div class="row form-group">

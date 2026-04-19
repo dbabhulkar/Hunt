@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using API_Adda.DataBaseConnection;
+using API_HUNT.DataBaseConnection;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace API_Adda
+namespace API_HUNT
 {
     public class Startup
     {
@@ -57,7 +57,7 @@ namespace API_Adda
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             ConnectionDB connection = new ConnectionDB();
             //Live

@@ -1,66 +1,30 @@
-using Hunt.Controllers;
-using Hunt.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-
-namespace Hunt.Controllers
-{
-    public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
-}
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using API_Adda.Models;
+using API_HUNT.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using System.Data.SqlClient;
-//test
-namespace API_Adda.Controllers
+
+namespace API_HUNT.Controllers
 {
     public class AdminController : Controller
     {
-        AdminRepository Adminrepository = new AdminRepository();
-        AdminMaster adminMaster = new AdminMaster();
-        displayUsermaster disUsermaster = new displayUsermaster();
-        displayAppmaster disAppmaster = new displayAppmaster();
-        HomeController homeController = new HomeController();
-        SqlConnection sqlCon = new SqlConnection(Startup.connectionstring);
-        public IActionResult Index()
+        private readonly IAdminRepository _adminRepo;
+        private readonly IActivityLogRepository _activityLog;
+
+        public AdminController(IAdminRepository adminRepo, IActivityLogRepository activityLog)
         {
-            return View();
+            _adminRepo = adminRepo;
+            _activityLog = activityLog;
         }
+
+        public IActionResult Index() => View();
+
         public IActionResult Admins()
         {
             ModelState.Clear();
+            AdminMaster adminMaster = new AdminMaster();
             try
             {
-                adminMaster = Adminrepository.AllAdminMaster();
+                adminMaster = _adminRepo.AllAdminMaster();
             }
             catch (Exception ex)
             {
@@ -68,19 +32,21 @@ namespace API_Adda.Controllers
             }
             return View(adminMaster);
         }
+
         [HttpPost]
         public async Task<IActionResult> Admins(AdminMaster adminMaster, string button = null)
         {
             ModelState.Clear();
             return RedirectToAction("Admins", "Admin");
-            //return View(adminMaster);
         }
+
         [HttpPost]
         public JsonResult GetUserDetail(string data)
         {
+            displayUsermaster disUsermaster = new displayUsermaster();
             try
             {
-                disUsermaster = Adminrepository.UserMasterEdit(data);
+                disUsermaster = _adminRepo.UserMasterEdit(data);
             }
             catch (Exception ex)
             {
@@ -88,13 +54,14 @@ namespace API_Adda.Controllers
             }
             return new JsonResult(disUsermaster);
         }
+
         [HttpPost]
         public JsonResult GetAppDetail(string data)
         {
-
+            displayAppmaster disAppmaster = new displayAppmaster();
             try
             {
-                disAppmaster = Adminrepository.AppMasterEdit(data);
+                disAppmaster = _adminRepo.AppMasterEdit(data);
             }
             catch (Exception ex)
             {
@@ -105,10 +72,10 @@ namespace API_Adda.Controllers
 
         public JsonResult GetAppDetailpoc(string appId, string appName)
         {
-
+            displayAppmaster disAppmaster = new displayAppmaster();
             try
             {
-                disAppmaster = Adminrepository.AppMasterEditpoc(appId, appName);
+                disAppmaster = _adminRepo.AppMasterEditpoc(appId, appName);
             }
             catch (Exception ex)
             {
@@ -116,21 +83,19 @@ namespace API_Adda.Controllers
             }
             return new JsonResult(disAppmaster);
         }
+
         [HttpPost]
         public JsonResult AddUpdateAppMaster(displayAppmaster disAppmaster)
         {
             string result = "";
             try
             {
-                result = Adminrepository.AddUpdateAPPsMaster(disAppmaster, HttpContext.Session.GetString("EmpId"));
+                string empId = HttpContext.Session.GetString("EmpId") ?? string.Empty;
+                result = _adminRepo.AddUpdateAPPsMaster(disAppmaster, empId);
                 if (disAppmaster.btnValue == "Submit")
-                {
-                    homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Admin", "API ADDA", 1, "Admin Insert AppMaster", "Admin Insert AppMaster - " + HttpContext.Session.GetString("EmpId").ToString());
-                }
+                    _activityLog.LogActivity(empId, "Admin", "API HUNT", 1, "Admin Insert AppMaster", "Admin Insert AppMaster - " + empId);
                 else if (disAppmaster.btnValue == "Update")
-                {
-                    homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Admin", "API ADDA", 1, "Admin Update AppMaster", "Admin Update AppMaster - " + HttpContext.Session.GetString("EmpId").ToString());
-                }
+                    _activityLog.LogActivity(empId, "Admin", "API HUNT", 1, "Admin Update AppMaster", "Admin Update AppMaster - " + empId);
             }
             catch (Exception ex)
             {
@@ -138,21 +103,19 @@ namespace API_Adda.Controllers
             }
             return new JsonResult(result);
         }
+
         [HttpPost]
         public JsonResult AddUpdateUserMaster(displayUsermaster disUsermaster)
         {
             string result = "";
             try
             {
-                result = Adminrepository.AddUpdateUsersMaster(disUsermaster, HttpContext.Session.GetString("EmpId"));
+                string empId = HttpContext.Session.GetString("EmpId") ?? string.Empty;
+                result = _adminRepo.AddUpdateUsersMaster(disUsermaster, empId);
                 if (disUsermaster.btnValue == "Submit")
-                {
-                    homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Admin", "API ADDA", 1, "Admin Insert UserMaster", "Admin Insert UserMaster - " + HttpContext.Session.GetString("EmpId").ToString());
-                }
+                    _activityLog.LogActivity(empId, "Admin", "API HUNT", 1, "Admin Insert UserMaster", "Admin Insert UserMaster - " + empId);
                 else if (disUsermaster.btnValue == "Update")
-                {
-                    homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Admin", "API ADDA", 1, "Admin Update UserMaster", "Admin Update UserMaster - " + HttpContext.Session.GetString("EmpId").ToString());
-                }
+                    _activityLog.LogActivity(empId, "Admin", "API HUNT", 1, "Admin Update UserMaster", "Admin Update UserMaster - " + empId);
             }
             catch (Exception ex)
             {
@@ -160,13 +123,14 @@ namespace API_Adda.Controllers
             }
             return new JsonResult(result);
         }
+
         [HttpPost]
         public JsonResult GetUserName(string UserID)
         {
             GetUserDetail UserDetail = new GetUserDetail();
             try
             {
-                UserDetail = Adminrepository.GetUserNames(UserID);
+                UserDetail = _adminRepo.GetUserNames(UserID);
             }
             catch (Exception ex)
             {

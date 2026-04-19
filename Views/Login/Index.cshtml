@@ -1,4 +1,4 @@
-﻿@model API_Adda.Models.LoginModel
+@model API_HUNT.Models.LoginModel
 @{
     Layout = null;
 }
@@ -9,106 +9,84 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>index</title>
+    <title>Login - API HUNT</title>
 
-    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <link href="~/css/style.css" rel="stylesheet" />
-    <link href="~/fonts/boxicons/css/boxicons.css" rel="stylesheet" />
-    <link href="~/css/aos.css" rel="stylesheet" />
-    <!-- Add these links to the head section of your HTML file -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
 </head>
-<body>
-    <div class="container mt-10">
-        <div class="card">
-            <div class="card-body" style="padding: 5% 7%;">
-                <div class="row">
-                    <div class="col-md-6">
-                        <img src="~/images/login.png" style="width:80%;" />
-                    </div>
-                    <div class="col-md-6">
-                        @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-                        {
-                            <div class="login-form text-center">
-                                <img src="~/images/HDFC_logo.png" />
-                                <h4>API ADDA</h4>
-                                <div class="form">
-                                    <div class="form-group">
-
-                                        @Html.LabelFor(a => a.UserId, new { @class = "label-control" })
-
-                                        @*<label class="label-control">User Id</label>*@
-
-                                        <div class="input-group">
-                                            @Html.TextBoxFor(a => a.UserId, new { @class = "form-control",autofocus = ""  })
-
-                                            <div class="input-group-addon">
-                                                <i class="bx bx-user"></i>
-                                            </div>
-                                        </div>
-                                        @Html.ValidationMessageFor(a => a.UserId)
-
-                                    </div>
-                                    <div class="form-group">
-                                        @Html.LabelFor(a => a.Password, new { @class = "label-control" })
-
-                                        <div class="input-group">
-                                            @Html.TextBoxFor(a => a.Password, new { @class = "form-control",Type="Password" })
-                                            @*<input type="password" class="form-control" />*@
-                                            <div class="input-group-addon">
-                                                <i class="bx bxs-lock"></i>
-                                            </div>
-                                        </div>
-                                        @Html.ValidationMessageFor(a => a.Password)
-                                    </div>
-                                    <div class="form-group text-center">
-                                        <input type="submit" class="btn btn-primary" name="button" style="width: 250px; margin-top: 20px;" id="BtnLogin" value="Login" />
-                                        @*<a href="/home/index/" class="btn btn-primary" style="width: 250px; margin-top: 20px;">Login <i class="bx bx-log-in"></i></a>*@
-                                    </div>
-                                    <div class="form-group">
-                                        @if (TempData["Message"] != null)
-                                        {
-                                            <label class="label-control">@TempData["Message"]</label>
-                                        }
-                                    </div>
-
-                                </div>
-                            </div>
-                        }
-                    </div>
+<body style="background: #fff;">
+    <div class="login-wrapper">
+        <!-- Left — Brand panel -->
+        <div class="login-brand">
+            <div>
+                <div class="brand-name">API HUNT</div>
+                <div class="app-chip">Partner Integration Platform</div>
+            </div>
+            <div>
+                <div class="tagline">
+                    One platform for API discovery, testing and partner integration.
                 </div>
+                <div class="tagline-sub">
+                    For development teams and integration partners. Manage onboarding, testing, and exceptions in one place.
+                </div>
+            </div>
+            <div class="version-info">
+                3i Infotech · For internal use only
             </div>
         </div>
 
+        <!-- Right — Login form -->
+        <div class="login-form-panel">
+            @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+            {
+                <div class="login-form">
+                    <div>
+                        <h2 class="login-heading">Sign in</h2>
+                        <p class="login-sub">Enter your credentials to continue</p>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(a => a.UserId, new { @class = "label-control" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(a => a.UserId, new { @class = "form-control", autofocus = "", placeholder = "Enter User ID" })
+                            <div class="input-group-addon">
+                                <i class="bx bx-user"></i>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(a => a.UserId)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(a => a.Password, new { @class = "label-control" })
+                        <div class="input-group">
+                            @Html.TextBoxFor(a => a.Password, new { @class = "form-control", Type = "Password", placeholder = "Enter Password" })
+                            <div class="input-group-addon">
+                                <i class="bx bxs-lock"></i>
+                            </div>
+                        </div>
+                        @Html.ValidationMessageFor(a => a.Password)
+                    </div>
+
+                    <div class="login-actions">
+                        <label>
+                            <input type="checkbox" /> Remember me
+                        </label>
+                        <a href="#">Forgot password?</a>
+                    </div>
+
+                    <input type="submit" class="btn btn-primary" name="button" id="BtnLogin" value="Sign in" />
+
+                    @if (TempData["Message"] != null)
+                    {
+                        <div class="login-error">@TempData["Message"]</div>
+                    }
+                </div>
+            }
+        </div>
     </div>
 
-    <script src="~/js/jquery.min.js"></script>
-    <script src="~/js/aos.js"></script>
-    <script src="~/js/bootstrap.bundle.js"></script>
-    <script src="~/js/main.js"></script>
-    @*<script>
-        function SubmitsEncry() {
-                
-                var Login = document.getElementById("<%=Password.ClientID %>").value.trim();
-
-                var key = CryptoJS.enc.Utf8.parse('8080808080808080');
-                var iv = CryptoJS.enc.Utf8.parse('8080808080808080');
-
-                var encryptedlogin = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(Login), key,
-                    {
-                        keySize: 128 / 8,
-                        iv: iv,
-                        mode: CryptoJS.mode.CBC,
-                        padding: CryptoJS.pad.Pkcs7
-                    });
-
-                document.getElementById("<%=Password.ClientID %>").value = encryptedlogin;
-            }
-
-    </script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

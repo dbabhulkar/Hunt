@@ -77,7 +77,7 @@
           }
         },
         "url": {
-          "raw": "https://10.226.163.7:9444/com.ofss.fc.cz.hdfc.obp.webservice/CustomerAndAccountInformationInquiryRest/doCustomerAndAccountInformationInquiry",
+          "raw": "https://10.226.163.7:9444/com.ofss.fc.cz.hunt.obp.webservice/CustomerAndAccountInformationInquiryRest/doCustomerAndAccountInformationInquiry",
           "protocol": "https",
           "host": [
             "10",
@@ -87,7 +87,7 @@
           ],
           "port": "9444",
           "path": [
-            "com.ofss.fc.cz.hdfc.obp.webservice",
+            "com.ofss.fc.cz.hunt.obp.webservice",
             "CustomerA"
           ]
         }

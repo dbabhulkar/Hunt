@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Http
-@model API_Adda.Models.PartnerOnboarding
+@model API_HUNT.Models.PartnerOnboarding
 
 @inject IHttpContextAccessor Accessor
 @{
@@ -9,7 +9,7 @@
 @using (Html.BeginForm("SaveAddPartneronBoarding", "Partner_Integration", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
     <form id="uploadForm" action="/Partner_Integration/ListofPartnerIntegration" method="post" enctype="multipart/form-data">
-        <div class="container mt-10">
+        <div class="container-fluid">
             <div class="card">
                 <div class="card-body">
                     <div class="row form-group">
@@ -502,7 +502,7 @@
 
                 source: function (request, response) {
                     $.ajax({
-                        url: '/Partner_Integration/GetlstApiDeatil',
+                        url: '/Partner_Integration/GetlstApiDetail',
                         data: { "prefix": request.term },
                         type: "POST",
                         success: function (data) {
@@ -527,7 +527,7 @@
                     var consId = $("#APIName").val();
                     $.ajax({
                         type: "POST",
-                        url: '/Partner_Integration/GetApiDeatil',
+                        url: '/Partner_Integration/GetApiDetail',
                         data: {
                             APIName: consId
                         },
@@ -550,7 +550,7 @@
         //    debugger;
         //    source: function (request, response) {
         //        $.ajax({
-        //            url: '/PartnerOnboarding/GetlstApiDeatil',
+        //            url: '/PartnerOnboarding/GetlstApiDetail',
         //            data: { "prefix": request.term },
         //            type: "POST",
         //            success: function (data) {
@@ -594,7 +594,7 @@
         //    var APIName = $('#APIName').val();
         //    $.ajax({
         //        type: "POST",
-        //        url: '/PartnerOnboarding/GetApiDeatil',
+        //        url: '/PartnerOnboarding/GetApiDetail',
         //        data: { APIName: APIName },
         //        dataType: 'json',
         //        success: function (response) {
@@ -951,16 +951,16 @@
         objPartnerOnboarding.PartnerRiskScore = $('#PartnerRiskScore').val();
         objPartnerOnboarding.PartnerRisk = $('#PartnerRiskClassification').text();
         objPartnerOnboarding.APIRisk = $('#APIRiskClassification').text();
-        var lstApiDeatil = [];
+        var lstApiDetail = [];
         $('#tblAPIbody tr').each(function (e) {
             var obj = {};
             debugger;
             obj.APIName = $(this).find("td .APIName").val();
             obj.APIRisk = $(this).find("td .APIRisk").val();
             obj.APIRiskScore = $(this).find("td .APIRiskScore").val();
-            lstApiDeatil.push(obj);
+            lstApiDetail.push(obj);
         });
-        objPartnerOnboarding.lstApiDeatil = lstApiDeatil;
+        objPartnerOnboarding.lstApiDetail = lstApiDetail;
         objPartnerOnboarding.HOPP_FH = $("#ddlHOPP_FH").val();
         objPartnerOnboarding.HOPP_VH = $("#ddlHOPP_VH").val();
         objPartnerOnboarding.HOPP_GH = $("#ddlHOPP_GH").val();

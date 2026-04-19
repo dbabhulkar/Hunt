@@ -1,37 +1,3 @@
-using Hunt.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using System.Diagnostics;
-
-namespace Hunt.Controllers
-{
-    public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
-}
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -39,25 +5,24 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using API_Adda.Models;
+using API_HUNT.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-namespace API_Adda.Controllers
+namespace API_HUNT.Controllers
 {
     public class Partner_IntegrationController : Controller
     {
-        PartnerRepository submitrepository_Obj = new PartnerRepository();
-        HomeController homeController = new HomeController();
-        SqlConnection sqlCon = new SqlConnection(Startup.connectionstring);
+        private readonly IPartnerRepository submitrepository_Obj;
+        private readonly IActivityLogRepository _activityLog;
         private readonly string uploadFolderPath;
-        public Partner_IntegrationController()
+        public Partner_IntegrationController(IPartnerRepository partnerRepo, IActivityLogRepository activityLog)
         {
-            string solutionDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            //uploadFolderPath = Path.Combine(solutionDirectory, "UploadPO");
+            submitrepository_Obj = partnerRepo;
+            _activityLog = activityLog;
             uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory() + "\\wwwroot\\UploadPO\\");
-            Directory.CreateDirectory(uploadFolderPath); // Ensure the folder exists
+            Directory.CreateDirectory(uploadFolderPath);
         }
         public IActionResult Index()
         {
@@ -117,7 +82,7 @@ namespace API_Adda.Controllers
         public IActionResult AddEditIntegration(PartnerOnboarding PartnerOnboarding/*, string PartnerRiskClassification, 
             string APIRiskClassification, string ApproverType,string ApproverLevel*/)
         {
-            PartnerRepository submitrepository_Obj = new PartnerRepository();
+            var submitrepository_Obj = this.submitrepository_Obj;
             PartnerOnboarding = submitrepository_Obj.partnertype();
             //PartnerOnboarding = submitrepository_Obj.PartnerCaseApprovalMetrix(PartnerRiskClassification, APIRiskClassification, ApproverType, ApproverLevel);
             return View(PartnerOnboarding);
@@ -143,7 +108,7 @@ namespace API_Adda.Controllers
         {
             try
             {
-                PartnerRepository submitrepository_Obj = new PartnerRepository();
+                var submitrepository_Obj = this.submitrepository_Obj;
                 //PartnerOnboarding = submitrepository_Obj.partnertype();
 
                 PartnerOnboarding objPartnerOnboarding = new PartnerOnboarding();
@@ -159,13 +124,13 @@ namespace API_Adda.Controllers
                 objPartnerOnboarding.APIRisk = txt_apiRisk;
                 objPartnerOnboarding.APIRiskScore = txt_apiRiskScore;
                 objPartnerOnboarding.IdentFlag = "AddPartnerboarding";
-                objPartnerOnboarding.SpName = "Usp_APIA_PartnerOnBoarding";
+                objPartnerOnboarding.SpName = "Usp_HUNT_PartnerOnBoarding";
 
                 if (submitrepository_Obj.AddEditPartner(objPartnerOnboarding))
                 {
                     ViewBag.Message = "Partner Onboarding details added successfully";
                 }
-                homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Partner Onboarding", "API ADDA", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
+                _activityLog.LogActivity(HttpContext.Session.GetString("EmpId") ?? string.Empty, "Partner Onboarding", "API HUNT", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
 
                 return RedirectToAction("ListofPartner");
             }
@@ -177,14 +142,14 @@ namespace API_Adda.Controllers
         public JsonResult PartnerCaseApprovalMetrix(string PartnerRiskClassification, string APIRiskClassification, string ApproverType,
                                                            string ApproverLevel)
         {
-            PartnerRepository submitrepository_Obj = new PartnerRepository();
+            var submitrepository_Obj = this.submitrepository_Obj;
             var objPartnerCaseApprovalMetrix = submitrepository_Obj.PartnerCaseApprovalMetrix(PartnerRiskClassification, APIRiskClassification, ApproverType, ApproverLevel);
             var lstPartnerCaseApprovalMetrix = JsonConvert.SerializeObject(objPartnerCaseApprovalMetrix.lstPartnerCaseApprovalMetrix);
             return Json(lstPartnerCaseApprovalMetrix);
         }
         public IActionResult AddEditPartnerIntegration()
         {
-            PartnerRepository submitrepository_Obj = new PartnerRepository();
+            var submitrepository_Obj = this.submitrepository_Obj;
 
             var PartnerTypeList = (from product in submitrepository_Obj.GetPartnerTypeList()
                                    select new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
@@ -194,19 +159,19 @@ namespace API_Adda.Controllers
             return View();
         }
         [HttpPost]
-        public JsonResult GetApiDeatil(string APIName)
+        public JsonResult GetApiDetail(string APIName)
         {
-            ApiDeatil apiDeatil = new ApiDeatil();
-            PartnerRepository submitrepository_Obj = new PartnerRepository();
+            ApiDetail apiDetail = new ApiDetail();
+            var submitrepository_Obj = this.submitrepository_Obj;
             try
             {
-                apiDeatil = submitrepository_Obj.GetApiDeatil(APIName);
+                apiDetail = submitrepository_Obj.GetApiDetail(APIName);
             }
             catch (Exception ex)
             {
                 ex.ToString();
             }
-            return new JsonResult(apiDeatil);
+            return new JsonResult(apiDetail);
         }
         [HttpPost]
         public IActionResult SaveAddPartneronBoarding(string jsonPartnerOnboarding/*, IFormFile AttachedJourneyDocuments, IFormFile APIRiskAssessment, IFormFile OtherDocument*/, string next = null)
@@ -238,7 +203,7 @@ namespace API_Adda.Controllers
 
                     objPartnerOnboarding.createdBy = HttpContext.Session.GetString("EmpId").ToString();
                     objPartnerOnboarding.IdentFlag = "AddPartner";
-                    objPartnerOnboarding.SpName = "Usp_APIA_PartnerOnBoarding";
+                    objPartnerOnboarding.SpName = "Usp_HUNT_PartnerOnBoarding";
 
                     //objPartnerOnboarding = submitrepository_Obj.AddPartner(objPartnerOnboarding);
 
@@ -270,11 +235,10 @@ namespace API_Adda.Controllers
                     }
                 }
                 //return RedirectToAction("ListofPartner", "PartnerOnboarding");
-                homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Partner Onboarding", "API ADDA", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
+                _activityLog.LogActivity(HttpContext.Session.GetString("EmpId") ?? string.Empty, "Partner Onboarding", "API HUNT", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
                 if (objPartnerOnboarding.Action != "Draft")
                 {
-                    PartnerRepository repository = new PartnerRepository();
-                    repository.GetPartnerSendMailDeatil(CaseID);
+                    submitrepository_Obj.GetPartnerSendMailDetail(CaseID);
                 }
                 return Json(objPartnerOnboarding);
             }
@@ -334,12 +298,12 @@ namespace API_Adda.Controllers
 
             ViewBag.Listofproducts = PartnerTypeList;
 
-            var partnerApproval = submitrepository_Obj.GetPartnerApprovalDeatil(id);
-            partnerApproval.lstPOFeedbackHistory = submitrepository_Obj.GetFeedbackDeatil(id);
-            partnerApproval.lstApiDeatil = submitrepository_Obj.GetPartnerApprovalAPIDeatil(id);
+            var partnerApproval = submitrepository_Obj.GetPartnerApprovalDetail(id);
+            partnerApproval.lstPOFeedbackHistory = submitrepository_Obj.GetFeedbackDetail(id);
+            partnerApproval.lstApiDetail = submitrepository_Obj.GetPartnerApprovalAPIDetail(id);
             partnerApproval.CaseID = id;
 
-            partnerApproval.PartnerApproval = submitrepository_Obj.GetApprovalTrailDeatil(id);
+            partnerApproval.PartnerApproval = submitrepository_Obj.GetApprovalTrailDetail(id);
             partnerApproval.statusDesc = status;
 
             partnerApproval.HOPP_FH = partnerApproval.PartnerApproval.Where(x => x.ApproverLevel == "FH" && x.Department == "HOPP").Select(x => x.ApproverUserID).FirstOrDefault();
@@ -392,7 +356,7 @@ namespace API_Adda.Controllers
                 TempData["Result"] = "Data Edited Successfully";
                 TempData["IsSuccess"] = "True";
 
-                homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Partner Onboarding", "API ADDA", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
+                _activityLog.LogActivity(HttpContext.Session.GetString("EmpId") ?? string.Empty, "Partner Onboarding", "API HUNT", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
 
                 return RedirectToAction("ListofPartnerIntegration", partnerEdit);
             }
@@ -409,12 +373,12 @@ namespace API_Adda.Controllers
 
             ViewBag.Listofproducts = PartnerTypeList;
 
-            var partnerApproval = submitrepository_Obj.GetPartnerApprovalDeatil(id);
+            var partnerApproval = submitrepository_Obj.GetPartnerApprovalDetail(id);
             partnerApproval.lstPOFeedbackHistory = submitrepository_Obj.GetFeedbackHistory(id);
-            partnerApproval.lstApiDeatil = submitrepository_Obj.GetPartnerApprovalAPIDeatil(id);
+            partnerApproval.lstApiDetail = submitrepository_Obj.GetPartnerApprovalAPIDetail(id);
             partnerApproval.CaseID = id;
 
-            partnerApproval.PartnerApproval = submitrepository_Obj.GetApprovalTrailDeatil(id);
+            partnerApproval.PartnerApproval = submitrepository_Obj.GetApprovalTrailDetail(id);
 
             partnerApproval.HOPP_FH = partnerApproval.PartnerApproval.Where(x => x.ApproverLevel == "FH" && x.Department == "HOPP").Select(x => x.ApproverUserID).FirstOrDefault();
             partnerApproval.HOPP_VH = partnerApproval.PartnerApproval.Where(x => x.ApproverLevel == "VH" && x.Department == "HOPP").Select(x => x.ApproverUserID).FirstOrDefault();
@@ -453,17 +417,17 @@ namespace API_Adda.Controllers
         }
         public JsonResult GetMstPartnerType(string PartnerType, string PartnerSubType, string PartnerEntityType, string IdentFlag)
         {
-            PartnerRepository submitrepository_Obj = new PartnerRepository();
+            var submitrepository_Obj = this.submitrepository_Obj;
             var objMstPartnerType = submitrepository_Obj.GetMstPartnerType(PartnerType, PartnerSubType, PartnerEntityType, IdentFlag);
             var lstMstPartnerType = JsonConvert.SerializeObject(objMstPartnerType.lstMstPartnerType);
             return Json(lstMstPartnerType);
         }
         [HttpPost]
-        public JsonResult GetlstApiDeatil(string prefix)
+        public JsonResult GetlstApiDetail(string prefix)
         {
             PartnerOnboarding partner = new PartnerOnboarding();
-            partner = submitrepository_Obj.GetlstApiDeatil();
-            var a = partner.lstApiDeatil.Where(x => x.APIName.ToLower().Contains(prefix.ToLower()) || x.APIName.ToLower().Contains(prefix.ToLower())).ToList();
+            partner = submitrepository_Obj.GetlstApiDetail();
+            var a = partner.lstApiDetail.Where(x => x.APIName.ToLower().Contains(prefix.ToLower()) || x.APIName.ToLower().Contains(prefix.ToLower())).ToList();
             return Json(a);
         }
         [HttpPost]
@@ -499,7 +463,7 @@ namespace API_Adda.Controllers
                 TempData["Result"] = "Data Edited Successfully";
                 TempData["IsSuccess"] = "True";
 
-                homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Partner Onboarding", "API ADDA", 1, "Partner Onboarding Save Feedback Reply", "Partner Onboarding Save Feedback Reply - " + HttpContext.Session.GetString("EmpId").ToString());
+                _activityLog.LogActivity(HttpContext.Session.GetString("EmpId") ?? string.Empty, "Partner Onboarding", "API HUNT", 1, "Partner Onboarding Save Feedback Reply", "Partner Onboarding Save Feedback Reply - " + HttpContext.Session.GetString("EmpId").ToString());
 
                 return Json(obj);
             }
@@ -528,7 +492,7 @@ namespace API_Adda.Controllers
                     TempData["Result"] = "Failed to delete data";
                     TempData["IsSuccess"] = "False";
                 }
-                homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Partner Onboarding", "API ADDA", 1, "Partner Onboarding Delete", "Partner Onboarding Delete - " + HttpContext.Session.GetString("EmpId").ToString());
+                _activityLog.LogActivity(HttpContext.Session.GetString("EmpId") ?? string.Empty, "Partner Onboarding", "API HUNT", 1, "Partner Onboarding Delete", "Partner Onboarding Delete - " + HttpContext.Session.GetString("EmpId").ToString());
 
                 return RedirectToAction("ListofPartner", new { Status = "2" });
             }
@@ -545,12 +509,12 @@ namespace API_Adda.Controllers
 
             ViewBag.Listofproducts = PartnerTypeList;
 
-            var partnerApproval = submitrepository_Obj.GetPartnerApprovalDeatil(id);
-            partnerApproval.lstPOFeedbackHistory = submitrepository_Obj.GetFeedbackDeatil(id);
-            partnerApproval.lstApiDeatil = submitrepository_Obj.GetPartnerApprovalAPIDeatil(id);
+            var partnerApproval = submitrepository_Obj.GetPartnerApprovalDetail(id);
+            partnerApproval.lstPOFeedbackHistory = submitrepository_Obj.GetFeedbackDetail(id);
+            partnerApproval.lstApiDetail = submitrepository_Obj.GetPartnerApprovalAPIDetail(id);
             partnerApproval.CaseID = id;
 
-            partnerApproval.PartnerApproval = submitrepository_Obj.GetApprovalTrailDeatil(id);
+            partnerApproval.PartnerApproval = submitrepository_Obj.GetApprovalTrailDetail(id);
             partnerApproval.statusDesc = status;
 
             partnerApproval.HOPP_FH = partnerApproval.PartnerApproval.Where(x => x.ApproverLevel == "FH" && x.Department == "HOPP").Select(x => x.ApproverUserID).FirstOrDefault();
@@ -626,15 +590,14 @@ namespace API_Adda.Controllers
                     StoreFileLocally(Request.Form.Files["OtherDocument"], data.CaseID, "OtherDocument");
                 }
 
-                homeController.CaptureProductivityDetails(sqlCon, HttpContext.Session.GetString("EmpId").ToString(), "Partner Onboarding", "API ADDA", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
+                _activityLog.LogActivity(HttpContext.Session.GetString("EmpId") ?? string.Empty, "Partner Onboarding", "API HUNT", 1, "Partner Onboarding Add", "Partner Onboarding Add - " + HttpContext.Session.GetString("EmpId").ToString());
 
                 TempData["Result"] = "Data Edited Successfully";
                 TempData["IsSuccess"] = "True";
 
                 if (data.Action != "Draft")
                 {
-                    PartnerRepository repository = new PartnerRepository();
-                    repository.GetPartnerSendMailDeatil(data.CaseID);
+                    submitrepository_Obj.GetPartnerSendMailDetail(data.CaseID);
                 }
 
                 return RedirectToAction("ListofPartnerIntegration", partnerEdit);
@@ -665,7 +628,7 @@ namespace API_Adda.Controllers
             {
                 if (Con.State == ConnectionState.Closed) { Con.Open(); }
 
-                cmd = new SqlCommand("USP_Insert_Data_In_Activity_Log_Tracker_API_Adda", Con);
+                cmd = new SqlCommand("USP_Insert_Data_In_Activity_Log_Tracker_API_HUNT", Con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@Emp_Code", SqlDbType.Text).Value = Empcode;
                 cmd.Parameters.Add("@Form_Name", SqlDbType.Text).Value = Form_Name;

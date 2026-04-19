@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor Accessor
-@model API_Adda.Models.NewIntegration
+@model API_HUNT.Models.NewIntegration
 @{
     ViewData["Title"] = "Appprovalintegration";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -22,7 +22,7 @@
         }
     </style>*@
 
-<div class="container mt-10">
+<div class="container-fluid">
     @*<div>
     <a href="/home/NewIntegrationList/" class="btn btn-primary" style="width:75px; margin-bottom:20px;">Back</a>
     </div>id="integration",Appprovalintegration*@
@@ -557,9 +557,9 @@
                                 <label id="UserJourneyFile" class="label-control">@Model.UserJourneyFiles</label>&nbsp;&nbsp;
                                 <a class="btn btn-primary" id="btn_DownloadUserJorneyDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
 
-                                <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.UserJourneyFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+                                <a href="~/wwwroot/APIHuntDoc/NewIntegrations/@TempData["APIHuntId"]/@Model.UserJourneyFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
 
-                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.UserJourneyFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIHuntId"]+Model.UserJourneyFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
                                     <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
                                 </a>
                                 @Html.HiddenFor(x => x.UserJourneyFiles)
@@ -575,9 +575,9 @@
                             <div class="col-md-12">
                                 <label id="RDConceptNoteFile" class="label-control">@Model.RDConceptNoteFiles</label>&nbsp;&nbsp;
                                 <a class="btn btn-primary" id="btn_DownloadRDConceptNoteDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
-                                <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.RDConceptNoteFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+                                <a href="~/wwwroot/APIHuntDoc/NewIntegrations/@TempData["APIHuntId"]/@Model.RDConceptNoteFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
 
-                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.RDConceptNoteFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIHuntId"]+Model.RDConceptNoteFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
                                     <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
                                 </a>
                                 @Html.HiddenFor(x => x.RDConceptNoteFiles)
@@ -594,8 +594,8 @@
 
                                 <label id="SequenceDiagFile" class="label-control">@Model.SequenceDiagFiles</label>&nbsp;&nbsp;
                                 <a class="btn btn-primary" id="btn_DownloadSequenceDiagDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
-                                <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.SequenceDiagFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
-                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.SequenceDiagFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                                <a href="~/wwwroot/APIHuntDoc/NewIntegrations/@TempData["APIHuntId"]/@Model.SequenceDiagFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+                                <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIHuntId"]+Model.SequenceDiagFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
                                     <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
                                 </a>
                                 @Html.HiddenFor(x => x.SequenceDiagFiles)
@@ -804,8 +804,8 @@
                         @Html.HiddenFor(x => x.serviceDetails1.ExpectedAPISpecificationFiles)
                         <label id="ExpectedAPISpecificationFiles" class="label-control">@Model.serviceDetails1.ExpectedAPISpecificationFiles</label>&nbsp;&nbsp;
                         <a class="btn btn-primary" id="btn_DownloadExpAPISPCFDoc" style="display:inline-block;padding: 0px 4px;margin-top:5px"><i class="bx bx-cloud-download" style="font-size: 20px;margin-top:2px;"></i></a>
-                        <a href="~/wwwroot/APIAddaDoc/NewIntegrations/@TempData["APIAddaId"]/@Model.serviceDetails1.ExpectedAPISpecificationFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
-                        <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIAddaId"]+Model.serviceDetails1.ExpectedAPISpecificationFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
+                        <a href="~/wwwroot/APIHuntDoc/NewIntegrations/@TempData["APIHuntId"]/@Model.serviceDetails1.ExpectedAPISpecificationFiles" target="_blank" class="btn btn-primary" style="display:none;padding: 0px 4px;margin-top:5px"><i class="bx bxs-show" style="font-size:20px;"></i> </a>
+                        <a href="#" onclick="openFileInPopup('@Url.Action("DisplayFile", "Home" , new { fileName=TempData["APIHuntId"]+Model.serviceDetails1.ExpectedAPISpecificationFiles})')" class="btn btn-primary" style="display:inline-block;padding: 0px 4px;margin-top:5px">
                         <i class="bx bxs-show" style="font-size:20px;"></i> <!-- Display icon -->
                         </a>
 

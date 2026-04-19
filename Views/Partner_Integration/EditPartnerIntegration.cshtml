@@ -1,4 +1,4 @@
-﻿@model API_Adda.Models.PartnerOnboarding
+﻿@model API_HUNT.Models.PartnerOnboarding
 @inject IHttpContextAccessor Accessor
 @using Microsoft.AspNetCore.Http
 @using Newtonsoft.Json
@@ -21,7 +21,7 @@
 
 @using (Html.BeginForm("SaveEditPartner", "Partner_Integration", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-    <div class="container mt-10">
+    <div class="container-fluid">
         <div class="card">
             <div class="card-body">
                 <div class="row form-group">
@@ -209,7 +209,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="tblAPIbody" class="d-none">
-                                                @foreach (var item in Model.lstApiDeatil)
+                                                @foreach (var item in Model.lstApiDetail)
                                                 {
                                                     <tr>
                                                         <td>
@@ -226,21 +226,21 @@
                                                 }
                                             </tbody>
                                             <tbody id="tblAPIbody">
-                                                @for (var i = 0; i < Model.lstApiDeatil.Count; i++)
+                                                @for (var i = 0; i < Model.lstApiDetail.Count; i++)
                                                 {
                                                     <tr>
                                                         <td>
-                                                            @Model.lstApiDeatil[i].APIName
-                                                            @Html.HiddenFor(model => Model.lstApiDeatil[i].APIId)
+                                                            @Model.lstApiDetail[i].APIName
+                                                            @Html.HiddenFor(model => Model.lstApiDetail[i].APIId)
                                                         </td>
                                                         <td class="APIRisk">
-                                                            @Model.lstApiDeatil[i].APIRisk
+                                                            @Model.lstApiDetail[i].APIRisk
                                                         </td>
                                                         <td style="width: 120px;">
-                                                            @Model.lstApiDeatil[i].APIRiskScore
+                                                            @Model.lstApiDetail[i].APIRiskScore
                                                         </td>
 
-                                                        @if (i == Model.lstApiDeatil.Count - 1)
+                                                        @if (i == Model.lstApiDetail.Count - 1)
                                                         {
                                                             <td style="text-align: left;">
                                                                 <!-- Button only in the last iteration -->
