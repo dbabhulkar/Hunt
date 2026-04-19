@@ -2,7 +2,7 @@ namespace API_HUNT.DataBaseConnection
 {
     public class ConnectionDB
     {
-        // MySQL local connection string.
+        // MySQL local connection string. Need to be updated with actual credentials for local testing.
         // Update Server, Database, Uid, and Pwd to match your local MySQL setup.
         private const string MySqlConnectionString = "";
         public string getConString(string appId, string extra, string encryptedPassword, bool isProd)
