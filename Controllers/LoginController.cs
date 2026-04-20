@@ -11,6 +11,7 @@ using System.DirectoryServices;
 
 namespace API_HUNT.Controllers
 {
+    [SkipCustomFilter]
     public class LoginController : Controller
     {
         private readonly ILoginRepository _loginRepo;

@@ -10,7 +10,10 @@ namespace API_HUNT
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<API_HUNT.Models.CustomFilter>();
+            });
 
             // Form options (mirrors Startup.ConfigureServices)
             builder.Services.Configure<FormOptions>(options => { options.ValueCountLimit = 5000; });

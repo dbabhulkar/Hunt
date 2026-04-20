@@ -26,9 +26,6 @@ using System.Net.Http;
 
 namespace API_HUNT.Controllers
 {
-    [CustomFilter]
-
-    // [PassParametersDuringRedirect]
     public class HomeController : Controller
     {
         private readonly ISubmitRepository submitRepository;
@@ -3428,19 +3425,22 @@ namespace API_HUNT.Controllers
         {
             try
             {
-                int Id = Convert.ToInt32(TempData["integrationId"]);
+                if (string.IsNullOrWhiteSpace(fileName))
+                    return BadRequest();
+                fileName = Path.GetFileName(fileName); // Strip directory traversal
+
                 string UserId = HttpContext.Session.GetString("EmpId");
-                string path = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\APIHuntDoc\NewIntegrations\") + HttpContext.Session.GetString("folderName") + "\\" + fileName;
+                string basePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "APIHuntDoc", "NewIntegrations",
+                    HttpContext.Session.GetString("folderName") ?? string.Empty);
+                string path = FileSecurityHelper.GetSafePath(fileName, basePath);
                 byte[] bytes = System.IO.File.ReadAllBytes(path);
                 CaptureProductivityDetails(null!, UserId, "DownloadFile", "API HUNT", 1, "Download File ", " DownloadFile In for EmpCode - " + UserId.Trim());
                 return File(bytes, "application/octet-stream", fileName);
             }
-            catch (Exception Ex)
+            catch
             {
                 return NotFound();
             }
-
-
         }
         [HttpGet]
         public FileResult DownloadFileOBP(string fileName)
@@ -4634,34 +4634,38 @@ namespace API_HUNT.Controllers
 
         public IActionResult DisplayFile(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return BadRequest();
 
-            string filePath = Path.Combine(fileName);
-            int pos = fileName.LastIndexOf(".") + 1;
-            int pos1 = fileName.LastIndexOf("\\") + 1;
-            var extension = fileName.Substring(pos, fileName.Length - pos);
-            var diplayFilename = fileName.Substring(pos1, fileName.Length - pos1);
-            extension = "." + extension;
+            // Sanitize: strip any directory components to prevent path traversal
+            string safeFileName = Path.GetFileName(fileName);
+            if (string.IsNullOrWhiteSpace(safeFileName))
+                return BadRequest();
 
-            if (System.IO.File.Exists(filePath))
+            string basePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "APIHuntDoc", "NewIntegrations",
+                HttpContext.Session.GetString("folderName") ?? string.Empty);
+            string filePath;
+            try
             {
-                //byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-                //string contentType = GetContentType(extension);
-                //return File(fileBytes, contentType, diplayFilename);
-                byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
-                if (extension == ".docx" || extension == ".xlsx"/* || extension == ".txt" */|| extension == ".xls" || extension == ".zip" || extension == ".7z" || extension == ".doc")
-                {
-                    return File(fileBytes, "application/octet-stream", diplayFilename);
-                }
-                else
-                {
-                    string contentType = GetContentType(extension);
-                    return File(fileBytes, contentType);
-                }
+                filePath = FileSecurityHelper.GetSafePath(safeFileName, basePath);
             }
-            else
+            catch
             {
+                return BadRequest();
+            }
+
+            if (!System.IO.File.Exists(filePath))
                 return NotFound();
-            }
+
+            var extension = Path.GetExtension(filePath).ToLower();
+            var displayFilename = Path.GetFileName(filePath);
+            byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+            if (extension is ".docx" or ".xlsx" or ".xls" or ".zip" or ".7z" or ".doc")
+                return File(fileBytes, "application/octet-stream", displayFilename);
+
+            string contentType = GetContentType(extension);
+            return File(fileBytes, contentType);
         }
         private string GetContentType(string fileExtension)
         {
