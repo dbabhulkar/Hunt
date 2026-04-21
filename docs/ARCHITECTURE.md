@@ -142,7 +142,7 @@ Both are active in the codebase. The "New" version is the primary path.
 |------|-----------|
 | `HOPP` | Head Office - Partnership & Products |
 | `HOB` | Head Office - Business |
-| `HODB` | Head Office - Digital Banking |
+| `HODB` | Head Office - Digital Business |
 | `HOISG` | Head Office - Information Security Group |
 | `HOITDRM` | Head Office - IT Digital Risk Management |
 
@@ -190,7 +190,7 @@ Each role only sees items assigned to them by default. The `AccessRight` session
 | Level 2 | Level 1 + ITDRM VH, ITDRM GH, CISO GH |
 | Level 3 | IT VH, BSG VH, Business VH, Compliance VH, ITDRM VH, ISG VH, APEX Steering Committee |
 
-The exception level is determined by `ImpactOnBank` classification (called via AJAX `GetExceptionLevel`).
+The exception level is determined by `ImpactOnOrganization` classification (called via AJAX `GetExceptionLevel`).
 
 Exception cases reference an `OriginalOnboardingGASID` linking back to the original integration case.
 
@@ -198,7 +198,7 @@ Exception cases reference an `OriginalOnboardingGASID` linking back to the origi
 
 **Purpose**: Automatically create JIRA tickets for approved integrations.
 
-**Authentication**: Basic auth with hardcoded credentials (`genobpenh` / `Bank@2023`)
+**Authentication**: Basic auth with hardcoded credentials (`genobpenh` / `Pass@2026`)
 
 **Ticket creation logic** based on platform:
 - **External** (`IN_Platform == "External"`):
@@ -212,8 +212,8 @@ Exception cases reference an `OriginalOnboardingGASID` linking back to the origi
 After ticket creation, documents are zipped and uploaded as JIRA attachments via the attachments API.
 
 **Middleware IDs** (magic numbers):
-- `82` = SOA
-- `83` = OBP (Oracle Banking Platform)
+- `82` = SOA (Oracle SOA)
+- `83` = OBP (Oracle Platform On Premise)
 
 **Existing_New_Id values**:
 - `1` = Existing service
@@ -273,7 +273,7 @@ There is also a legacy `CaptureProductivityDetails` method in `Partner_Integrati
 | `tbl_API_HUNT_USER` | Application-level user records — role assignment, active status |
 | `TBL_OVI_RM_Hierarchy_Mapping` | Organizational hierarchy — maps EmpCode to EmpRole |
 | `tbl_API_HUNT_Activity_Log_Tracker` | Audit trail for all user actions |
-| `tbl_Mofee_Url` | External portal URL (for logout redirect) |
+| `tbl_API_HUNT_Url` | External portal URL (for logout redirect) |
 
 ---
 
@@ -404,7 +404,7 @@ Hunt/
 
 ## Risk & Compliance Context
 
-This application exists to enforce **API governance** in what appears to be a **banking/financial services organization**. Key indicators:
+This application exists to enforce **API governance** in what appears to be a **business/financial services organization**. Key indicators:
 
 - TPRM (Third-Party Risk Management) assessment is mandatory for partners
 - Risk scoring at both partner and API level
@@ -422,5 +422,5 @@ This application exists to enforce **API governance** in what appears to be a **
 |--------|----------|---------|
 | Active Directory | `LDAP://ldap.hunt.com` | User authentication |
 | JIRA | `https://jira.hunt.com/rest/api/2/` | Ticket creation for approved integrations |
-| Mofee Portal | URL from `tbl_Mofee_Url` | Parent application portal (redirects on logout) |
+| Mofee Portal | URL from `tbl_API_HUNT_Url` | Parent application portal (redirects on logout) |
 | Monitoring URLs | From database | OBP/SOA/APIGW health dashboards (UAT and Live) |
