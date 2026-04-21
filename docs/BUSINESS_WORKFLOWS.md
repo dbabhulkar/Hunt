@@ -37,7 +37,7 @@ IF user not found in UserMaster
 ISAC is the internal IT service request system where users must raise tickets for access issues.
 
 ### Logout
-On logout, the user is redirected to the LogOut=1.
+On logout, the user is redirected to the LogOut.
 
 ---
 
