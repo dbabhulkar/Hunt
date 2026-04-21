@@ -12,7 +12,7 @@ dotnet watch run          # with hot reload
 ## Local Database Setup
 
 1. Install MySQL 8.0+ and create a database called `hunt`
-2. The connection string is in `Models/DataBaseConnection.cs` — update credentials to match your local MySQL
+2. The connection string is in `appSettings.json` — update credentials to match your local MySQL
 3. The current local config points to `localhost:3306`, database `hunt`, user `root`
 
 **Important**: The production connection string in `Program.cs` passes an encrypted password (`COLD3whn89PtD+SNyCdvwQ==`) to `ConnectionDB.getConString()`. In the current code, `getConString()` ignores these parameters and returns the hardcoded local MySQL string. Production deployment would need the original `getConString()` logic restored.
@@ -50,9 +50,9 @@ Create these tables to get the app running locally:
 
 - `UserMaster` — Employee master with EmpCode, EmpName, Active, Locked, Dormant, Enabled, LastLoginDate, LastLogoutDate
 - `tbl_API_HUNT_USER` — App users with EmpCode, Role, IsActive
-- `TBL_OVI_RM_Hierarchy_Mapping` — Maps EmpCode to EmpRole
+- `TBL_API_HUNT_Hierarchy_Mapping` — Maps EmpCode to EmpRole
 - `tbl_API_HUNT_Activity_Log_Tracker` — Audit log
-- `tbl_Mofee_Url` — Single-row table with the external portal URL
+- `tbl_API_HUNT_Url` — Single-row table with the external portal URL
 
 ## Testing
 
