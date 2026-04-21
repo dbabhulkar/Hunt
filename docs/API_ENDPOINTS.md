@@ -9,7 +9,7 @@ All routes follow the pattern `/{Controller}/{Action}/{id?}`. Default route: `/L
 | GET | `/Login/Index` | Login page (or SSO via `?USERID=&USERNAME=` query params) |
 | POST | `/Login/Index` | Form login with EmpCode + password |
 | GET | `/Login/LogoutUser` | Logout, clear session, redirect to Mofee |
-| POST | `/Login/RedirectToLogin` | Redirect to Mofee portal |
+| POST | `/Login/RedirectToLogin` | Redirect to Login page|
 
 ## HomeController `[CustomFilter]`
 
