@@ -1,5 +1,6 @@
 using System.Data;
 using Microsoft.AspNetCore.Http;
+using MySqlConnector;
 
 namespace API_HUNT.Models
 {
@@ -18,10 +19,10 @@ namespace API_HUNT.Models
             using (var conn = _connectionFactory.CreateConnection())
             {
                 conn.Open();
-                using (var cmd = new SqlCommand("SELECT URL FROM TBL_API_URLMaster WHERE URLName = @URLName AND Status = 1", conn))
+                using (var cmd = new MySqlCommand("SELECT URL FROM TBL_API_URLMaster WHERE URLName = @URLName AND Status = 1", conn))
                 {
                     cmd.Parameters.AddWithValue("@URLName", radioValue);
-                    using (var da = new SqlDataAdapter(cmd))
+                    using (var da = new MySqlDataAdapter(cmd))
                     {
                         da.Fill(dt);
                     }
@@ -71,7 +72,7 @@ namespace API_HUNT.Models
             var list = new List<SelectItem>();
             using var conn = _connectionFactory.CreateConnection();
             conn.Open();
-            using var cmd = new SqlCommand("SELECT MisccdId AS ID, CDValDesc AS Val FROM tbl_API_HUNT_Misccd WHERE CDTP = @CDTP AND Status = 1 ORDER BY Seq", conn);
+            using var cmd = new MySqlCommand("SELECT MisccdId AS ID, CDValDesc AS Val FROM tbl_API_HUNT_Misccd WHERE CDTP = @CDTP AND Status = 1 ORDER BY Seq", conn);
             cmd.Parameters.AddWithValue("@CDTP", cdtp);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())

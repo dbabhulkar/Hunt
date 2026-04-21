@@ -80,9 +80,9 @@
 ┌────────────────────────────────────▼────────────────────────────────────────┐
 │                           DATA ACCESS LAYER                                 │
 │  ┌──────────────────────────────┬─────────────────────────────────────────┐│
-│  │ Direct SQL (SqlConnection)   │ Database: Hunt                          ││
-│  │ ├─ SqlCommand                │ ├─ Partner Tables                       ││
-│  │ ├─ SqlDataAdapter            │ ├─ Exception Tables                     ││
+│  │ Direct SQL (MySqlConnection)   │ Database: Hunt                          ││
+│  │ ├─ MySqlCommand                │ ├─ Partner Tables                       ││
+│  │ ├─ MySqlDataAdapter            │ ├─ Exception Tables                     ││
 │  │ ├─ Parameterized Queries     │ ├─ Approval Trail Tables                ││
 │  │ │  (inconsistent usage)      │ ├─ API Master Tables                    ││
 │  │ └─ Stored Procedures         │ ├─ User & Profile Tables                ││
@@ -1524,10 +1524,10 @@ Pooling: Default (likely enabled)
 **Connection Management:**
 ```
 Pattern:
-- New SqlConnection created in each controller constructor
+- New MySqlConnection created in each controller constructor
 - No connection pooling management visible
-- SqlDataAdapter for dataset operations
-- SqlCommand for query execution
+- MySqlDataAdapter for dataset operations
+- MySqlCommand for query execution
 
 Risk: Resource leaks if connections not properly closed
 ```

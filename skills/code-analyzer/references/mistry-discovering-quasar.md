@@ -63,7 +63,7 @@ Move these 5 helper method bodies from HomeController (shared by `newintegration
 - `RemoveListData` (lines 3995-4008) — pure model manipulation
 - `UpdateWorkflowIntegrationservice` (lines 4010-4043) — needs `ISubmitRepository`
 - `DeletePriviousdocinupdate` (lines 4419-4441) — pure file I/O
-- `CaptureProductivityDetails` (line 4414) — needs `IActivityLogRepository`; drop dead `SqlConnection` first param (always `null!`)
+- `CaptureProductivityDetails` (line 4414) — needs `IActivityLogRepository`; drop dead `MySqlConnection` first param (always `null!`)
 - `SetFilePath` (lines 4835-4839) — needs folder name from caller (pass as param instead of TempData)
 
 **Modify `HomeController.cs`:**

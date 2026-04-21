@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using MySqlConnector;
 
 namespace API_HUNT.Models
 {
@@ -15,7 +16,7 @@ namespace API_HUNT.Models
         public LoginUserRecord? GetUserMasterData(string userName)
         {
             using var connection = _connectionFactory.CreateConnection();
-            using var cmd = new SqlCommand(@"
+            using var cmd = new MySqlCommand(@"
                 SELECT a.EmpName, a.EmpCode, a.ProfileDescription, a.ProfileId, a.BranchCode, a.Id AS ID, a.Active,
                   CASE
                     WHEN a.Locked = 1 THEN 'Locked'
@@ -31,9 +32,9 @@ namespace API_HUNT.Models
                 WHERE LTRIM(RTRIM(a.Empcode)) = @p_Empcode
                   AND IFNULL(a.Flag,'') <> 'Resigned'", connection);
             cmd.CommandType = CommandType.Text;
-            cmd.CommandTimeout = 0;
-            cmd.Parameters.Add("@p_Empcode", SqlDbType.VarChar).Value = userName;
-            var da = new SqlDataAdapter(cmd);
+            cmd.CommandTimeout = 30;
+            cmd.Parameters.Add("@p_Empcode", MySqlDbType.VarChar).Value = userName;
+            var da = new MySqlDataAdapter(cmd);
             var ds = new DataSet();
             connection.Open();
             da.Fill(ds);
@@ -61,10 +62,10 @@ namespace API_HUNT.Models
         public string GetUserRole(string userId)
         {
             using var connection = _connectionFactory.CreateConnection();
-            using var cmd = new SqlCommand("SELECT Role FROM tbl_API_HUNT_USER WHERE EmpCode = @p_UserId AND IsActive = 1", connection);
+            using var cmd = new MySqlCommand("SELECT Role FROM tbl_API_HUNT_USER WHERE EmpCode = @p_UserId AND IsActive = 1", connection);
             cmd.CommandType = CommandType.Text;
             cmd.Parameters.AddWithValue("@p_UserId", userId);
-            var da = new SqlDataAdapter(cmd);
+            var da = new MySqlDataAdapter(cmd);
             var dt = new DataTable();
             connection.Open();
             da.Fill(dt);
@@ -74,8 +75,8 @@ namespace API_HUNT.Models
         public string GetMofeeUrl()
         {
             using var connection = _connectionFactory.CreateConnection();
-            using var cmd = new SqlCommand("SELECT Url FROM tbl_Mofee_Url LIMIT 1", connection);
-            var da = new SqlDataAdapter(cmd);
+            using var cmd = new MySqlCommand("SELECT Url FROM tbl_Mofee_Url LIMIT 1", connection);
+            var da = new MySqlDataAdapter(cmd);
             var dt = new DataTable();
             connection.Open();
             da.Fill(dt);

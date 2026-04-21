@@ -57,6 +57,12 @@ namespace API_HUNT.Controllers
             {
                 string empId = HttpContext.Session.GetString("EmpId") ?? string.Empty;
                 PartnerOnboardingNew objPartnerOnboarding = JsonConvert.DeserializeObject<PartnerOnboardingNew>(jsonPartnerOnboarding);
+
+                if (objPartnerOnboarding == null)
+                {
+                    return BadRequest("Invalid partner onboarding data.");
+                    // or: throw new ArgumentException("Failed to deserialize partner onboarding data.");
+                }
                 objPartnerOnboarding.CreatedBy = empId;
 
                 var fileData = _partnerRepo.GetNewPartnerID();
@@ -131,10 +137,13 @@ namespace API_HUNT.Controllers
 
         public IActionResult DownloadFile(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
+            fileName = Path.GetFileName(fileName);
+
             string[] extensions = { ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".txt", ".xls", ".zip", ".7z", ".doc" };
             foreach (var ext in extensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + ext);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + ext, uploadFolderPath);
                 if (System.IO.File.Exists(filePath))
                     return File(System.IO.File.ReadAllBytes(filePath), "application/octet-stream", fileName + ext);
             }
@@ -143,10 +152,13 @@ namespace API_HUNT.Controllers
 
         public IActionResult DisplayFile(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
+            fileName = Path.GetFileName(fileName);
+
             string[] extensions = { ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".txt", ".xls", ".zip", ".7z", ".doc" };
             foreach (var ext in extensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + ext);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + ext, uploadFolderPath);
                 if (System.IO.File.Exists(filePath))
                 {
                     byte[] bytes = System.IO.File.ReadAllBytes(filePath);
@@ -181,10 +193,13 @@ namespace API_HUNT.Controllers
 
         private void DeleteFile(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return;
+            fileName = Path.GetFileName(fileName);
+
             string[] extensions = { ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".txt", ".xls", ".zip", ".7z", ".doc" };
             foreach (var ext in extensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + ext);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + ext, uploadFolderPath);
                 if (System.IO.File.Exists(filePath))
                     System.IO.File.Delete(filePath);
             }
@@ -192,12 +207,12 @@ namespace API_HUNT.Controllers
 
         private static string GetContentType(string ext) => ext.ToLower() switch
         {
-            ".png"  => "image/png",
+            ".png" => "image/png",
             ".jpg" or ".jpeg" => "image/jpeg",
-            ".gif"  => "image/gif",
-            ".pdf"  => "application/pdf",
-            ".txt"  => "text/plain",
-            _       => "application/octet-stream"
+            ".gif" => "image/gif",
+            ".pdf" => "application/pdf",
+            ".txt" => "text/plain",
+            _ => "application/octet-stream"
         };
     }
 }

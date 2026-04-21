@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using MySqlConnector;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -621,24 +621,24 @@ namespace API_HUNT.Controllers
                 }
             }
         }
-        public void CaptureProductivityDetails(SqlConnection Con, string Empcode, string Form_Name, string Module_Name, int Total_Count, string Activity, string Activity_Details)
+        public void CaptureProductivityDetails(MySqlConnection Con, string Empcode, string Form_Name, string Module_Name, int Total_Count, string Activity, string Activity_Details)
         {
-            SqlCommand cmd = null;
+            MySqlCommand cmd = null;
             try
             {
                 if (Con.State == ConnectionState.Closed) { Con.Open(); }
 
-                cmd = new SqlCommand("USP_Insert_Data_In_Activity_Log_Tracker_API_HUNT", Con);
+                cmd = new MySqlCommand("USP_Insert_Data_In_Activity_Log_Tracker_API_HUNT", Con);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@Emp_Code", SqlDbType.Text).Value = Empcode;
-                cmd.Parameters.Add("@Form_Name", SqlDbType.Text).Value = Form_Name;
-                cmd.Parameters.Add("@Module_Name", SqlDbType.Text).Value = Module_Name;
-                cmd.Parameters.Add("@Total_Count", SqlDbType.Int).Value = Total_Count;
-                cmd.Parameters.Add("@Activity", SqlDbType.Text).Value = Activity;
-                cmd.Parameters.Add("@Activity_Details", SqlDbType.Text).Value = Activity_Details;
+                cmd.Parameters.Add("@Emp_Code", MySqlDbType.Text).Value = Empcode;
+                cmd.Parameters.Add("@Form_Name", MySqlDbType.Text).Value = Form_Name;
+                cmd.Parameters.Add("@Module_Name", MySqlDbType.Text).Value = Module_Name;
+                cmd.Parameters.Add("@Total_Count", MySqlDbType.Int32).Value = Total_Count;
+                cmd.Parameters.Add("@Activity", MySqlDbType.Text).Value = Activity;
+                cmd.Parameters.Add("@Activity_Details", MySqlDbType.Text).Value = Activity_Details;
 
 
-                cmd.CommandTimeout = 0;
+                cmd.CommandTimeout = 30;
                 cmd.ExecuteNonQuery();
                 cmd.Dispose();
 

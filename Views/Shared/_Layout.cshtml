@@ -108,7 +108,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/PartnerOffboarding/Index/">
+                    <a href="/PartnerOffboarding/PartnerOffboarding/">
                         <img src="~/images/icons/portfolio.svg" class="nav-icon" alt="" />
                         <span>Partner Offboarding</span>
                     </a>
@@ -161,7 +161,19 @@
         </div>
     </div>
 
+    @Html.AntiForgeryToken()
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        // Send CSRF token with all AJAX POST/PUT/DELETE requests
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (settings.type && settings.type.toUpperCase() !== 'GET') {
+                    var token = $('input[name="__RequestVerificationToken"]').val();
+                    if (token) xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                }
+            }
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prismjs/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>

@@ -23,6 +23,7 @@ namespace API_HUNT.Controllers
             _activityLog = activityLog;
         }
 
+        [IgnoreAntiforgeryToken]
         public IActionResult Index(string USERID, string USERNAME)
         {
             try
@@ -151,6 +152,9 @@ namespace API_HUNT.Controllers
                 _activityLog.LogActivity(userId, "Logout", "API HUNT", 1, "Logout successfully", "Logout successfully for EmpCode - " + userId);
                 HttpContext.Session.Clear();
                 HttpContext.Session.Remove("EmpId");
+
+                if (!IsValidRedirectUrl(mofeeUrl + "?LogOut=1"))
+                    return RedirectToAction("Index", "Login");
                 return Redirect(mofeeUrl + "?LogOut=1");
             }
             catch (Exception)
@@ -165,12 +169,21 @@ namespace API_HUNT.Controllers
             try
             {
                 string mofeeUrl = _loginRepo.GetMofeeUrl();
+                if (!IsValidRedirectUrl(mofeeUrl))
+                    return RedirectToAction("Index", "Login");
                 return Redirect(mofeeUrl);
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        private static bool IsValidRedirectUrl(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return false;
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return false;
+            return uri.Scheme == "https" || uri.Scheme == "http";
         }
 
         private bool ValidateActiveDirectoryLogin(string domain, string userName, string password)

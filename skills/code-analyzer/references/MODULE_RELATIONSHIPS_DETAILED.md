@@ -575,7 +575,7 @@ ENTITY: Role
 │                                                    │
 │ GetConnectionString (Database Connection)         │
 │  ├─ Static Property: Startup.connectionstring      │
-│  ├─ Type: SqlConnection                            │
+│  ├─ Type: MySqlConnection                            │
 │  └─ Source: Not visible in codebase                │
 │                                                    │
 │ Activity Logging (Manual Implementation)           │

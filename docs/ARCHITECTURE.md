@@ -40,7 +40,7 @@ The application is used by employees identified by their `EmpCode` (employee ID)
 | Layer | Technology |
 |-------|-----------|
 | Framework | ASP.NET Core 8.0 MVC |
-| Database | MySQL (via MySqlConnector, wrapped in `SqlCommand`/`SqlDataAdapter` patterns) |
+| Database | MySQL (via MySqlConnector, wrapped in `MySqlCommand`/`MySqlDataAdapter` patterns) |
 | Auth | Active Directory / LDAP (`LDAP://ldap.hunt.com`) |
 | Ticketing | JIRA REST API v2 (`https://jira.hunt.com`) |
 | Excel Export | EPPlus |
@@ -240,15 +240,15 @@ Redirects to monitoring URLs stored in the database, mapped by platform:
 
 ### Connection Factory
 
-`DbConnectionFactory` wraps `SqlConnection` (actually MySqlConnector) and automatically executes `SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci` on every connection open. This ensures proper Unicode support.
+`DbConnectionFactory` wraps `MySqlConnection` (actually MySqlConnector) and automatically executes `SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci` on every connection open. This ensures proper Unicode support.
 
 ### Query Pattern (used everywhere)
 
 ```csharp
 using var connection = _connectionFactory.CreateConnection();
-using var cmd = new SqlCommand("SELECT ... WHERE col = @p_col", connection);
-cmd.Parameters.Add("@p_col", SqlDbType.VarChar).Value = value;
-var da = new SqlDataAdapter(cmd);
+using var cmd = new MySqlCommand("SELECT ... WHERE col = @p_col", connection);
+cmd.Parameters.Add("@p_col", MySqlDbType.VarChar).Value = value;
+var da = new MySqlDataAdapter(cmd);
 var ds = new DataSet();
 connection.Open();
 da.Fill(ds);

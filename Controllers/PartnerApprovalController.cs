@@ -108,10 +108,13 @@ namespace API_HUNT.Controllers
 
         public IActionResult ShowImage(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
+            fileName = Path.GetFileName(fileName);
+
             var extensions = new[] { ".png", ".jpg", ".jpeg", ".gif" };
             foreach (var ext in extensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + ext);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + ext, uploadFolderPath);
                 if (System.IO.File.Exists(filePath))
                     return File(new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read), "image/jpeg");
             }
@@ -130,10 +133,13 @@ namespace API_HUNT.Controllers
 
         private IActionResult ServeFile(string fileName, bool display = false)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
+            fileName = Path.GetFileName(fileName);
+
             string[] extensions = { ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".txt", ".xls", ".zip", ".7z", ".doc" };
             foreach (var ext in extensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + ext);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + ext, uploadFolderPath);
                 if (System.IO.File.Exists(filePath))
                 {
                     byte[] bytes = System.IO.File.ReadAllBytes(filePath);

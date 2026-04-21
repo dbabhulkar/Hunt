@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using MySqlConnector;
 using System.Linq;
 using System.Threading.Tasks;
 using API_HUNT;
@@ -13,7 +13,7 @@ namespace OneViewIndicator.Controllers
 {
     public class CommonController : Controller
     {
-        SqlConnection sqlCon = new SqlConnection(Startup.connectionstring);
+        MySqlConnection sqlCon = new MySqlConnection(Startup.connectionstring);
         public IActionResult Index()
         {
             return View();

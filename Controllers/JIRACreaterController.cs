@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using MySqlConnector;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace API_HUNT.Controllers
         private readonly IActivityLogRepository _activityLog;
         private readonly HomeController _homeController;
         private readonly HttpClient _httpClient;
-        public JIRACreatorController(HttpClient httpClient, ISubmitRepository submitRepo, IJiraRepository jiraRepo, IActivityLogRepository activityLog, HomeController homeControllerDep)
+        public JIRACreatorController(HttpClient httpClient, ISubmitRepository submitRepo, IJiraRepository jiraRepo, IActivityLogRepository activityLog, HomeController homeControllerDep, IConfiguration configuration)
         {
             _httpClient = httpClient;
             submitRepository = submitRepo;
@@ -30,9 +30,9 @@ namespace API_HUNT.Controllers
             _activityLog = activityLog;
             _homeController = homeControllerDep;
 
-            // Set up Basic Authentication
-            var username = "genobpenh";
-            var password = "Bank@2023";
+            // Set up Basic Authentication from configuration
+            var username = configuration["JiraSettings:Username"] ?? string.Empty;
+            var password = configuration["JiraSettings:Password"] ?? string.Empty;
             var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", basicAuth);
         }

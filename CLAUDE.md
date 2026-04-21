@@ -27,11 +27,11 @@ The solution (`Hunt.sln`) contains three projects: `Hunt` (main app), `Hunt.Test
 
 ### Data Access
 
-Uses **raw ADO.NET** (not EF Core). Database is **MySQL** via MySqlConnector, but code uses `SqlCommand`/`SqlDataAdapter` patterns.
+Uses **raw ADO.NET** (not EF Core). Database is **MySQL** via MySqlConnector, but code uses `MySqlCommand`/`MySqlDataAdapter` patterns.
 
 - Connection string built in `Program.cs` via `ConnectionDB.getConString()` (defined in `Models/DataBaseConnection.cs`) with encrypted credentials.
 - Connection factory: `IDbConnectionFactory` / `DbConnectionFactory` — injected into repositories.
-- Data pattern: `SqlDataAdapter` → `DataSet` → iterate `DataTable.Rows`. Parameters use `@p_` prefix convention.
+- Data pattern: `MySqlDataAdapter` → `DataSet` → iterate `DataTable.Rows`. Parameters use `@p_` prefix convention.
 
 ### Authentication Flow
 

@@ -72,7 +72,7 @@ namespace API_HUNT
             //connectionstring = strConnection;
             //Emailconnectionstring = strConnectionemail;  
             //string strConnectionemail = VaultAPI_Live.DBConnection.GetDBVault("zMWOpB3jCjLJzCpaF2nWKg==", "2415005", emp, sValues);
-            //string strConnectionemail = "Data Source = 10.226.70.52\\MSSQLSERVER,1989; Initial Catalog = SMTP_MAIL; User ID = BTGAPP_N5074; password = T52bc@Cro1; Max Pool Size = 32767";
+            // SMTP connection string removed — use appsettings.json for email configuration
             connectionstring = strConnection;
             //Emailconnectionstring = strConnectionemail;
 

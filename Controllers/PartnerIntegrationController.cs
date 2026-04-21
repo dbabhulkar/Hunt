@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using API_HUNT.Models;
 using System.Data;
-using System.Data.SqlClient;
+using MySqlConnector;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -99,7 +99,7 @@ namespace API_HUNT.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { error = "An error occurred while fetching partner details: " + ex.Message });
+                return Json(new { error = "An error occurred while fetching partner details. Please try again later." });
             }
         }
         public JsonResult PartnerCaseApprovalMetrix(string PartnerRiskClassification, string APIRiskClassification, string ApproverType,
@@ -221,11 +221,14 @@ namespace API_HUNT.Controllers
         }
         public void DeleteFile(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return;
+            fileName = Path.GetFileName(fileName);
+
             string[] supportedExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".txt", ".xls", ".zip", ".7z", ".doc" };
 
             foreach (string extension in supportedExtensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + extension);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + extension, uploadFolderPath);
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -317,11 +320,14 @@ namespace API_HUNT.Controllers
         }
         public IActionResult DownloadFile(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
+            fileName = Path.GetFileName(fileName);
+
             string[] supportedExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".txt", ".xls", ".zip", ".7z", ".doc" };
 
             foreach (string extension in supportedExtensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + extension);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + extension, uploadFolderPath);
 
                 if (System.IO.File.Exists(filePath))
                 {
@@ -334,11 +340,14 @@ namespace API_HUNT.Controllers
         }
         public IActionResult DisplayFile(string fileName)
         {
+            if (string.IsNullOrWhiteSpace(fileName)) return BadRequest("File name is required.");
+            fileName = Path.GetFileName(fileName);
+
             string[] supportedExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".docx", ".xlsx", ".txt", ".xls", ".zip", ".7z", ".doc" };
 
             foreach (string extension in supportedExtensions)
             {
-                string filePath = Path.Combine(uploadFolderPath, fileName + extension);
+                string filePath = FileSecurityHelper.GetSafePath(fileName + extension, uploadFolderPath);
 
                 if (System.IO.File.Exists(filePath))
                 {

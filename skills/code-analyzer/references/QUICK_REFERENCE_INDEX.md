@@ -155,7 +155,7 @@ Consistency: Need for referential integrity (FKs not enforced in schema)
 - Current: SQL Server 2016+
 - Name: "Hunt"
 - Tables: ~50 with mix of legacy (tbl_API_*) and current (tbl_API_HUNT_*) naming
-- No ORMs: Direct SQL queries via SqlConnection/SqlCommand
+- No ORMs: Direct SQL queries via MySqlConnection/MySqlCommand
 - **Recommendation**: Switch to ORM (Hibernate/SQLAlchemy) in new system
 
 ### **Authentication**

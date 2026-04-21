@@ -72,7 +72,7 @@ PartnerDashboardController
   └── (no dependencies — empty shell)
 
 CommonController
-  └── (no DI — uses static SqlConnection from dead Startup class)
+  └── (no DI — uses static MySqlConnection from dead Startup class)
 ```
 
 ### DI Registration Summary (Program.cs)
@@ -228,7 +228,7 @@ CommonController
 |---|---|---|
 | Crypto no-ops | `Models/AppEDCrypto.cs` — Encrypt/Decrypt are identity functions | HIGH |
 | Hardcoded connection string parameters | `Program.cs:37` and `startupclass.cs:65` contain encrypted DB credential keys | MEDIUM |
-| Static SQL connection | `CommonController.cs` uses static `SqlConnection` outside DI | MEDIUM |
+| Static SQL connection | `CommonController.cs` uses static `MySqlConnection` outside DI | MEDIUM |
 | SQL queries | Parameterized queries appear to be used consistently (no SQL injection found) | OK |
 
 ---

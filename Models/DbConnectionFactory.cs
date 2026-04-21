@@ -1,3 +1,5 @@
+using MySqlConnector;
+
 namespace API_HUNT.Models
 {
     public class DbConnectionFactory : IDbConnectionFactory
@@ -9,14 +11,14 @@ namespace API_HUNT.Models
             _connectionString = connectionString;
         }
 
-        public SqlConnection CreateConnection()
+        public MySqlConnection CreateConnection()
         {
-            var conn = new SqlConnection(_connectionString);
+            var conn = new MySqlConnection(_connectionString);
             conn.StateChange += (sender, e) =>
             {
                 if (e.CurrentState == System.Data.ConnectionState.Open)
                 {
-                    using var cmd = ((SqlConnection)sender!).CreateCommand();
+                    using var cmd = ((MySqlConnection)sender!).CreateCommand();
                     cmd.CommandText = "SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci;";
                     cmd.ExecuteNonQuery();
                 }

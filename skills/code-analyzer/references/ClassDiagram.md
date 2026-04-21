@@ -21,11 +21,11 @@ class IActionFilter {
 %% ============================================================
 
 class HomeController {
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -SubmitRepository submitRepository
     -int workflowstatus
-    -SqlCommand cmd
-    -SqlDataAdapter sda
+    -MySqlCommand cmd
+    -MySqlDataAdapter sda
     -HttpClient _httpClient
     +Index() IActionResult
     +DiagnoseIssue() IActionResult
@@ -64,7 +64,7 @@ class HomeController {
     +DownloadZip(string) IActionResult
     +GetBTGPorjectMngr(string) JsonResult
     +UploadFile(string, IFormFile) IActionResult
-    +CaptureProductivityDetails(SqlConnection, string, string, string, int, string, string) void
+    +CaptureProductivityDetails(MySqlConnection, string, string, string, int, string, string) void
     +Table_Export_IntegratedXL(DataSet, int, string) void
 }
 
@@ -74,7 +74,7 @@ class AdminController {
     -displayUsermaster disUsermaster
     -displayAppmaster disAppmaster
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     +Index() IActionResult
     +Admins() IActionResult
     +Admins(AdminMaster, string) IActionResult
@@ -87,7 +87,7 @@ class AdminController {
 }
 
 class LoginController {
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -DataSet chkstatus
     -ResponseContent message
     +Index(string, string) IActionResult
@@ -99,11 +99,11 @@ class LoginController {
     +GetMOfeeUrl() string
     +GetUserRole(string) string
     +ValidateActiveDirectoryLogin(string, string, string) bool
-    +CaptureProductivityDetails(SqlConnection, string, string, string, int, string, string) void
+    +CaptureProductivityDetails(MySqlConnection, string, string, string, int, string, string) void
 }
 
 class CommonController {
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     +Index() IActionResult
     +SessionExpiry() IActionResult
 }
@@ -116,7 +116,7 @@ class PartnerDashboardController {
 class PartnerOnboardingController {
     -PartnerRepository submitrepository_Obj
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -string uploadFolderPath
     +Index() IActionResult
     +ListofPartner(string) IActionResult
@@ -129,7 +129,7 @@ class PartnerOnboardingController {
 
 class PartnerOnboardingNewController {
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -string uploadFolderPath
     +ListofPartner() IActionResult
     +AddPartnerOnBoarding() IActionResult
@@ -141,7 +141,7 @@ class PartnerOnboardingNewController {
 class PartnerApprovalController {
     -string uploadFolderPath
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -PartnerApprovalRepository partnerApprovalRepository
     +Index() IActionResult
     +ApprovedPartner(string) IActionResult
@@ -154,7 +154,7 @@ class PartnerApprovalController {
 
 class PartnerApprovalNewController {
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -string uploadFolderPath
     -PartnerOnboardingNewRepository PartnerRepository
     +ListofPartner() IActionResult
@@ -165,7 +165,7 @@ class PartnerApprovalNewController {
 class PartnerIntegrationController {
     -PartnerRepository submitrepository_Obj
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -string uploadFolderPath
     +Index() IActionResult
     +AddEditPartnerIntegration() IActionResult
@@ -174,7 +174,7 @@ class PartnerIntegrationController {
 
 class PartnerIntegrationNewController {
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -string uploadFolderPath
     -PartnerOnboardingNewRepository partnerOnboardingNewRepository
     +ListofPartner(string) IActionResult
@@ -185,7 +185,7 @@ class PartnerIntegrationNewController {
 class Partner_IntegrationController {
     -PartnerRepository submitrepository_Obj
     -HomeController homeController
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -string uploadFolderPath
     +Index() IActionResult
     +ListofPartnerIntegration(string) IActionResult
@@ -227,13 +227,13 @@ class ExceptionApprovalController {
 }
 
 class JIRACreaterController {
-    -SqlConnection sqlCon
+    -MySqlConnection sqlCon
     -SubmitRepository submitRepository
     -JIRARepository jIRARepository
     -HomeController homeController
     -HttpClient _httpClient
-    -SqlCommand cmd
-    -SqlDataAdapter sda
+    -MySqlCommand cmd
+    -MySqlDataAdapter sda
     +CreateJIRA(NewIntegration) Task~NewIntegration~
     +JIRADocUpload(NewIntegration, string) Task~string~
 }

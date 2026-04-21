@@ -8,7 +8,7 @@ using API_HUNT.Models;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using System.Data;
-using System.Data.SqlClient;
+using MySqlConnector;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
@@ -32,14 +32,16 @@ namespace API_HUNT.Controllers
         private readonly IActivityLogRepository _activityLog;
         private readonly IDbConnectionFactory _connectionFactory;
         private readonly IJiraRepository _jiraRepository;
+        private readonly IConfiguration _configuration;
         int workflowstatus = 0;
 
-        public HomeController(ISubmitRepository submitRepo, IActivityLogRepository activityLog, IDbConnectionFactory connectionFactory, IJiraRepository jiraRepository)
+        public HomeController(ISubmitRepository submitRepo, IActivityLogRepository activityLog, IDbConnectionFactory connectionFactory, IJiraRepository jiraRepository, IConfiguration configuration)
         {
             submitRepository = submitRepo;
             _activityLog = activityLog;
             _connectionFactory = connectionFactory;
             _jiraRepository = jiraRepository;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -594,11 +596,11 @@ namespace API_HUNT.Controllers
                 DataTable dataSet = new DataTable();
                 using (var sqlCon1 = _connectionFactory.CreateConnection())
                 {
-                    var cmd1 = new SqlCommand("SELECT CreatedAt FROM TBL_API_HUNT_Integration WHERE IntegrationId = @IntegrationId", sqlCon1);
+                    var cmd1 = new MySqlCommand("SELECT CreatedAt FROM TBL_API_HUNT_Integration WHERE IntegrationId = @IntegrationId", sqlCon1);
                     cmd1.CommandType = CommandType.Text;
                     cmd1.Parameters.AddWithValue("@IntegrationId", umodel.IntegrationId);
                     sqlCon1.Open();
-                    var sda1 = new SqlDataAdapter(cmd1);
+                    var sda1 = new MySqlDataAdapter(cmd1);
                     sda1.Fill(dataSet);
                 }
                 if (dataSet.Rows.Count > 0)
@@ -618,10 +620,10 @@ namespace API_HUNT.Controllers
                 dataSet = new DataTable();
                 using (var sqlCon2 = _connectionFactory.CreateConnection())
                 {
-                    var cmd2 = new SqlCommand("SELECT IntegrationId FROM TBL_API_HUNT_Integration ORDER BY IntegrationId DESC", sqlCon2);
+                    var cmd2 = new MySqlCommand("SELECT IntegrationId FROM TBL_API_HUNT_Integration ORDER BY IntegrationId DESC", sqlCon2);
                     cmd2.CommandType = CommandType.Text;
                     sqlCon2.Open();
-                    var sda2 = new SqlDataAdapter(cmd2);
+                    var sda2 = new MySqlDataAdapter(cmd2);
                     sda2.Fill(dataSet);
                 }
 
@@ -2054,9 +2056,9 @@ namespace API_HUNT.Controllers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                searchAPI.response = ex.Message;
+                searchAPI.response = "An error occurred while processing the request.";
             }
             //TempData["searchAPITemp"] = searchAPI;
             TempData["TestApidata"] = JsonConvert.SerializeObject(searchAPI);
@@ -2100,9 +2102,9 @@ namespace API_HUNT.Controllers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                searchAPI.response = ex.Message;
+                searchAPI.response = "An error occurred while processing the request.";
             }
             //TempData["searchAPITemp"] = searchAPI;
             // TempData["TestApidata"] = JsonConvert.SerializeObject(searchAPI);
@@ -2498,12 +2500,10 @@ namespace API_HUNT.Controllers
                     return View(search_api);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // search_api.Raw = ex.Message;
-
-                search_api.ResponseSample = ex.Message;
-                search_api.response = ex.Message;
+                search_api.ResponseSample = "An error occurred while processing the request.";
+                search_api.response = "An error occurred while processing the request.";
                 return View(search_api);
             }
 
@@ -2612,7 +2612,7 @@ namespace API_HUNT.Controllers
         public IActionResult Appprovalintegration(NewIntegration umodel, string button = null)
         {
             var httpClient = new HttpClient();
-            var jiraApiService = new JIRACreatorController(httpClient, submitRepository, _jiraRepository, _activityLog, this);
+            var jiraApiService = new JIRACreatorController(httpClient, submitRepository, _jiraRepository, _activityLog, this, _configuration);
             try
             {
                 // var serviceDetails1 = umodel.serviceDetails1;
@@ -3443,23 +3443,29 @@ namespace API_HUNT.Controllers
             }
         }
         [HttpGet]
-        public FileResult DownloadFileOBP(string fileName)
+        public IActionResult DownloadFileOBP(string fileName)
         {
-            string filePath = "";
             try
             {
-                int Id = Convert.ToInt32(TempData["integrationId"]);
+                if (string.IsNullOrWhiteSpace(fileName))
+                    return BadRequest("File name is required.");
+
+                fileName = Path.GetFileName(fileName);
+
+                string basePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "APIHuntDoc", "NewIntegrations", HttpContext.Session.GetString("folderName") ?? string.Empty);
+                string filePath = FileSecurityHelper.GetSafePath(fileName, basePath);
+
+                if (!System.IO.File.Exists(filePath))
+                    return NotFound();
+
                 string UserId = HttpContext.Session.GetString("EmpId");
-                filePath = Path.Combine(Directory.GetCurrentDirectory() + @"\wwwroot\APIHuntDoc\NewIntegrations\" + HttpContext.Session.GetString("folderName") + "\\");
-                filePath = filePath + fileName;
                 byte[] bytes = System.IO.File.ReadAllBytes(filePath);
                 CaptureProductivityDetails(null!, UserId, "DownloadFile", "API HUNT", 1, "Download File ", " DownloadFile In for EmpCode - " + UserId.Trim());
                 return File(bytes, "application/octet-stream", fileName);
             }
-
-            catch (Exception ex)
+            catch (UnauthorizedAccessException)
             {
-                throw;
+                return BadRequest("Invalid file name.");
             }
         }
         [HttpPost]
@@ -4411,7 +4417,7 @@ namespace API_HUNT.Controllers
 
 
         }
-        public void CaptureProductivityDetails(SqlConnection Con, string Empcode, string Form_Name, string Module_Name, int Total_Count, string Activity, string Activity_Details)
+        public void CaptureProductivityDetails(MySqlConnection Con, string Empcode, string Form_Name, string Module_Name, int Total_Count, string Activity, string Activity_Details)
         {
             _activityLog.LogActivity(Empcode, Form_Name, Module_Name, Total_Count, Activity, Activity_Details);
         }
@@ -4823,7 +4829,7 @@ namespace API_HUNT.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                return StatusCode(500, "An internal error occurred. Please try again later.");
             }
         }
 
@@ -4883,7 +4889,7 @@ namespace API_HUNT.Controllers
             }
             catch (Exception ex)
             {
-                return Content($"Error uploading file: {ex.Message}");
+                return Content("Error uploading file. Please try again later.");
             }
         }
     }

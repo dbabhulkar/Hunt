@@ -13,6 +13,12 @@ namespace API_HUNT
             builder.Services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<API_HUNT.Models.CustomFilter>();
+                options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
+            });
+
+            builder.Services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-CSRF-TOKEN";
             });
 
             // Form options (mirrors Startup.ConfigureServices)
@@ -24,6 +30,9 @@ namespace API_HUNT
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.IsEssential = true;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Strict;
             });
 
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -33,7 +42,9 @@ namespace API_HUNT
             builder.Services.AddHttpClient();
 
             // Database connection factory — single source of truth for the connection string
-            var connectionString = new ConnectionDB().getConString("1605485", string.Empty, "COLD3whn89PtD+SNyCdvwQ==", isProd: true);
+            var connectionString = builder.Configuration.GetConnectionString("HuntDb")
+                ?? throw new InvalidOperationException("Missing ConnectionStrings:HuntDb in appsettings.json");
+            ConnectionDB.SetConnectionString(connectionString);
             builder.Services.AddSingleton<IDbConnectionFactory>(new DbConnectionFactory(connectionString));
 
             // Repositories
