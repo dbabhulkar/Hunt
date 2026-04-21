@@ -37,7 +37,7 @@ IF user not found in UserMaster
 ISAC is the internal IT service request system where users must raise tickets for access issues.
 
 ### Logout
-On logout, the user is redirected to the Mofee portal URL (from `tbl_Mofee_Url`) with `?LogOut=1` appended.
+On logout, the user is redirected to the LogOut=1.
 
 ---
 
