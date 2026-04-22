@@ -1,0 +1,486 @@
+%% ==========================================================================
+%%  Hunt Database - Entity Relationship Diagram
+%%  Source : Hunt_mysql_tables.sql (converted from SQL Server dump)
+%%  Tables : 46  |  Declared FKs : 18
+%%
+%%  Logical Domains
+%%  ---------------
+%%   A. User / Authentication / Hierarchy
+%%   B. Application Masters & SPOC
+%%   C. Integration / Service Onboarding
+%%   D. Question-Risk Assessment
+%%   E. Partner Onboarding / Approval / Audit
+%%   F. Exception Management
+%%   G. API Main / External Service Catalogue
+%%   H. Generic Masters & Utility
+%%
+%%  Solid lines  : FK explicitly declared in the DDL
+%%  (Implicit / missing relationships are documented in the .md report.)
+%% ==========================================================================
+erDiagram
+
+    %% ------------------------------------------------------------------
+    %% A. USER / AUTH / HIERARCHY
+    %% ------------------------------------------------------------------
+    ProfileMaster {
+        DECIMAL ProfileId PK
+        varchar ProfileShortCode
+        varchar ProfileName
+        TINYINT  Authorised
+        varchar Flag
+    }
+
+    UserMaster {
+        BIGINT  Id PK
+        varchar EmpCode UK
+        varchar EmpName
+        DECIMAL ProfileId FK
+        DECIMAL BranchCode
+        varchar Department
+        TINYINT Active
+        TINYINT Locked
+        varchar Flag
+    }
+
+    LoginAttempts {
+        DECIMAL Id PK
+        varchar Empcode
+        varchar Empname
+        int     ProfileId
+        varchar ProfileName
+        int     Brcode
+        varchar IpAddress
+        datetime LoginTime
+    }
+
+    TBL_API_HUNT_Hierarchy_Mapping {
+        varchar EmpCode
+        varchar EmpName
+        varchar EmpRole
+        varchar SupervisorCode
+        varchar SupervisorName
+        varchar Business
+        varchar EmpEmail
+    }
+
+    tbl_API_hunt_USER {
+        int     Id PK
+        varchar EmpCode
+        varchar Role
+        varchar EmailId
+        int     IsActive
+    }
+
+    tbl_API_hunt_Activity_Log_Tracker {
+        varchar Emp_Code
+        varchar Form_Name
+        varchar Module_Name
+        varchar Activity
+        datetime Activity_Date
+    }
+
+    %% ------------------------------------------------------------------
+    %% B. APPLICATION MASTERS & SPOC
+    %% ------------------------------------------------------------------
+    tbl_API_MstApplications {
+        int     Id PK
+        varchar APPShortName
+        varchar FullName
+        varchar ITGRCCode
+        varchar HostingDC
+        int     status
+    }
+
+    tbl_API_ApplicationsSPOC {
+        int     Id PK
+        int     APPID FK
+        varchar APPShortName
+        varchar SPOCDepartment
+        varchar SpocEMPCode
+        varchar EmailAddress
+        int     status
+    }
+
+    TBL_API_HUNT_Producer {
+        int     ProducerId PK
+        varchar ApplicationName
+        varchar CreatedBy
+        datetime CreatedAt
+    }
+
+    %% ------------------------------------------------------------------
+    %% C. INTEGRATION / SERVICE ONBOARDING
+    %% ------------------------------------------------------------------
+    TBL_API_statusMaster {
+        int     statusCode PK
+        varchar statusDescription
+    }
+
+    TBL_API_HUNT_Integration {
+        int     IntegrationId PK
+        varchar ProjectName
+        varchar ProjectId
+        datetime PlannedGoLiveDate
+        varchar BusinessSponsor
+        int     Status FK
+        int     Parent_IntegrationId FK
+        int     ConsumerApplicationId FK
+        varchar ConsumerApplication
+        varchar In_Platform
+    }
+
+    tbl_API_hunt_Feedback {
+        int     Feedback_Id PK
+        int     Integration_Id FK
+        LONGTEXT Feedback_Details
+        int     Status
+        varchar AssignTo
+        varchar AssignFrom
+        TINYINT IsActive
+    }
+
+    TBL_API_HUNT_ServiceDetails {
+        int     ServiceID PK
+        int     IntegrationId FK
+        LONGTEXT ServiceName
+        varchar Purpose
+        varchar ConsumerApplication
+        varchar ProducerApplication
+        int     Existing_New_Id
+        int     Rest_SOAP_Id
+        int     ServiceType_Id
+        int     APICategory_Id
+        int     APIRiskScore_Id
+        int     DomainName_Id
+        real    RiskScore
+        varchar Classification
+    }
+
+    %% ------------------------------------------------------------------
+    %% D. QUESTION-RISK ASSESSMENT
+    %% ------------------------------------------------------------------
+    TBL_API_HUNT_ServiceQuestion {
+        int     QID PK
+        varchar Question
+        varchar QuestionType
+        varchar APICategory
+        int     APICategoryId
+        int     Status
+    }
+
+    TBL_API_HUNT_QuestionData {
+        int     ID PK
+        int     QID
+        varchar Options
+        float   Weightage
+        int     Status
+    }
+
+    tbl_API_HUNT_QusServiceDetails {
+        int     QusSerID PK
+        int     ServiceID FK
+        int     QID FK
+        int     OptionsID FK
+        TINYINT IsActive
+    }
+
+    %% ------------------------------------------------------------------
+    %% E. PARTNER ONBOARDING / APPROVAL / AUDIT
+    %% ------------------------------------------------------------------
+    tbl_API_HUNT_Partner_Onboarding {
+        int     PartnetOnboading_ID PK
+        varchar Partner_Name
+        varchar API_name
+        varchar Partnerrisk
+        varchar APIrisk_score
+        int     statusCode FK
+        varchar created_By
+        datetime created_date
+    }
+
+    tbl_API_HUNT_PartnerOnboarding {
+        int     PartnetOnboadingID PK
+        varchar Partner_Name
+        varchar Project_Description
+        datetime TentativeGoLiveDate
+        varchar PartnerType
+        varchar PartnerRisk
+        varchar APIName
+        varchar APIRisk
+    }
+
+    tbl_API_HUNT_PO_ApprovalTrailTable {
+        int     Id PK
+        varchar CaseId
+        varchar Department
+        varchar ApproverLevel
+        varchar ApproverUserID
+        varchar Sequence
+        varchar Status
+    }
+
+    tbl_API_HUNT_PO_ApprovalTrailTable_New {
+        int     Id PK
+        varchar CaseId
+        varchar Department
+        varchar ApproverLevel
+        varchar ApproverUserID
+        varchar Status
+    }
+
+    tbl_API_HUNT_POCaseApproverMetrix {
+        int     ID PK
+        int     caseID FK
+        varchar department
+        varchar Approver_level
+        varchar emailid
+        varchar status
+    }
+
+    tbl_API_HUNT_POFeedbackReply_history {
+        int     Id PK
+        int     CaseID FK
+        int     ApprovalId FK
+        varchar Department
+        varchar feedbackBy
+        varchar Role
+        varchar Status
+        varchar Feedback
+    }
+
+    tbl_API_HUNT_Approval_trace_trial {
+        int     Id PK
+        varchar caseID
+        varchar ApprovalTrialID
+        varchar Department
+        varchar ApprovalLevel
+        varchar Status
+        varchar AssignTo
+    }
+
+    tbl_API_HUNT_Audit_log {
+        int     id PK
+        int     CaseID FK
+        int     ApprovalID FK
+        varchar status
+        varchar createdBy
+        varchar Feedback
+    }
+
+    tbl_API_HUNT_PO_ApiDeatil {
+        int     Id PK
+        varchar CaseId
+        varchar APIName
+        varchar APIRisk
+        varchar APIRiskScore
+    }
+
+    tbl_API_HUNT_PartnerCaseServiceList {
+        int     CaseID
+        varchar APIName
+        int     APIRiskClassification
+        varchar APIStatus
+        datetime DateCreated
+    }
+
+    tbl_API_HUNT_PartnerOffboardning_getdetails {
+        int     ID PK
+        varchar Exit_Scenario
+        varchar Partner_Name
+        varchar API_Name
+        varchar partner_checkilist
+    }
+
+    %% ------------------------------------------------------------------
+    %% F. EXCEPTION MANAGEMENT
+    %% ------------------------------------------------------------------
+    tbl_API_HUNT_ExceptionManagement {
+        int     ID PK
+        varchar CaseId
+        varchar OriginalOnboardingGASID
+        varchar ExceptionRequestor
+        varchar APIProjectName
+        varchar ExceptionLevel
+        date    StartDate
+        date    EndDate
+    }
+
+    TBL_API_HUNT_NewExceptionManagement {
+        int     OriginalOnboardingGASID PK
+        varchar ExceptionRequestor
+        varchar APIProjectName
+        varchar PartenerstobeIntegrated
+        varchar RequestedException
+        varchar DurationofApproval
+        varchar ToDate
+    }
+
+    tbl_API_HUNT_ExceptionLevel {
+        int     apiid
+        varchar ImpactOnbank
+        varchar Level
+    }
+
+    tbl_API_HUNT_MstExceptionApprovalMetrix {
+        varchar ExceptionLevel
+        varchar ApproverType
+        varchar ApproverLevel
+        varchar ApproverUserID
+        varchar ApproverEmail
+    }
+
+    tbl_API_HUNT_MstExepMetrix {
+        varchar ExceptionImpact
+        varchar ExceptionLevel
+    }
+
+    tbl_API_HUNT_MstPartnerCaseApprovalMetrix {
+        varchar PartnerRiskClassification
+        varchar APIRiskClassification
+        varchar ApproverType
+        varchar ApproverUserID
+        varchar ApproverSequence
+    }
+
+    tbl_API_HUNT_MSTPartnerType {
+        varchar PartnerType
+        varchar PartnerEntityType
+        varchar TPRMAapplicable
+    }
+
+    %% ------------------------------------------------------------------
+    %% G. API MAIN / EXTERNAL SERVICE CATALOGUE
+    %% ------------------------------------------------------------------
+    TBL_API_Main {
+        int     TBL_API_Main_ID PK
+        LONGTEXT COD_SERVICE_ID
+        varchar NAM_SERVICE_MIDDLEWARE
+        varchar SERVICE_PROVIDER
+        int     SERVICE_VERSION
+        datetime DAT_GO_LIVE
+        varchar DOMAIN_NAME
+        LONGTEXT FileName
+    }
+
+    TBL_API_Main_Temp {
+        int     TBL_API_Main_ID PK
+        LONGTEXT COD_SERVICE_ID
+        int     SERVICE_VERSION
+        int     CONNECT_TIMEOUT_VALUE
+    }
+
+    TBL_API_Main_Scheduler_Data {
+        LONGTEXT COD_SERVICE_ID
+        varchar NAM_SERVICE_MIDDLEWARE
+        varchar SERVICE_PROVIDER
+        int     SERVICE_VERSION
+        datetime DAT_GO_LIVE
+    }
+
+    Tbl_API_Main_Schedule_ActivityLog {
+        bigint  Id PK
+        LONGTEXT Errormsg
+        varchar Status
+        varchar ModuleName
+        datetime InsertedOn
+    }
+
+    Tbl_API_FilePath {
+        int     Tbl_API_FilePath_Id PK
+        LONGTEXT FileName
+        int     TBL_API_Main_ID FK
+        TINYINT Active
+    }
+
+    TBL_API_EXTERNALSERVICES {
+        int     EXTERNALSERVICE_ID PK
+        LONGTEXT COD_SERVICE_ID
+        varchar NAM_SERVICE_MIDDLEWARE
+        LONGTEXT SERVICE_PROVIDER
+        varchar SERVICE_TYPE
+        varchar API_CAT
+        varchar DOMAIN_NAME
+    }
+
+    TBL_API_HUNT_APIDetails {
+        int     API_ID PK
+        varchar ProjectName
+        int     ProjectId
+        varchar APIName
+        varchar APIUrl
+        varchar Endpoint
+        varchar MethodName
+        TINYINT IsDepricated
+        TINYINT IsHostedOnAPIGW
+    }
+
+    %% ------------------------------------------------------------------
+    %% H. GENERIC MASTERS & UTILITY
+    %% ------------------------------------------------------------------
+    TBL_API_Master {
+        int     API_Master_ID PK
+        varchar Value
+        LONGTEXT Description
+    }
+
+    TBL_API_Master_Values {
+        int     Id PK
+        int     API_Master_ID FK
+        LONGTEXT Value
+        LONGTEXT Description
+    }
+
+    TBL_API_URLMaster {
+        int     ID PK
+        varchar URLName
+        varchar URL
+        int     Status
+    }
+
+    tbl_Mofee_Url {
+        int     ID PK
+        varchar URL
+        TINYINT Is_active
+    }
+
+    tbl_API_hunt_Misccd {
+        int     MisccdId
+        varchar CDTP
+        varchar CDValDesc
+        int     Seq
+        int     Status
+    }
+
+    %% ==================================================================
+    %%  DECLARED FOREIGN KEY RELATIONSHIPS (18 total)
+    %% ==================================================================
+
+    %% User / Profile
+    ProfileMaster ||--o{ UserMaster : "has"
+
+    %% Integration graph
+    TBL_API_statusMaster       ||--o{ TBL_API_HUNT_Integration       : "status"
+    TBL_API_HUNT_Integration   ||--o{ TBL_API_HUNT_Integration       : "parent"
+    tbl_API_MstApplications    ||--o{ TBL_API_HUNT_Integration       : "consumer app"
+    TBL_API_HUNT_Integration   ||--o{ tbl_API_hunt_Feedback          : "has feedback"
+    TBL_API_HUNT_Integration   ||--o{ TBL_API_HUNT_ServiceDetails    : "contains services"
+
+    %% SPOC
+    tbl_API_MstApplications    ||--o{ tbl_API_ApplicationsSPOC       : "has SPOC"
+
+    %% Risk questionnaire
+    TBL_API_HUNT_ServiceDetails  ||--o{ tbl_API_HUNT_QusServiceDetails : "answers"
+    TBL_API_HUNT_ServiceQuestion ||--o{ tbl_API_HUNT_QusServiceDetails : "question"
+    TBL_API_HUNT_QuestionData    ||--o{ tbl_API_HUNT_QusServiceDetails : "option"
+
+    %% Partner Onboarding
+    TBL_API_statusMaster               ||--o{ tbl_API_HUNT_Partner_Onboarding         : "status"
+    tbl_API_HUNT_Partner_Onboarding    ||--o{ tbl_API_HUNT_POCaseApproverMetrix       : "approver"
+    tbl_API_HUNT_Partner_Onboarding    ||--o{ tbl_API_HUNT_POFeedbackReply_history    : "reply"
+    tbl_API_HUNT_PO_ApprovalTrailTable ||--o{ tbl_API_HUNT_POFeedbackReply_history    : "reply on"
+    tbl_API_HUNT_Partner_Onboarding    ||--o{ tbl_API_HUNT_Audit_log                  : "logged"
+    tbl_API_HUNT_PO_ApprovalTrailTable ||--o{ tbl_API_HUNT_Audit_log                  : "approval audit"
+
+    %% API Main
+    TBL_API_Main   ||--o{ Tbl_API_FilePath      : "has file"
+    TBL_API_Master ||--o{ TBL_API_Master_Values : "values"
